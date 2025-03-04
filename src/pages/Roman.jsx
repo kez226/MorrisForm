@@ -142,7 +142,7 @@ const Roman = () => {
                     Clutch Lift
                 </label> <br></br>
                 {opFunction === 'lift' && <div>
-                    <label>
+                    <label style={{marginLeft:'25px'}}>
                         What color bead chain would you like?
                         <input></input>
                     </label>
