@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/MorrisForm/static/css/main.ffa2a6a9.css",
+    "main.js": "/MorrisForm/static/js/main.76928f1a.js",
+    "static/js/453.0b604e00.chunk.js": "/MorrisForm/static/js/453.0b604e00.chunk.js",
+    "index.html": "/MorrisForm/index.html",
+    "main.ffa2a6a9.css.map": "/MorrisForm/static/css/main.ffa2a6a9.css.map",
+    "main.76928f1a.js.map": "/MorrisForm/static/js/main.76928f1a.js.map",
+    "453.0b604e00.chunk.js.map": "/MorrisForm/static/js/453.0b604e00.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ffa2a6a9.css",
+    "static/js/main.76928f1a.js"
+  ]
+}
