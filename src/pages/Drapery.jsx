@@ -89,6 +89,7 @@ const Drapery = () => {
 
         let formData = new FormData();
         formData.append('Sheet', 'Drapery');
+        //formData.append('Img', windowImg);
         let date = new Date(Date.now());
         formData.append('Date', date.toLocaleString());
         formData.append('Units1', units1);
