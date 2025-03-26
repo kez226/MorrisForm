@@ -17,20 +17,19 @@ const Drapery = () => {
     const[com, setCom] = useState('');
     const[mainrailroad, setMainRailroad] = useState('');
     const[contrastrailroad, setContrastRailroad] = useState('');
-    const[units1, setUnits1] = useState('');
-    const[units2, setUnits2] = useState('');
-    const[units3, setUnits3] = useState('');
-    const GoogleSheets = process.env.Google_Sheets_Endpoint;
+    const[units1, setUnits1] = useState('in');
+    const[units2, setUnits2] = useState('in');
+    const[units3, setUnits3] = useState('in');
 
     const fractions = [
         { label: '0', value: 0},
-        { label: '1/8', value: .125 },
-        { label: '2/8', value: .25 },
-        { label: '3/8', value: .375 },
-        { label: '4/8', value: .5 },
-        { label: '5/8', value: .625 },
-        { label: '6/8', value: .75 },
-        { label: '7/8', value: .875 }
+        { label: '1/8', value: '.125' },
+        { label: '1/4', value: '.25' },
+        { label: '3/8', value: '.375' },
+        { label: '1/2', value: '.5' },
+        { label: '5/8', value: '.625' },
+        { label: '3/4', value: '.75' },
+        { label: '7/8', value: '.875' }
     ];
 
     const handleImageUpload = (event) => {setWindowImg(event.target.files[0]);}
@@ -130,6 +129,14 @@ const Drapery = () => {
         formData.append('Units2', units2);
         formData.append('Mainvendor', document.getElementById('mainvendor').value);
         formData.append('Mainpattern', document.getElementById('mainpattern').value);
+
+        let mainlink = document.getElementById('mainlink').value;
+        if (mainlink == null || mainlink === ""){
+            mainlink = document.getElementById('mainvendor').value + "+" + document.getElementById('mainpattern').value;
+            mainlink = "https://www.google.com/search?q=" + mainlink.replace(/[^a-zA-Z0-9]+/g, '+')  // Replace non-alphanumeric characters with "+"
+                    .replace(/^\+|(\++)/g, '+');
+        }
+        formData.append('Mainlink', mainlink);
         formData.append('Mainwidth', document.getElementById('mainwidth').value + mainWidth);
         formData.append('Mainvert', document.getElementById('mainvert').value + mainVertical);
         formData.append('Mainhorizontal', document.getElementById('mainhorizontal').value + mainHorizontal);
@@ -138,26 +145,35 @@ const Drapery = () => {
         formData.append('Units3', units3);
         formData.append('Contrastvendor', document.getElementById('contrastvendor').value);
         formData.append('Contrastpattern', document.getElementById('contrastpattern').value);
+        let contrlink = document.getElementById('contrlink').value;
+        if (contrlink == null || contrlink === ""){
+            contrlink = document.getElementById('contrastvendor').value + '+' + document.getElementById('contrastpattern').value;
+            contrlink = "https://www.google.com/search?q=" + contrlink.replace(/[^a-zA-Z0-9]+/g, '+')  // Replace non-alphanumeric characters with "+"
+            .replace(/^\+|(\++)/g, '+');
+        }
+        formData.append('Contrastlink', contrlink);
         formData.append('Contrastwidth', document.getElementById('contrastwidth').value + contrastHorizontal);
         formData.append('Contrastvert', document.getElementById('contrastvert').value + contrastVertical);
         formData.append('Contrasthorizontal', document.getElementById('contrasthorizontal').value + contrastHorizontal);
         formData.append('Contrastrailroad', contrastrailroad);
         formData.append('Where', document.getElementById('where').value);
 
+        // console.log(mainlink);
+        // console.log(contrlink);
 
-        // formData.forEach((value, key) => {
-        //     console.log(key, value); // Logs each key-value pair
-        //   });
+        formData.forEach((value, key) => {
+            console.log(key, value); // Logs each key-value pair
+          });
 
-        fetch("https://script.google.com/macros/s/AKfycby5yAFqA-cl6Q7YTWA-XLZSYWPyAt-ji-2G7kbx4U7EZ9iic4SP-eZeHEA0K0FP95iMrw/exec", {
-            method: 'POST',
-            body: formData,
-        }).then(res => res.json())
-        .then(data => {
-            console.log(data);
-            alert(data.msg);
-        })
-        .catch(err => console.log(err));
+        // fetch("https://script.google.com/macros/s/AKfycby5yAFqA-cl6Q7YTWA-XLZSYWPyAt-ji-2G7kbx4U7EZ9iic4SP-eZeHEA0K0FP95iMrw/exec", {
+        //     method: 'POST',
+        //     body: formData,
+        // }).then(res => res.json())
+        // .then(data => {
+        //     console.log(data);
+        //     alert(data.msg);
+        // })
+        // .catch(err => console.log(err));
     }
 
     useEffect(() => {
@@ -198,7 +214,7 @@ const Drapery = () => {
             <label>
                 <input style={{marginLeft:'25px'}} value='cm' type='radio' name='units1' onChange={handleUnits1}></input> Centimeters
                 <input value='in' type='radio' name='units1' onChange={handleUnits1}
-                    style={{marginLeft:'25px'}}></input> Inches
+                    style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
             </label>
             <div>
                 <label>
@@ -454,7 +470,7 @@ const Drapery = () => {
                 <label>
                     <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units2' onChange={handleUnits2}></input> Centimeters
                     <input value='in' type='radio' name='units2' onChange={handleUnits2}
-                        style={{marginLeft:'25px'}}></input> Inches
+                        style={{marginLeft:'25px'}} checked={units2 === 'in'}></input> Inches
                 </label>
                 <br></br><label>
                     Vendor:
@@ -465,6 +481,9 @@ const Drapery = () => {
                     <input type='text' id='mainpattern' style={{marginLeft:'15px'}}></input>
                 </label>
                 <br></br><label>
+                    Link to fabric if available:
+                    <input type='href' id='mainlink' placeholder=' ' style={{marginLeft:'13px'}}></input>
+                </label><br></br><label>
                     Width:
                     <input type='number' id='mainwidth' style={{marginLeft:'144px'}}></input>
                 </label>
@@ -514,7 +533,7 @@ const Drapery = () => {
                 <label>
                     <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units3' onChange={handleUnits3}></input> Centimeters
                     <input value='in' type='radio' name='units3' onChange={handleUnits3}
-                        style={{marginLeft:'25px'}}></input> Inches
+                        style={{marginLeft:'25px'}} checked={units3 === 'in'}></input> Inches
                 </label>
                 <br></br><label>
                     Vendor:
@@ -525,6 +544,9 @@ const Drapery = () => {
                     <input type='text' id='contrastpattern' style={{marginLeft:'15px'}}></input>
                 </label>
                 <br></br><label>
+                    Link to fabric if available:
+                    <input type='href' id='contrlink' style={{marginLeft:'13px'}}></input>
+                </label><br></br><label>
                     Width:
                     <input type='number' id='contrastwidth' style={{marginLeft:'144px'}}></input>
                 </label>

@@ -6,7 +6,7 @@ const Roman = () => {
     const[stationary,setStationary] = useState('');
     const[opFunction, setOpFunction] = useState('');
     const[motorType, setMotorType] = useState('');
-    const[hardwired, setHardwired] = useState('');
+    // const[hardwired, setHardwired] = useState('');
     const[homeAuto, setHomeAuto] = useState('');
     const[lined, setLined] = useState('');
     const[lining, setLining] = useState('');
@@ -14,9 +14,9 @@ const Roman = () => {
     const[mainrailroad, setMainRailroad] = useState('');
     const[contrastrailroad, setContrastRailroad] = useState('');
 
-    const[units1, setUnits1] = useState('');
-    const[units2, setUnits2] = useState('');
-    const[units3, setUnits3] = useState('');
+    const[units1, setUnits1] = useState('in');
+    const[units2, setUnits2] = useState('in');
+    const[units3, setUnits3] = useState('in');
 
     const [f2fw, f2fwc] = useState('');
     const [f2fh, f2fhc] = useState('');
@@ -32,7 +32,7 @@ const Roman = () => {
     const handleStationary = (event) =>{setStationary(event.target.value);}
     const handleOpFunction = (event) => {setOpFunction(event.target.value);}
     const handleMotorChange = (event) => {setMotorType(event.target.value);}
-    const handleHardwired = (event) => {setHardwired(event.target.value);}
+    //const handleHardwired = (event) => {setHardwired(event.target.value);}
     const handleHomeAuto = (event) => {setHomeAuto(event.target.value);}
     const handleLined = (event) => {setLined(event.target.value);}
     const handleLining = (event) => {setLining(event.target.value);}
@@ -67,13 +67,13 @@ const Roman = () => {
 
     const fractions = [
         { label: '0', value: 0},
-        { label: '1/8', value: .125 },
-        { label: '2/8', value: .25 },
-        { label: '3/8', value: .375 },
-        { label: '4/8', value: .5 },
-        { label: '5/8', value: .625 },
-        { label: '6/8', value: .75 },
-        { label: '7/8', value: .875 }
+        { label: '1/8', value: '.125' },
+        { label: '2/8', value: '.25' },
+        { label: '3/8', value: '.375' },
+        { label: '4/8', value: '.5' },
+        { label: '5/8', value: '.625' },
+        { label: '6/8', value: '.75' },
+        { label: '7/8', value: '.875' }
     ];
 
     const submitForm = (e) => {
@@ -102,13 +102,13 @@ const Roman = () => {
                 formData.append('F2fw', document.getElementById('of2fw').value);
                 formData.append('F2fh', document.getElementById('of2fh').value);
                 formData.append('Abvc', document.getElementById('abvc').value);
-                formData.append('F2fh', document.getElementById('f2fh').value);
+                formData.append('Abvf', document.getElementById('abvf').value);
             }
             else{
                 formData.append('F2fw', document.getElementById('of2fw').value + f2fw);
-                formData.append('F2fh', document.getElementById('of2fh').value);
-                formData.append('Abvc', document.getElementById('abvc').value);
-                formData.append('Abvf', document.getElementById('abvf').value + f2fh);
+                formData.append('F2fh', document.getElementById('of2fh').value + f2fh);
+                formData.append('Abvc', document.getElementById('abvc').value + abvc);
+                formData.append('Abvf', document.getElementById('abvf').value + abvf);
             }
         }
 
@@ -117,8 +117,8 @@ const Roman = () => {
         if(opFunction === 'lift'){formData.append('OpFunc', opFunction + document.getElementById('lift-color').value);}
         else if (opFunction === 'motorized'){
             if(motorType === 'hardwired'){
-                if(hardwired !== 'yes'){}
-                else{}
+                if(homeAuto === 'no') {formData.append('OpFunc', opFunction + ' ' + motorType + ' no existing home auto');}
+                else{formData.append('OpFunc', opFunction + ' ' + motorType + ' existing home auto: ' + document.getElementById('homeauto').value);}
             }
             else{formData.append('OpFunc', opFunction + motorType);}
         }
@@ -137,10 +137,24 @@ const Roman = () => {
         formData.append('Mainvert', document.getElementById('mainvert').value + mainVertical);
         formData.append('Mainhorizontal', document.getElementById('mainhorizontal').value + mainHorizontal);
         formData.append('Mainrailroad', mainrailroad);
+        let mainlink = document.getElementById('mainlink').value;
+        if (mainlink == null || mainlink === ""){
+            mainlink = document.getElementById('mainvendor').value + "+" + document.getElementById('mainpattern').value;
+            mainlink = "https://www.google.com/search?q=" + mainlink.replace(/[^a-zA-Z0-9]+/g, '+')  // Replace non-alphanumeric characters with "+"
+                    .replace(/^\+|(\++)/g, '+');
+        }
+        formData.append('Mainlink', mainlink);
 
         formData.append('Units3', units3);
         formData.append('Contrastvendor', document.getElementById('contrastvendor').value);
         formData.append('Contrastpattern', document.getElementById('contrastpattern').value);
+        let contrlink = document.getElementById('contrlink').value;
+        if (contrlink == null || contrlink === ""){
+            contrlink = document.getElementById('contrastvendor').value + '+' + document.getElementById('contrastpattern').value;
+            contrlink = "https://www.google.com/search?q=" + contrlink.replace(/[^a-zA-Z0-9]+/g, '+')  // Replace non-alphanumeric characters with "+"
+            .replace(/^\+|(\++)/g, '+');
+        }
+        formData.append('Contrastlink', contrlink);
         formData.append('Contrastwidth', document.getElementById('contrastwidth').value + contrastHorizontal);
         formData.append('Contrastvert', document.getElementById('contrastvert').value + contrastVertical);
         formData.append('Contrasthorizontal', document.getElementById('contrasthorizontal').value + contrastHorizontal);
@@ -148,19 +162,19 @@ const Roman = () => {
         formData.append('Where', document.getElementById('where').value);
 
 
-        formData.forEach((value, key) => {
-            console.log(key, value); // Logs each key-value pair
-          });
+        // formData.forEach((value, key) => {
+        //     console.log(key, value); // Logs each key-value pair
+        //   });
 
-        // fetch("https://script.google.com/macros/s/AKfycby5yAFqA-cl6Q7YTWA-XLZSYWPyAt-ji-2G7kbx4U7EZ9iic4SP-eZeHEA0K0FP95iMrw/exec", {
-        //     method: 'POST',
-        //     body: formData,
-        // }).then(res => res.json())
-        // .then(data => {
-        //     console.log(data);
-        //     alert(data.msg);
-        // })
-        // .catch(err => console.log(err));
+        fetch("https://script.google.com/macros/s/AKfycby5yAFqA-cl6Q7YTWA-XLZSYWPyAt-ji-2G7kbx4U7EZ9iic4SP-eZeHEA0K0FP95iMrw/exec", {
+            method: 'POST',
+            body: formData,
+        }).then(res => res.json())
+        .then(data => {
+            console.log(data);
+            alert(data.msg);
+        })
+        .catch(err => console.log(err));
     }
 
     const Dropdown =({ value, change}) => { 
@@ -189,7 +203,7 @@ const Roman = () => {
             <label>
                 <input style={{marginLeft:'25px'}} value='cm' type='radio' name='units1' onChange={handleUnits1}></input> Centimeters
                 <input value='in' type='radio' name='units1' onChange={handleUnits1}
-                    style={{marginLeft:'25px'}}></input> Inches
+                    style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
             </label><br></br>
             Where are we mounting?
             <div>
@@ -326,31 +340,19 @@ const Roman = () => {
                         value={'hardwired'} onChange={handleMotorChange}></input>
                         Hardwired
                     </label> <br></br>
-                    {motorType === 'hardwired' && <div>
-                        <label> 
-                            <input type='radio' name='hardwired' style={{marginRight:'5px', marginLeft:"50px"}}
-                            value={'no'} onChange={handleHardwired}></input>
+                    {motorType === 'hardwired' && <div style={{marginLeft:'50px'}}>
+                        Is there an existing home-automation system?
+                        <br></br><label> 
+                            <input type='radio' name='homeAuto' style={{marginRight:'5px'}}
+                            value={'no'} onChange={handleHomeAuto}></input>
                             No
                         </label> <br></br>
                         <label>
-                            <input type='radio' name='hardwired' style={{marginRight:'5px', marginLeft:"50px"}}
-                            value={'yes'} onChange={handleHardwired}></input>
-                            Yes
-                        </label>
-                        {hardwired === 'yes' && <div style={{marginRight:'5px', marginLeft:"50px"}}>
-                            Is there an existing home-automation system?
-                            <br></br><label> 
-                                <input type='radio' name='homeAuto' style={{marginRight:'5px', marginLeft:"25px"}}
-                                value={'no'} onChange={handleHomeAuto}></input>
-                                No
-                            </label> <br></br>
-                            <label>
-                                <input type='radio' name='homeAuto' style={{marginRight:'5px', marginLeft:"25px"}}
-                                value={'yes'} onChange={handleHomeAuto}></input>
-                                Yes (what is it)?
-                                    <input></input>
-                            </label><br></br><br></br>
-                        </div>}
+                            <input type='radio' name='homeAuto' style={{marginRight:'5px'}}
+                            value={'yes'} onChange={handleHomeAuto}></input>
+                            Yes (what is it)?
+                                <input id='homeauto'></input>
+                        </label><br></br>
                     </div>}
                 </div>}
                 <br></br>
@@ -409,7 +411,7 @@ const Roman = () => {
                 <label>
                     <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units2' onChange={handleUnits2}></input> Centimeters
                     <input value='in' type='radio' name='units2' onChange={handleUnits2}
-                        style={{marginLeft:'25px'}}></input> Inches
+                        style={{marginLeft:'25px'}} checked={units2 === 'in'}></input> Inches
                 </label>
                 <br></br><label>
                     Vendor:
@@ -418,6 +420,9 @@ const Roman = () => {
                 <br></br><label>
                     Pattern name & number:
                     <input type='text' id='mainpattern' style={{marginLeft:'15px'}}></input>
+                </label><br></br><label>
+                    Link to fabric if available:
+                    <input type='href' id='mainlink' placeholder=' ' style={{marginLeft:'13px'}}></input>
                 </label>
                 <br></br><label>
                     Width:
@@ -469,7 +474,7 @@ const Roman = () => {
                 <label>
                     <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units3' onChange={handleUnits3}></input> Centimeters
                     <input value='in' type='radio' name='units3' onChange={handleUnits3}
-                        style={{marginLeft:'25px'}}></input> Inches
+                        style={{marginLeft:'25px'}} checked={units2 === 'in'}></input> Inches
                 </label>
                 <br></br><label>
                     Vendor:
@@ -478,6 +483,10 @@ const Roman = () => {
                 <br></br><label>
                     Pattern name & number:
                     <input type='text' id='contrastpattern' style={{marginLeft:'15px'}}></input>
+                </label>
+                <br></br><label>
+                    Link to fabric if available:
+                    <input type='href' id='contrlink' placeholder=' ' style={{marginLeft:'13px'}}></input>
                 </label>
                 <br></br><label>
                     Width:
@@ -524,7 +533,7 @@ const Roman = () => {
                 </label><br></br><br></br>
                 Please specify where the contrast fabric will be used:
                 <input id='where'></input>
-            </div><br></br><br></br>
+            </div><br></br>
 
             <button onClick={submitForm}>Submit</button>
         </div>
