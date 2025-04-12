@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-const Roman = () => {
+const Roman = (text) => {
+    const name = text;
     const[windowImg, setWindowImg] = useState(null);
     const[mount, setMount] = useState('');
     const[stationary,setStationary] = useState('');

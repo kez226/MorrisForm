@@ -1,5 +1,4 @@
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
+import '../App.css';
 
 import Drapery from './Drapery';
 import Roman from './Roman';
@@ -8,30 +7,48 @@ import HardTreatments from './HardTreatments';
 import React, { useState } from 'react';
 
 const Window = () => {
+  const [pname,setPName] = useState('');
+  const [address,setAddress] = useState('');
+  const [name,setName] = useState('');
+  const [contact,setContact] = useState('');
   const [existingTreatment, setExistingTreatment] = useState(false);
   const [drapery, setDrapery] = useState(false);
   const [roman, setRoman] = useState(false);
   const [valence, setValence] = useState(false);
   const [hard, setHard] = useState(false);
 
-  const handleExistingChange = (event) => {
-    setExistingTreatment(event.target.value);
-  };
-
+  const handleNameChange = (event) => {setName(event.target.value);};
+  const handlePName = (event) => {setPName(event.target.value);};
+  const handleAddress= (event) => {setAddress(event.target.value);};
+  const handleContactChange = (event) => {setContact(event.target.value);};
+  const handleExistingChange = (event) => {setExistingTreatment(event.target.value);};
   const handleDraperyChange = (event) => {
-    setDrapery(event.target.checked);
+    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+      setDrapery(event.target.checked);
+    }else{
+      alert('Please enter your name and email');
+    }
   };
-
   const handleRomanChange = (event) => {
-    setRoman(event.target.checked);
+    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+      setRoman(event.target.checked);
+    }else{
+      alert('Please enter your name and email');
+    }
   };
-
   const handleValenceChange = (event) => {
-    setValence(event.target.checked);
+    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+      setValence(event.target.checked);
+    }else{
+      alert('Please enter your name and email');
+    }
   };
-
   const handleHardChange = (event) => {
-    setHard(event.target.checked);
+    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+      setHard(event.target.checked);
+    }else{
+      alert('Please enter your name and email');
+    }
   };
 
   return(<>
@@ -48,11 +65,36 @@ const Window = () => {
       </h3>
 
       <div style={{marginLeft: '20px', paddingBottom: '20px'}}>
-        <form name="windowTreatment">
-          <label>Room: </label><br></br>
-          <input type='text' id='room' style={{width: '200px'}}></input><br></br><br></br>
-          <label>Number of windows: </label><br></br>
-          <input type='number' id='windowNum' style={{width: '200px'}}></input> <br></br><br></br>
+        <div className="row">
+          <div className='column'>
+            <label>Project Name: </label><br></br>
+            <input type='text' id='pname' style={{width: '200px'}} onChange={handlePName}></input>
+          </div>
+          <div className='column'>
+            <label>Name: </label><br></br>
+            <input type='text' id='name' style={{width: '200px'}} onChange={handleNameChange}></input>
+          </div>
+          <div className='column'>
+            <label>Address: </label><br></br>
+            <input type='text' id='address' style={{width: '200px'}} onChange={handleAddress}></input>
+          </div>
+          <div className='column'>
+            <label>Email: </label><br></br>
+            <input type='email' id='contact' style={{width: '200px'}} onChange={handleContactChange}></input>
+          </div>
+          <br></br><br></br><br></br>
+          <div className='column'>
+            <label>Room: </label><br></br>
+            <input type='text' id='room' style={{width: '200px'}}></input>
+          </div>
+          <div className='column'>
+            <label>Number of windows: </label><br></br>
+            <input type='number' id='windowNum' style={{width: '200px'}}></input>
+          </div>
+          <div className='column'></div>
+          <div className='column'></div>
+        </div>
+        <br></br>
 
           Are there existing window treatments Plaza Park needs to take down / dispose of?
           <br></br><label> 
@@ -87,18 +129,14 @@ const Window = () => {
             checked={hard} onChange={handleHardChange}></input>
             Hard treatments (roller shades, woven woods, wood blinds, honeycomb shade, sheer shade)
           </label>
-        </form> 
-        
-
-        {/* <DropdownButton id="dropdown-basic-button" title="Dropdown button">
-          <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-          <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-          <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-        </DropdownButton> */}
       </div>
     </div></div>
 
-      {drapery && <div style={{padding:'5px'}}><Drapery></Drapery></div>}
+      {drapery && <div style={{padding:'5px'}}><Drapery 
+      name={name} pname={pname} address={address} email={contact}
+      room={document.getElementById('room').value}
+      numWindow={document.getElementById('windowNum').value}
+      ></Drapery></div>}
       {roman && <div style={{padding:'5px'}}><Roman></Roman></div>}
       {valence && <div style={{padding:'5px'}}><Valance></Valance></div>}
       {hard && <div style={{padding:'5px'}}><HardTreatments></HardTreatments></div>}
