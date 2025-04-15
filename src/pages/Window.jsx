@@ -4,52 +4,82 @@ import Drapery from './Drapery';
 import Roman from './Roman';
 import Valance from './Valence';
 import HardTreatments from './HardTreatments';
-import React, { useState } from 'react';
+import Pillows from './Pillows';
+import Cushions from './Cushions';
+import React, { useEffect, useState } from 'react';
+import Popup from './Popup';
 
 const Window = () => {
   const [pname,setPName] = useState('');
   const [address,setAddress] = useState('');
   const [name,setName] = useState('');
   const [contact,setContact] = useState('');
+  const [room,setRoom] = useState('');
+  const [windows,setWindows] = useState('');
   const [existingTreatment, setExistingTreatment] = useState(false);
   const [drapery, setDrapery] = useState(false);
   const [roman, setRoman] = useState(false);
   const [valence, setValence] = useState(false);
   const [hard, setHard] = useState(false);
+  const [pillows, setPillow] = useState(false);
+  const [cushions, setCushion] = useState(false);
+
+  const [uploads, setUploads] = useState(0);
 
   const handleNameChange = (event) => {setName(event.target.value);};
   const handlePName = (event) => {setPName(event.target.value);};
   const handleAddress= (event) => {setAddress(event.target.value);};
   const handleContactChange = (event) => {setContact(event.target.value);};
+  const handleRoom = (event) => {setRoom(event.target.value);};
+  const handleWindows = (event) => {setWindows(event.target.value);};
   const handleExistingChange = (event) => {setExistingTreatment(event.target.value);};
   const handleDraperyChange = (event) => {
-    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+    if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
       setDrapery(event.target.checked);
     }else{
       alert('Please enter your name and email');
     }
   };
   const handleRomanChange = (event) => {
-    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+    if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
       setRoman(event.target.checked);
     }else{
       alert('Please enter your name and email');
     }
   };
   const handleValenceChange = (event) => {
-    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+    if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
       setValence(event.target.checked);
     }else{
       alert('Please enter your name and email');
     }
   };
   const handleHardChange = (event) => {
-    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+    if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
       setHard(event.target.checked);
     }else{
       alert('Please enter your name and email');
     }
   };
+  const handlePillow = (event) => {
+    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+      setPillow(event.target.checked);
+    }else{
+      alert('Please enter your name and email');
+    }
+  };
+  const handleCushion = (event) => {
+    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+      setCushion(event.target.checked);
+    }else{
+      alert('Please enter your name and email');
+    }
+  };
+
+  useEffect(() => {
+    setWindows('');
+    setRoom('');
+  },[uploads])
 
   return(<>
     <div style={{padding:'5px'}}> <div style={{border: 'grey solid 1px', padding:'5px'}}>
@@ -85,11 +115,11 @@ const Window = () => {
           <br></br><br></br><br></br>
           <div className='column'>
             <label>Room: </label><br></br>
-            <input type='text' id='room' style={{width: '200px'}}></input>
+            <input type='text' id='room' style={{width: '200px'}} onChange={handleRoom} value={room}></input>
           </div>
           <div className='column'>
             <label>Number of windows: </label><br></br>
-            <input type='number' id='windowNum' style={{width: '200px'}}></input>
+            <input type='number' id='windowNum' style={{width: '200px'}} onChange={handleWindows} value={windows}></input>
           </div>
           <div className='column'></div>
           <div className='column'></div>
@@ -109,26 +139,51 @@ const Window = () => {
           </label><br></br><br></br>
 
           What type of treatment are you interested in:
-          <br></br><label>
-            <input type='checkbox' style={{marginRight:'5px'}}
-            checked={drapery} onChange={handleDraperyChange}></input>
-            Drapery
-          </label><br></br>
-          <label>
-            <input type='checkbox' style={{marginRight:'5px'}}
-            checked={roman} onChange={handleRomanChange}></input>
-            Roman shades
-          </label><br></br>
-          <label>
-            <input type='checkbox' style={{marginRight:'5px'}}
-            checked={valence} onChange={handleValenceChange}></input>
-            Valance / cornice
-          </label><br></br>
-          <label>
-            <input type='checkbox' style={{marginRight:'5px'}}
-            checked={hard} onChange={handleHardChange}></input>
-            Hard treatments (roller shades, woven woods, wood blinds, honeycomb shade, sheer shade)
-          </label>
+          <br></br><br></br>
+          <div>
+            Window treatments:
+            <br></br>
+            <label>
+              <input type='checkbox' style={{marginRight:'5px'}}
+              checked={drapery} onChange={handleDraperyChange}></input>
+              Drapery
+            </label>
+
+            {/* <Popup></Popup> */}
+
+
+            <br></br>
+            <label>
+              <input type='checkbox' style={{marginRight:'5px'}}
+              checked={roman} onChange={handleRomanChange}></input>
+              Roman shades
+            </label><br></br>
+            <label>
+              <input type='checkbox' style={{marginRight:'5px'}}
+              checked={valence} onChange={handleValenceChange}></input>
+              Valance / cornice
+            </label><br></br>
+            <label>
+              <input type='checkbox' style={{marginRight:'5px'}}
+              checked={hard} onChange={handleHardChange}></input>
+              Hard treatments (roller shades, woven woods, wood blinds, honeycomb shade, sheer shade)
+            </label>
+          </div><br></br>
+
+          <div>
+            Pillows/cushions:
+            <br></br>
+            <label>
+              <input type='checkbox' style={{marginRight:'5px'}}
+              checked={pillows} onChange={handlePillow}></input>
+              Pillows
+            </label><br></br>
+            <label>
+              <input type='checkbox' style={{marginRight:'5px'}}
+              checked={cushions} onChange={handleCushion}></input>
+              Cushions
+            </label>
+          </div>
       </div>
     </div></div>
 
@@ -136,10 +191,15 @@ const Window = () => {
       name={name} pname={pname} address={address} email={contact}
       room={document.getElementById('room').value}
       numWindow={document.getElementById('windowNum').value}
+      uploads={setUploads}
       ></Drapery></div>}
       {roman && <div style={{padding:'5px'}}><Roman></Roman></div>}
       {valence && <div style={{padding:'5px'}}><Valance></Valance></div>}
       {hard && <div style={{padding:'5px'}}><HardTreatments></HardTreatments></div>}
+      {pillows && <div style={{padding:'5px'}}><Pillows
+      name={name} pname={pname} address={address} email={contact}></Pillows></div>}
+      {cushions && <div style={{padding:'5px'}}><Cushions
+      name={name} pname={pname} address={address} email={contact}></Cushions></div>}
   </>)
 }
 

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { gapi } from "gapi-script";
+import { initGoogleAuth, signIn } from "./googleAuth";
 //import .env;
 
-const Drapery = () => {
+const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
     const[windowImg, setWindowImg] = useState(null);
     const[stationary, setStationary] = useState(false);
     const[lined, setLined] = useState('');
@@ -32,7 +34,22 @@ const Drapery = () => {
         { label: '7/8', value: '.875' }
     ];
 
-    const handleImageUpload = (event) => {setWindowImg(event.target.files[0]);}
+    const handleImageUpload = (event) => {
+        if (event.target.files.length > 5){
+            setWindowImg(null);
+            alert("Please select no more than five files");
+
+        }
+        else{
+            for (const file of event.target.files){
+                if (file.size > 10 * 1024 * 1024){
+                    alert(file.name + " is too big to upload");
+                    return;
+                }
+            }
+            setWindowImg(event.target.files);
+        }
+    }
     const handleRipple = (event) => {setRipplePercent(event.target.value);}
     const handleStationaryChange = (event) => {setStationary(event.target.value);}
     const handleLinedChange = (event) => {setLined(event.target.value);}
@@ -88,9 +105,14 @@ const Drapery = () => {
 
         let formData = new FormData();
         formData.append('Sheet', 'Drapery');
-        //formData.append('Img', windowImg);
         let date = new Date(Date.now());
         formData.append('Date', date.toLocaleString());
+        formData.append('PName', pname);
+        formData.append('Name', name);
+        formData.append('Address', address);
+        formData.append('Email', email);
+        formData.append('Room', room);
+        formData.append('Windows', numWindow);
         formData.append('Units1', units1);
         if (units1 !== 'in'){
             formData.append('F2fw', document.getElementById('f2fw').value);
@@ -158,22 +180,23 @@ const Drapery = () => {
         formData.append('Contrastrailroad', contrastrailroad);
         formData.append('Where', document.getElementById('where').value);
 
-        // console.log(mainlink);
-        // console.log(contrlink);
+        // formData.forEach((value, key) => {
+        //     console.log(key, value); // Logs each key-value pair
+        //   });
 
-        formData.forEach((value, key) => {
-            console.log(key, value); // Logs each key-value pair
-          });
+        fetch("https://script.google.com/macros/s/AKfycbwlwY47vpYlfYv8YA43q9TFm0VYSJiVuKlPV4m5OGt15_SBQsKkWBVJ-B5vAi1yiTdizg/exec", {
+            method: 'POST',
+            body: formData,
+        }).then(res => res.json())
+        .then(data => {
+            console.log(data);
+            uploads(prev => prev + 1);
+            alert(data.msg);
+        })
+        .catch(err => console.log(err));
 
-        // fetch("https://script.google.com/macros/s/AKfycby5yAFqA-cl6Q7YTWA-XLZSYWPyAt-ji-2G7kbx4U7EZ9iic4SP-eZeHEA0K0FP95iMrw/exec", {
-        //     method: 'POST',
-        //     body: formData,
-        // }).then(res => res.json())
-        // .then(data => {
-        //     console.log(data);
-        //     alert(data.msg);
-        // })
-        // .catch(err => console.log(err));
+        // uploadFile();
+        uploadAllFiles();
     }
 
     useEffect(() => {
@@ -182,8 +205,58 @@ const Drapery = () => {
         }
     },[pleat])
 
-    //still need to implement some form handling with the box input values
+    const uploadFile = () => {
+        for (const file of windowImg){
+            const fr = new FileReader();
+            fr.readAsArrayBuffer(file);
+            fr.onload = f => {
+                
+                const url = "https://script.google.com/macros/s/AKfycbwlwY47vpYlfYv8YA43q9TFm0VYSJiVuKlPV4m5OGt15_SBQsKkWBVJ-B5vAi1yiTdizg/exec";
+                
+                const qs = new URLSearchParams({filename: file.name, mimeType: file.type});
+                fetch(`${url}?${qs}`, {method: "POST", body: JSON.stringify([...new Int8Array(f.target.result)])})
+                .then(res => res.json())
+                .then(e => console.log(e))
+                .catch(err => console.log(err));
+            }
+        }
+        alert("Images uploaded");
+    };
 
+    async function uploadAllFiles() {
+        const url = "https://script.google.com/macros/s/AKfycbwlwY47vpYlfYv8YA43q9TFm0VYSJiVuKlPV4m5OGt15_SBQsKkWBVJ-B5vAi1yiTdizg/exec";
+      
+        const uploadPromises = Array.from(windowImg).map(file => {
+          return new Promise((resolve, reject) => {
+            const fr = new FileReader();
+            fr.readAsArrayBuffer(file);
+      
+            fr.onload = f => {
+              const body = JSON.stringify([...new Int8Array(f.target.result)]);
+              const qs = new URLSearchParams({ filename: file.name, mimeType: file.type });
+      
+              fetch(`${url}?${qs}`, {
+                method: "POST",
+                body: body
+              })
+                .then(res => res.json())
+                .then(data => resolve(data))
+                .catch(err => reject(err));
+            };
+      
+            fr.onerror = err => reject(err);
+          });
+        });
+      
+        try {
+          const results = await Promise.all(uploadPromises);
+          console.log("All uploads complete", results);
+          alert("All files uploaded successfully!");
+        } catch (error) {
+          console.error("One or more uploads failed", error);
+          alert("There was an error uploading the files.");
+        }
+      }
     
     const Dropdown =({ value, change}) => { 
     return( 
@@ -205,7 +278,7 @@ const Drapery = () => {
             <h1>Drapery</h1>
             <label>
                 Please load a photo of the window:
-                <input type='file' onChange={handleImageUpload} style={{marginLeft:'15px'}}></input>
+                <input type='file' onChange={handleImageUpload} style={{marginLeft:'15px'}} multiple></input>
             </label><br></br><br></br>
 
             
