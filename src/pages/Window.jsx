@@ -13,6 +13,7 @@ const Window = () => {
   const [pname,setPName] = useState('');
   const [address,setAddress] = useState('');
   const [name,setName] = useState('');
+  const [estName,setEstName] = useState('');
   const [contact,setContact] = useState('');
   const [room,setRoom] = useState('');
   const [windows,setWindows] = useState('');
@@ -27,6 +28,7 @@ const Window = () => {
   const [uploads, setUploads] = useState(0);
 
   const handleNameChange = (event) => {setName(event.target.value);};
+  const handleEstNameChange = (event) => {setEstName(event.target.value);};
   const handlePName = (event) => {setPName(event.target.value);};
   const handleAddress= (event) => {setAddress(event.target.value);};
   const handleContactChange = (event) => {setContact(event.target.value);};
@@ -37,42 +39,42 @@ const Window = () => {
     if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
       setDrapery(event.target.checked);
     }else{
-      alert('Please enter your name and email');
+      alert('Please fill out all fields about your project');
     }
   };
   const handleRomanChange = (event) => {
     if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
       setRoman(event.target.checked);
     }else{
-      alert('Please enter your name and email');
+      alert('Please fill out all fields about your project');
     }
   };
   const handleValenceChange = (event) => {
     if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
       setValence(event.target.checked);
     }else{
-      alert('Please enter your name and email');
+      alert('Please fill out all fields about your project');
     }
   };
   const handleHardChange = (event) => {
     if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
       setHard(event.target.checked);
     }else{
-      alert('Please enter your name and email');
+      alert('Please fill out all fields about your project');
     }
   };
   const handlePillow = (event) => {
     if(name !== '' && contact !== '' && pname !== '' && address !== ''){
       setPillow(event.target.checked);
     }else{
-      alert('Please enter your name and email');
+      alert('Please fill out all fields about your project');
     }
   };
   const handleCushion = (event) => {
     if(name !== '' && contact !== '' && pname !== '' && address !== ''){
       setCushion(event.target.checked);
     }else{
-      alert('Please enter your name and email');
+      alert('Please fill out all fields about your project');
     }
   };
 
@@ -80,6 +82,22 @@ const Window = () => {
     setWindows('');
     setRoom('');
   },[uploads])
+
+  async function testFolder() {
+    const url = "https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec";
+  
+    console.log("testing folder creation");
+    fetch(url, {
+      method: 'POST',
+      body: new URLSearchParams({
+        FolderName: "Test_Ken_Address"
+      })
+    }).then(res => res.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(err => console.log(err));
+  }
 
   return(<>
     <div style={{padding:'5px'}}> <div style={{border: 'grey solid 1px', padding:'5px'}}>
@@ -101,7 +119,11 @@ const Window = () => {
             <input type='text' id='pname' style={{width: '200px'}} onChange={handlePName}></input>
           </div>
           <div className='column'>
-            <label>Name: </label><br></br>
+            <label>Estimator Name: </label><br></br>
+            <input type='text' id='estname' style={{width: '200px'}} onChange={handleEstNameChange}></input>
+          </div>
+          <div className='column'>
+            <label>Customer Name: </label><br></br>
             <input type='text' id='name' style={{width: '200px'}} onChange={handleNameChange}></input>
           </div>
           <div className='column'>
@@ -121,7 +143,6 @@ const Window = () => {
             <label>Number of windows: </label><br></br>
             <input type='number' id='windowNum' style={{width: '200px'}} onChange={handleWindows} value={windows}></input>
           </div>
-          <div className='column'></div>
           <div className='column'></div>
         </div>
         <br></br>
@@ -148,10 +169,6 @@ const Window = () => {
               checked={drapery} onChange={handleDraperyChange}></input>
               Drapery
             </label>
-
-            {/* <Popup></Popup> */}
-
-
             <br></br>
             <label>
               <input type='checkbox' style={{marginRight:'5px'}}
@@ -163,11 +180,11 @@ const Window = () => {
               checked={valence} onChange={handleValenceChange}></input>
               Valance / cornice
             </label><br></br>
-            <label>
+            {/* <label>
               <input type='checkbox' style={{marginRight:'5px'}}
               checked={hard} onChange={handleHardChange}></input>
               Hard treatments (roller shades, woven woods, wood blinds, honeycomb shade, sheer shade)
-            </label>
+            </label> */}
           </div><br></br>
 
           <div>
@@ -187,19 +204,32 @@ const Window = () => {
       </div>
     </div></div>
 
+    <button onClick={testFolder}>button</button>
+
       {drapery && <div style={{padding:'5px'}}><Drapery 
-      name={name} pname={pname} address={address} email={contact}
+      name={name} pname={pname} address={address} email={contact} estName={estName}
       room={document.getElementById('room').value}
       numWindow={document.getElementById('windowNum').value}
       uploads={setUploads}
       ></Drapery></div>}
-      {roman && <div style={{padding:'5px'}}><Roman></Roman></div>}
-      {valence && <div style={{padding:'5px'}}><Valance></Valance></div>}
+      
+      {roman && <div style={{padding:'5px'}}><Roman
+      name={name} pname={pname} address={address} email={contact} estName={estName}
+      room={document.getElementById('room').value}
+      numWindow={document.getElementById('windowNum').value}
+      uploads={setUploads}></Roman></div>}
+
+      {valence && <div style={{padding:'5px'}}><Valance
+      name={name} pname={pname} address={address} email={contact} estName={estName}
+      room={document.getElementById('room').value}
+      numWindow={document.getElementById('windowNum').value}
+      uploads={setUploads}
+      ></Valance></div>}
       {hard && <div style={{padding:'5px'}}><HardTreatments></HardTreatments></div>}
       {pillows && <div style={{padding:'5px'}}><Pillows
-      name={name} pname={pname} address={address} email={contact}></Pillows></div>}
+      name={name} pname={pname} address={address} email={contact} estName={estName}></Pillows></div>}
       {cushions && <div style={{padding:'5px'}}><Cushions
-      name={name} pname={pname} address={address} email={contact}></Cushions></div>}
+      name={name} pname={pname} address={address} email={contact} estName={estName}></Cushions></div>}
   </>)
 }
 

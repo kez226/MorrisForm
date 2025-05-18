@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-const Cushions = ({pname, name, address, email}) => {
+const Cushions = ({pname, name, address, email, estName}) => {
+    const[windowImg, setWindowImg] = useState(null);
     const [template, setTemplate] = useState('');
     const[units1, setUnits1] = useState('in');
     const[units2, setUnits2] = useState('in');
@@ -10,8 +11,27 @@ const Cushions = ({pname, name, address, email}) => {
     const [edgeOther, setEdgeOther] = useState('');
     const [com, setCom] = useState('');
 
+
+    const handleImageUpload = (event) => {
+        if (event.target.files.length > 5){
+            setWindowImg(null);
+            alert("Please select no more than five files");
+        }
+        else{
+            for (const file of event.target.files){
+                if (file.size > 10 * 1024 * 1024){
+                    alert(file.name + " is too big to upload");
+                    return;
+                }
+            }
+            setWindowImg(event.target.files);
+        }
+    }
     const handleInsert = (e) => {setInsert(e.target.value);}
-    const handleEdge = (e) => {setEdge(e.target.value);}
+    const handleEdge = (e) => {setEdge(e.target.value);
+        if (e.target.value === "Welt"){setEdgeOther("Self-welt")}
+        if (e.target.value === "Flange"){setEdgeOther("Self-flange")}
+    }
     const handleEdgeOther = (e) => {setEdgeOther(e.target.value);}
     const handleUnits1 = (e) => {setUnits1(e.target.value);}
 
@@ -82,6 +102,7 @@ const Cushions = ({pname, name, address, email}) => {
         let date = new Date(Date.now());
         formData.append('Date', date.toLocaleString());
         formData.append('PName', pname);
+        formData.append('EstName', estName);
         formData.append('Name', name);
         formData.append('Address', address);
         formData.append('Email', email);
@@ -135,20 +156,64 @@ const Cushions = ({pname, name, address, email}) => {
         //     console.log(key, value); // Logs each key-value pair
         //   });
 
-        fetch("https://script.google.com/macros/s/AKfycbwlwY47vpYlfYv8YA43q9TFm0VYSJiVuKlPV4m5OGt15_SBQsKkWBVJ-B5vAi1yiTdizg/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec", {
             method: 'POST',
             body: formData,
         }).then(res => res.json())
         .then(data => {
             console.log(data);
             alert(data.msg);
+            uploadAllFiles();
         })
         .catch(err => console.log(err));
     }
 
+    async function uploadAllFiles() {
+        console.log("Uploading:", {
+            pname, name, address, windowImg
+          });
+        const url = "https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec";
+      
+        const uploadPromises = Array.from(windowImg).map(file => {
+          return new Promise((resolve, reject) => {
+            const fr = new FileReader();
+            fr.readAsArrayBuffer(file);
+      
+            fr.onload = f => {
+                const body = JSON.stringify([...new Int8Array(f.target.result)]);
+                const qs = new URLSearchParams({ FolderName: pname + '_' + name + '_' + address, filename: file.name, mimeType: file.type});
+                // const qs = new URLSearchParams({ filename: file.name, mimeType: file.type, FolderID: FolderID });
+      
+              fetch(`${url}?${qs}`, {
+                method: "POST",
+                body: body
+              })
+                .then(res => res.json())
+                .then(data => resolve(data))
+                .catch(err => reject(err));
+            };
+      
+            fr.onerror = err => reject(err);
+          });
+        });
+      
+        try {
+          const results = await Promise.all(uploadPromises);
+          console.log("All uploads complete", results);
+          alert("All files uploaded successfully!");
+        } catch (error) {
+          console.error("One or more uploads failed", error);
+          alert("There was an error uploading the files.");
+        }
+      }
+
     return(<>
     <div style={{border: 'grey solid 1px', padding:'5px'}}>
         <h1>Cushions</h1>
+        <label>
+            Please load a photo of the window:
+            <input type='file' onChange={handleImageUpload} style={{marginLeft:'15px'}} multiple></input>
+        </label><br></br><br></br>
 
         Is a template required?
         <br></br><label>
@@ -208,28 +273,28 @@ const Cushions = ({pname, name, address, email}) => {
             </label>
             <br></br><label>
                 <input type='radio' style={{marginRight:'5px'}}
-                value='Down & Feather mix' onClick={handleInsert} name='insert'></input>
+                value='25/75 Down Feather' onClick={handleInsert} name='insert'></input>
                 Down & Feather Mix (please note prices increase with down count):
             </label>
             {insert !== '' && insert !== 'Cover only' && insert !== 'Dacron' && insert !== 'Outdoor' && insert !== '50/50 Dacron' &&
             <div><label style={{marginLeft:'25px'}}>
                     <input type='radio' style={{marginRight:'5px'}}
-                    value='10/90' onClick={handleInsert} name='mix'></input>
+                    value='10/90 Down Feather' onClick={handleInsert} name='mix'></input>
                     10 / 90 Down & Feather mix
                 </label>
                 <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' style={{marginRight:'5px'}}
-                    value='25/75' onClick={handleInsert} name='mix'></input>
+                    <input type='radio' style={{marginRight:'5px'}} defaultChecked={true}
+                    value='25/75 Down Feather' onClick={handleInsert} name='mix'></input>
                     25 / 75 (Plaza Park standard)
                 </label>
                 <br></br><label style={{marginLeft:'25px'}}>
                     <input type='radio' style={{marginRight:'5px'}}
-                    value='50/50 Feather' onClick={handleInsert} name='mix'></input>
+                    value='50/50 Down Feather' onClick={handleInsert} name='mix'></input>
                     50 / 50 Down & Feather mix
                 </label>
                 <br></br><label style={{marginLeft:'25px'}}>
                     <input type='radio' style={{marginRight:'5px'}}
-                    value='80/20' onClick={handleInsert} name='mix'></input>
+                    value='80/20 Down Feather' onClick={handleInsert} name='mix'></input>
                     90 / 20 Down & Feather mix
                 </label>
                 <br></br><label style={{marginLeft:'25px'}}>
@@ -255,7 +320,7 @@ const Cushions = ({pname, name, address, email}) => {
             {edge === 'Welt' && 
             <>
                 <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' name='welt' value={'Self-welt'}
+                    <input type='radio' name='welt' value={'Self-welt'} defaultChecked={true}
                     style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
                     Self-welt
                 </label>
@@ -278,7 +343,7 @@ const Cushions = ({pname, name, address, email}) => {
             {edge === 'Flange' && 
             <>
                 <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' name='welt' value={'Self-flange'}
+                    <input type='radio' name='welt' value={'Self-flange'} defaultChecked={true}
                     style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
                     Self-flange
                 </label>

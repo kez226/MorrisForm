@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { gapi } from "gapi-script";
-import { initGoogleAuth, signIn } from "./googleAuth";
 //import .env;
 
-const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
+const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName}) => {
     const[windowImg, setWindowImg] = useState(null);
     const[stationary, setStationary] = useState(false);
     const[lined, setLined] = useState('');
@@ -22,6 +20,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
     const[units1, setUnits1] = useState('in');
     const[units2, setUnits2] = useState('in');
     const[units3, setUnits3] = useState('in');
+    const[folderID, setFolderID] = useState(null);
 
     const fractions = [
         { label: '0', value: 0},
@@ -53,11 +52,21 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
     const handleRipple = (event) => {setRipplePercent(event.target.value);}
     const handleStationaryChange = (event) => {setStationary(event.target.value);}
     const handleLinedChange = (event) => {setLined(event.target.value);}
-    const handlePleatChange = (event) => {setPleat(event.target.value);}
-    const handleHardwareChange = (event) => {setHardware(event.target.value);}
-    const handleHardwareTypeChange = (event) => {setHardwareType(event.target.value);}
-    const handleHardwareDecorativeTypeChange = (event) => {setHardwareDecorativeType(event.target.value);}
-    const handleHardwiredChange = (event) => {setHardwired(event.target.value);}
+    const handlePleatChange = (event) => {setPleat(event.target.value);
+        if (event.target.value === 'ripple'){setRipplePercent('60%')}
+    }
+    const handleHardwareChange = (event) => {setHardware(event.target.value);
+        if(event.target.value === 'true'){setHardwareType('non-decorative');}
+    }
+    const handleHardwareTypeChange = (event) => {setHardwareType(event.target.value);
+        if(event.target.value === 'decorative'){setHardwareDecorativeType('track');}
+    }
+    const handleHardwareDecorativeTypeChange = (event) => {setHardwareDecorativeType(event.target.value);
+        if(event.target.value === 'motorized'){setHardwired('false');}
+    }
+    const handleHardwiredChange = (event) => {setHardwired(event.target.value);
+        if(event.target.value === 'motorized'){setHomeAuto('false');}
+    }
     const handleHomeAuto = (event) => {setHomeAuto(event.target.value);}
     const handleCom = (event) => {setCom(event.target.value);}
     const handleMainRailroad = (event) => {setMainRailroad(event.target.value);}
@@ -108,6 +117,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
         let date = new Date(Date.now());
         formData.append('Date', date.toLocaleString());
         formData.append('PName', pname);
+        formData.append('EstName', estName);
         formData.append('Name', name);
         formData.append('Address', address);
         formData.append('Email', email);
@@ -184,18 +194,18 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
         //     console.log(key, value); // Logs each key-value pair
         //   });
 
-        fetch("https://script.google.com/macros/s/AKfycbwlwY47vpYlfYv8YA43q9TFm0VYSJiVuKlPV4m5OGt15_SBQsKkWBVJ-B5vAi1yiTdizg/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec", {
             method: 'POST',
             body: formData,
         }).then(res => res.json())
         .then(data => {
             console.log(data);
+            setFolderID(data.folderID);
             uploads(prev => prev + 1);
             alert(data.msg);
         })
         .catch(err => console.log(err));
 
-        // uploadFile();
         uploadAllFiles();
     }
 
@@ -224,7 +234,11 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
     };
 
     async function uploadAllFiles() {
-        const url = "https://script.google.com/macros/s/AKfycbwlwY47vpYlfYv8YA43q9TFm0VYSJiVuKlPV4m5OGt15_SBQsKkWBVJ-B5vAi1yiTdizg/exec";
+        if (windowImg == null){
+            console.log("no images to upload");
+            return;
+        }
+        const url = "https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec";
       
         const uploadPromises = Array.from(windowImg).map(file => {
           return new Promise((resolve, reject) => {
@@ -232,8 +246,10 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
             fr.readAsArrayBuffer(file);
       
             fr.onload = f => {
-              const body = JSON.stringify([...new Int8Array(f.target.result)]);
-              const qs = new URLSearchParams({ filename: file.name, mimeType: file.type });
+                const body = JSON.stringify([...new Int8Array(f.target.result)]);
+                // const body = f.target.result;
+                const qs = new URLSearchParams({FolderID: folderID, FolderName: pname + '_' + name + '_' + address, filename: file.name, mimeType: file.type});
+                // const qs = new URLSearchParams({ filename: file.name, mimeType: file.type, FolderID: FolderID });
       
               fetch(`${url}?${qs}`, {
                 method: "POST",
@@ -365,12 +381,12 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
                 </label><br></br>
                 <label> 
                     <input type='radio' name='lined' style={{marginRight:'5px'}}
-                    value={'yes'} onChange={handleLinedChange}></input>
+                    value={'sheer'} onChange={handleLinedChange}></input>
                     Yes
                 </label><br></br>
                 {(lined !== '') && <div>
                     <label> 
-                        <input type='radio' name='liningType' style={{marginRight:'5px', marginLeft:'25px'}}
+                        <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px', marginLeft:'25px'}}
                         value={'sheer'} onChange={handleLinedChange}></input>
                         Sheer lining
                     </label><br></br>
@@ -417,7 +433,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
                 </label><br></br>
                 {(pleat === 'ripple') && <div>
                     <label> 
-                        <input type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
+                        <input defaultChecked={true} type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
                         value={'60%'} onChange={handleRipple}></input>
                         60%
                     </label><br></br>
@@ -459,7 +475,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
                 </label><br></br>
                 {hardware === 'true' && <div>
                     <label> 
-                        <input type='radio' name='hardwareType' style={{marginRight:'5px', marginLeft:'25px'}}
+                        <input type='radio' defaultChecked={true} name='hardwareType' style={{marginRight:'5px', marginLeft:'25px'}}
                         value={'non-decorative'} onChange={handleHardwareTypeChange}></input>
                         Non-decorative
                     </label> <br></br>
@@ -470,7 +486,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
                     </label><br></br>
                     {hardwareType === 'decorative' && <div>
                         <label> 
-                            <input type='radio' name='hardwareDecorativeType' style={{marginRight:'5px', marginLeft:'50px'}}
+                            <input type='radio' defaultChecked={true} name='hardwareDecorativeType' style={{marginRight:'5px', marginLeft:'50px'}}
                             value={'track'} onChange={handleHardwareDecorativeTypeChange}></input>
                             Track / mechanical
                         </label> <br></br>
@@ -493,7 +509,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
                         {hardwareDecorativeType === 'motorized' && <div style={{marginRight:'5px', marginLeft:'50px'}}>
                             Will it be hardwired?
                             <br></br><label>
-                                <input type='radio' name='hardwired' style={{marginRight:'5px', marginLeft:'25px'}}
+                                <input type='radio' defaultChecked={true} name='hardwired' style={{marginRight:'5px', marginLeft:'25px'}}
                                 value={'false'} onChange={handleHardwiredChange}></input>
                                 No
                             </label><br></br>
@@ -505,7 +521,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads}) => {
                             {hardwired === 'true' && <div style={{marginRight:'5px', marginLeft:'25px'}}>
                                 Is there an existing home-automation system?
                                 <br></br><label>
-                                    <input type='radio' name='homeAuto' style={{marginRight:'5px', marginLeft:'25px'}}
+                                    <input type='radio' defaultChecked={true} name='homeAuto' style={{marginRight:'5px', marginLeft:'25px'}}
                                     value={'false'} onChange={handleHomeAuto}></input>
                                     No
                                 </label><br></br>

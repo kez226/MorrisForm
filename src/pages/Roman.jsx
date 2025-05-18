@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-const Roman = (text) => {
-    const name = text;
+const Roman = ({pname, name, address, email, room, numWindow, uploads, estName}) => {
     const[windowImg, setWindowImg] = useState(null);
     const[mount, setMount] = useState('');
     const[stationary,setStationary] = useState('');
@@ -10,7 +9,6 @@ const Roman = (text) => {
     // const[hardwired, setHardwired] = useState('');
     const[homeAuto, setHomeAuto] = useState('');
     const[lined, setLined] = useState('');
-    const[lining, setLining] = useState('');
     const[com, setCom] = useState('');
     const[mainrailroad, setMainRailroad] = useState('');
     const[contrastrailroad, setContrastRailroad] = useState('');
@@ -28,15 +26,31 @@ const Roman = (text) => {
     const handleabvc = (e) => {abvcc(e.target.value);};
     const handleabvf = (e) => {abvfc(e.target.value);};
 
-    const handleImageUpload = (event) => {setWindowImg(event.target.files[0]);}
+    const handleImageUpload = (event) => {
+        if (event.target.files.length > 5){
+            setWindowImg(null);
+            alert("Please select no more than five files");
+        }
+        else{
+            for (const file of event.target.files){
+                if (file.size > 10 * 1024 * 1024){
+                    alert(file.name + " is too big to upload");
+                    return;
+                }
+            }
+            setWindowImg(event.target.files);
+        }
+    }
     const handleMount = (event) => {setMount(event.target.value);}
     const handleStationary = (event) =>{setStationary(event.target.value);}
-    const handleOpFunction = (event) => {setOpFunction(event.target.value);}
-    const handleMotorChange = (event) => {setMotorType(event.target.value);}
-    //const handleHardwired = (event) => {setHardwired(event.target.value);}
+    const handleOpFunction = (event) => {setOpFunction(event.target.value);
+        if (event.target.value === 'motorized'){setMotorType('battery')}
+    }
+    const handleMotorChange = (event) => {setMotorType(event.target.value);
+        if (event.target.value === 'hardwired'){setHomeAuto('no')}
+    }
     const handleHomeAuto = (event) => {setHomeAuto(event.target.value);}
-    const handleLined = (event) => {setLined(event.target.value);}
-    const handleLining = (event) => {setLining(event.target.value);}
+    const handleLinedChange = (event) => {setLined(event.target.value);}
     const handleCom = (event) => {setCom(event.target.value);}
     const handleMainRailroad = (event) => {setMainRailroad(event.target.value);}
     const handleContrastRailroad = (event) => {setContrastRailroad(event.target.value);}
@@ -82,9 +96,15 @@ const Roman = (text) => {
 
         let formData = new FormData();
         formData.append('Sheet', 'Roman');
-        //formData.append('Img', windowImg);
         let date = new Date(Date.now());
         formData.append('Date', date.toLocaleString());
+        formData.append('PName', pname);
+        formData.append('EstName', estName);
+        formData.append('Name', name);
+        formData.append('Address', address);
+        formData.append('Email', email);
+        formData.append('Room', room);
+        formData.append('Windows', numWindow);
         formData.append('Units1', units1);
         formData.append('Location', mount);
 
@@ -127,7 +147,7 @@ const Roman = (text) => {
 
 
         if (lined === 'No'){formData.append('Lining', 'no');}
-        else{formData.append('Lining', lining);}
+        else{formData.append('Lining', lined);}
 
         formData.append('Com', com);
 
@@ -167,16 +187,59 @@ const Roman = (text) => {
         //     console.log(key, value); // Logs each key-value pair
         //   });
 
-        fetch("https://script.google.com/macros/s/AKfycby5yAFqA-cl6Q7YTWA-XLZSYWPyAt-ji-2G7kbx4U7EZ9iic4SP-eZeHEA0K0FP95iMrw/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec", {
             method: 'POST',
             body: formData,
         }).then(res => res.json())
         .then(data => {
             console.log(data);
+            uploads(prev => prev + 1);
             alert(data.msg);
+            uploadAllFiles();
         })
         .catch(err => console.log(err));
+
+        
     }
+
+    async function uploadAllFiles() {
+        console.log("Uploading:", {
+            pname, name, address, windowImg
+          });
+        const url = "https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec";
+      
+        const uploadPromises = Array.from(windowImg).map(file => {
+          return new Promise((resolve, reject) => {
+            const fr = new FileReader();
+            fr.readAsArrayBuffer(file);
+      
+            fr.onload = f => {
+                const body = JSON.stringify([...new Int8Array(f.target.result)]);
+                const qs = new URLSearchParams({ FolderName: pname + '_' + name + '_' + address, filename: file.name, mimeType: file.type});
+                // const qs = new URLSearchParams({ filename: file.name, mimeType: file.type, FolderID: FolderID });
+      
+              fetch(`${url}?${qs}`, {
+                method: "POST",
+                body: body
+              })
+                .then(res => res.json())
+                .then(data => resolve(data))
+                .catch(err => reject(err));
+            };
+      
+            fr.onerror = err => reject(err);
+          });
+        });
+      
+        try {
+          const results = await Promise.all(uploadPromises);
+          console.log("All uploads complete", results);
+          alert("All files uploaded successfully!");
+        } catch (error) {
+          console.error("One or more uploads failed", error);
+          alert("There was an error uploading the files.");
+        }
+      }
 
     const Dropdown =({ value, change}) => { 
         return( 
@@ -197,7 +260,7 @@ const Roman = (text) => {
             <h1>Roman Shades</h1>
             <label>
                 Please load a photo of the window:
-                <input type='file' onChange={handleImageUpload} style={{marginLeft:'15px'}}></input>
+                <input type='file' onChange={handleImageUpload} style={{marginLeft:'15px'}} multiple></input>
             </label><br></br><br></br>
 
             What units are the measurements in?
@@ -330,9 +393,9 @@ const Roman = (text) => {
                     value={'motorized'} onChange={handleOpFunction}></input>
                     Motorized (pick 1):
                 </label> <br></br>
-                {opFunction === 'motorized' && <div>
+                {opFunction !== '' && opFunction !== 'cordlock' && opFunction !== 'cordless' && opFunction !== 'lift' &&  <div>
                     <label> 
-                        <input type='radio' name='motorType' style={{marginRight:'5px', marginLeft:"25px"}}
+                        <input type='radio' defaultChecked = {true} name='motorType' style={{marginRight:'5px', marginLeft:"25px"}}
                         value={'battery'} onChange={handleMotorChange}></input>
                         Rechargeable battery
                     </label> <br></br>
@@ -344,7 +407,7 @@ const Roman = (text) => {
                     {motorType === 'hardwired' && <div style={{marginLeft:'50px'}}>
                         Is there an existing home-automation system?
                         <br></br><label> 
-                            <input type='radio' name='homeAuto' style={{marginRight:'5px'}}
+                            <input type='radio' defaultChecked={true} name='homeAuto' style={{marginRight:'5px'}}
                             value={'no'} onChange={handleHomeAuto}></input>
                             No
                         </label> <br></br>
@@ -363,30 +426,30 @@ const Roman = (text) => {
             <div>
                 <label>
                     <input type='radio' name='lined' style={{marginRight:'5px'}}
-                    value={'No'} onChange={handleLined}></input>
+                    value={''} onChange={handleLinedChange}></input>
                     No
                 </label><br></br>
                 <label> 
                     <input type='radio' name='lined' style={{marginRight:'5px'}}
-                    value={'Yes'} onChange={handleLined}></input>
+                    value={'sheer'} onChange={handleLinedChange}></input>
                     Yes
-                </label> <br></br>
-                {lined === 'Yes' && <div>
-                    <label>
-                        <input type='radio' name='lining' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'Sheer'} onChange={handleLining}></input>
+                </label><br></br>
+                {(lined !== '') && <div>
+                    <label> 
+                        <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px', marginLeft:'25px'}}
+                        value={'sheer'} onChange={handleLinedChange}></input>
                         Sheer lining
                     </label><br></br>
                     <label> 
-                        <input type='radio' name='lining' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'Light'} onChange={handleLining}></input>
+                        <input type='radio' name='liningType' style={{marginRight:'5px', marginLeft:'25px'}}
+                        value={'lightFilter'} onChange={handleLinedChange}></input>
                         Light filtering lining
-                    </label> <br></br>
+                    </label><br></br>
                     <label> 
-                        <input type='radio' name='lining' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'Blackout'} onChange={handleLining}></input>
+                        <input type='radio' name='liningType' style={{marginRight:'5px', marginLeft:'25px'}}
+                        value={'blackout'} onChange={handleLinedChange}></input>
                         Blackout lining
-                    </label> <br></br>
+                    </label><br></br>
                 </div>}
                 <br></br>
             </div>

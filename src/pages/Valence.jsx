@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { lessThan } from 'three/tsl';
 
-const Valance = () => {
+const Valance = ({pname, name, address, email, room, numWindow, uploads, estName}) => {
     const[windowImg, setWindowImg] = useState(null);
     const[inspoImg, setInspoImg] = useState(null);
     const[mount, setMount] = useState('outside');
@@ -81,9 +82,15 @@ const Valance = () => {
 
         let formData = new FormData();
         formData.append('Sheet', 'Valence');
-        //formData.append('Img', windowImg);
         let date = new Date(Date.now());
         formData.append('Date', date.toLocaleString());
+        formData.append('PName', pname);
+        formData.append('EstName', estName);
+        formData.append('Name', name);
+        formData.append('Address', address);
+        formData.append('Email', email);
+        formData.append('Room', room);
+        formData.append('Windows', numWindow);
         formData.append('Units1', units1);
         formData.append('Location', mount);
 
@@ -145,16 +152,92 @@ const Valance = () => {
         //     console.log(key, value); // Logs each key-value pair
         //   });
 
-        fetch("https://script.google.com/macros/s/AKfycby5yAFqA-cl6Q7YTWA-XLZSYWPyAt-ji-2G7kbx4U7EZ9iic4SP-eZeHEA0K0FP95iMrw/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec", {
             method: 'POST',
             body: formData,
         }).then(res => res.json())
         .then(data => {
             console.log(data);
             alert(data.msg);
+            uploads(prev => prev + 1);
+            // uploadAllFiles();
+            uploadFiles();
         })
         .catch(err => console.log(err));
     }
+
+    const uploadFiles = () => {
+        console.log('uploading window image:');
+        console.log(windowImg);
+        let fr = new FileReader();
+        fr.readAsArrayBuffer(windowImg);
+        fr.onload = f => {
+            
+            const url = "https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec";
+            
+            let qs = new URLSearchParams({FolderName: pname + '_' + name + '_' + address,filename: windowImg.name, mimeType: windowImg.type});
+            fetch(`${url}?${qs}`, {method: "POST", body: JSON.stringify([...new Int8Array(f.target.result)])})
+            .then(res => res.json())
+            .then(e => {
+                console.log(e);
+                console.log('uploading inspo image:');
+                console.log(inspoImg);
+                fr.readAsArrayBuffer(inspoImg);
+                fr.onload = f => {
+                    qs = new URLSearchParams({FolderName: pname + '_' + name + '_' + address,filename: inspoImg.name, mimeType: inspoImg.type});
+                    fetch(`${url}?${qs}`, {method: "POST", body: JSON.stringify([...new Int8Array(f.target.result)])})
+                    .then(res => res.json())
+                    .then(e => {
+                        console.log(e);
+                        alert("Images uploaded");
+                    }
+                    )
+                    .catch(err => console.log(err));
+                }
+            }
+            )
+            .catch(err => console.log(err));
+        }
+    };
+
+    async function uploadAllFiles() {
+        console.log("Uploading:", {
+            pname, name, address, windowImg
+          });
+        const url = "https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec";
+      
+        const uploadPromises = Array.from(windowImg).map(file => {
+          return new Promise((resolve, reject) => {
+            const fr = new FileReader();
+            fr.readAsArrayBuffer(file);
+      
+            fr.onload = f => {
+                const body = JSON.stringify([...new Int8Array(f.target.result)]);
+                const qs = new URLSearchParams({ FolderName: pname + '_' + name + '_' + address, filename: file.name, mimeType: file.type});
+                // const qs = new URLSearchParams({ filename: file.name, mimeType: file.type, FolderID: FolderID });
+      
+              fetch(`${url}?${qs}`, {
+                method: "POST",
+                body: body
+              })
+                .then(res => res.json())
+                .then(data => resolve(data))
+                .catch(err => reject(err));
+            };
+      
+            fr.onerror = err => reject(err);
+          });
+        });
+      
+        try {
+          const results = await Promise.all(uploadPromises);
+          console.log("All uploads complete", results);
+          alert("All files uploaded successfully!");
+        } catch (error) {
+          console.error("One or more uploads failed", error);
+          alert("There was an error uploading the files.");
+        }
+      }
 
     const Dropdown =({ value, change}) => { 
         return( 
