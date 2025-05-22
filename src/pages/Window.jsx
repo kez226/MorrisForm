@@ -7,7 +7,6 @@ import HardTreatments from './HardTreatments';
 import Pillows from './Pillows';
 import Cushions from './Cushions';
 import React, { useEffect, useState } from 'react';
-import Popup from './Popup';
 
 const Window = () => {
   const [pname,setPName] = useState('');
@@ -147,7 +146,7 @@ const Window = () => {
         </div>
         <br></br>
 
-          Are there existing window treatments Plaza Park needs to take down / dispose of?
+          {/* Are there existing window treatments Plaza Park needs to take down / dispose of?
           <br></br><label> 
             <input type='radio' name='existingTreatment' style={{marginRight:'5px'}}
             value={true} onChange={handleExistingChange}></input>
@@ -157,10 +156,10 @@ const Window = () => {
             <input type='radio' name='existingTreatment' style={{marginRight:'5px'}}
             value={false} onChange={handleExistingChange}></input>
             No
-          </label><br></br><br></br>
+          </label><br></br><br></br> */}
 
           What type of treatment are you interested in:
-          <br></br><br></br>
+          <br></br>
           <div>
             Window treatments:
             <br></br>

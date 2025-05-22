@@ -263,12 +263,12 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 <input type='file' onChange={handleImageUpload} style={{marginLeft:'15px'}} multiple></input>
             </label><br></br><br></br>
 
-            What units are the measurements in?
+            {/* What units are the measurements in?
             <label>
                 <input style={{marginLeft:'25px'}} value='cm' type='radio' name='units1' onChange={handleUnits1}></input> Centimeters
                 <input value='in' type='radio' name='units1' onChange={handleUnits1}
                     style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
-            </label><br></br>
+            </label><br></br> */}
             Where are we mounting?
             <div>
                 <label> 
@@ -327,7 +327,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                             change = {handlef2fh}
                         ></Dropdown>
                     </>}<br></br>
-                    <label >
+                    {/* <label >
                         Above frame to ceiling:
                         <input id='abvc' style={{marginLeft:'289px'}}></input>
                     </label>
@@ -336,7 +336,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                             value = {abvc}
                             change = {handleabvc}
                         ></Dropdown>
-                    </>}<br></br>
+                    </>}<br></br> */}
                     <label >
                         How far above frame will unit be mounted for outside mounts:
                         <input id='abvf' style={{marginLeft:'10px'}}></input>
@@ -422,35 +422,73 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 <br></br>
             </div>
 
-            Will the Roman be lined?
+            Roman Shade Lining Preference:
             <div>
                 <label>
-                    <input type='radio' name='lined' style={{marginRight:'5px'}}
-                    value={''} onChange={handleLinedChange}></input>
-                    No
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'unlined'} onChange={handleLinedChange}></input>
+                    Unlined
                 </label><br></br>
                 <label> 
-                    <input type='radio' name='lined' style={{marginRight:'5px'}}
+                    <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px'}}
                     value={'sheer'} onChange={handleLinedChange}></input>
-                    Yes
+                    Sheer lining
                 </label><br></br>
-                {(lined !== '') && <div>
-                    <label> 
-                        <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'sheer'} onChange={handleLinedChange}></input>
-                        Sheer lining
-                    </label><br></br>
-                    <label> 
-                        <input type='radio' name='liningType' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'lightFilter'} onChange={handleLinedChange}></input>
-                        Light filtering lining
-                    </label><br></br>
-                    <label> 
-                        <input type='radio' name='liningType' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'blackout'} onChange={handleLinedChange}></input>
-                        Blackout lining
-                    </label><br></br>
-                </div>}
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'lightweight light Filter'} onChange={handleLinedChange}></input>
+                    Light weight light filtering lining (Poly cotton)
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'lightFilter'} onChange={handleLinedChange}></input>
+                    Regular Light filtering lining (100% cotton)
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'blackout'} onChange={handleLinedChange}></input>
+                    Blackout lining
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Napped Sateen'} onChange={handleLinedChange}></input>
+                   Napped Sateen
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Lined and IStandard interlined'} onChange={handleLinedChange}></input>
+                   Lined and IStandard interlined
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Lined and Bump Interlined'} onChange={handleLinedChange}></input>
+                   Lined and Bump Interlined
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Self-Lined'} onChange={handleLinedChange}></input>
+                   Self-Lined
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Self-Lined and Blackout'} onChange={handleLinedChange}></input>
+                   Self-Lined and Blackout
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Self-Lined and standard Interlined'} onChange={handleLinedChange}></input>
+                   Self-Lined and standard Interlined
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Self-Lined and Bump Interlined'} onChange={handleLinedChange}></input>
+                   Self-Lined and Bump Interlined
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'French Blackout'} onChange={handleLinedChange}></input>
+                   French Blackout = Face fabric + 3 layered linings
+                </label><br></br>
                 <br></br>
             </div>
 

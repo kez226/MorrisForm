@@ -7,7 +7,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
     const[lined, setLined] = useState('');
     const[pleat, setPleat] = useState('');
     const[ripplePercent, setRipplePercent] = useState('');
-    let pleatOther; //document.getElementById('pleat_other')
+    const[fullness, setFullness] = useState('');
     const[hardware, setHardware] = useState('');
     const[hardwareType, setHardwareType] = useState('');
     const[hardwareDecorativeType, setHardwareDecorativeType] = useState('');
@@ -21,6 +21,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
     const[units2, setUnits2] = useState('in');
     const[units3, setUnits3] = useState('in');
     const[folderID, setFolderID] = useState(null);
+    const[yardage, setYardage] = useState(null);
 
     const fractions = [
         { label: '0', value: 0},
@@ -288,6 +289,59 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         </> 
     )}
 
+    const calcYardage = () => {
+        let yardage;
+        if (mainrailroad === 'false'){
+            if (stationary === 'true'){
+                const ypp = document.getElementById('wpp').value * 54 / 36;
+                const repeats = Math.ceil((Number(f2fh) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
+                const cl = repeats * (Number(mainVertical) + Number(document.getElementById('mainvert').value));
+                const cutYards = (cl + (8.0 - cl % 8)) / 36;
+                let fw = (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
+                if (fw == 0){
+                    fw = 54;
+                }
+                yardage = cutYards * Number(document.getElementById('wpp').value) * ((Number(document.getElementById('f2fw').value)+Number(f2fw)) / fw);
+            }
+            else if (stationary === 'false') {
+                const cw = 14.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * fullness;
+                let widths = cw / (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
+                widths = widths.toFixed(3);
+                if (widths % 1 <= .30){//round down to full width
+                    widths = Math.floor(widths);
+                }
+                else{//round up to nearest full width
+                    widths = Math.ceil(widths);
+                }
+                console.log(widths);
+                const repeats = Math.ceil((Number(document.getElementById('f2fh').value) + Number(f2fh) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
+                const cl = repeats * (Number(mainVertical) + Number(document.getElementById('mainvert').value));
+                const cutYards = (cl + (8.0 - cl % 8)) / 36;
+                yardage = widths * cutYards;
+            }
+        }
+        else{
+            if (stationary === 'false') {
+                const cw = 14.0 + (parseInt(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;
+                let yardage = cw / 36;
+                let f = Math.floor(yardage);
+                if(yardage-f < 0.5){
+                    yardage = f;
+                }
+                else {yardage = f+0.5;}
+                console.log(yardage);
+                const check = Number(document.getElementById('f2fh').value) + Number(f2fh) + 20;
+                console.log(check);
+                if (check > cw){alert("Height is too much by " + (check-cw));}
+                return (yardage);
+            }
+            else{
+                let fw = (Number(document.getElementById('f2fw').value)+ Number(f2fw)) / (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
+                yardage = (Number(document.getElementById('wpp').value) * 54 / 36) * fw;
+            }
+        }
+        return (yardage);
+    }
 
     return(<>
         <div style={{border: 'grey solid 1px', padding:'5px'}}>
@@ -299,16 +353,16 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
 
             
             What are the approximate dimensions of the following?<br></br>
-            What units are the measurements in?
+            {/* What units are the measurements in?
             <label>
                 <input style={{marginLeft:'25px'}} value='cm' type='radio' name='units1' onChange={handleUnits1}></input> Centimeters
                 <input value='in' type='radio' name='units1' onChange={handleUnits1}
                     style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
-            </label>
+            </label> */}
             <div>
                 <label>
-                    Frame to frame width: 
-                    <input type='number' id='f2fw' style={{marginLeft:'75px'}}></input>
+                    Rod width: 
+                    <input type='number' id='f2fw' style={{marginLeft:'100px'}}></input>
                 </label>
                 {units1 === 'in' && <>
                     <Dropdown
@@ -317,8 +371,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     ></Dropdown>
                 </>}<br></br>
                 <label>
-                    Frame-to-frame height (to sill):
-                    <input type='number' id='f2fh' style={{marginLeft:'10px'}}></input><br></br>
+                    Drapery height:
+                    <input type='number' id='f2fh' style={{marginLeft:'65px'}}></input><br></br>
                 </label>
                 {units1 === 'in' && <>
                     <Dropdown
@@ -326,7 +380,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         change = {handlef2fh}
                     ></Dropdown>
                 </>}<br></br>
-                <label>
+                {/* <label>
                     Above frame to ceiling:
                     <input type='number' id='abvf' style={{marginLeft:'68px'}}></input>
                 </label>
@@ -345,62 +399,125 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         value = {bsill}
                         change = {handlebsill}
                     ></Dropdown>
-                </>}<br></br>
-            How far above frame will hardware be mounted (if known)?
+                </>}<br></br> */}
+            {/* How far above frame will hardware be mounted (if known)?
             <br></br><input type='number' id='mountabvf'></input>
             {units1 === 'in' && <>
                 <Dropdown
                     value = {mountabvf}
                     change = {handlemountabvf}
                 ></Dropdown>
-            </>}<br></br>
+            </>}<br></br> */}
             </div>
 
             <br></br>
 
             Will the panels be stationary?
             <div>
-                <label> 
+                <label style={{marginRight:'25px'}}> 
                     <input type='radio' name='stationary' style={{marginRight:'5px'}}
-                    value={true} onChange={handleStationaryChange}></input>
+                    value={'true'} onChange={handleStationaryChange}></input>
                     Yes
-                </label> <br></br>
+                </label>  
+                {stationary === 'true' && <>
+                    What is the width per panel?
+                    <input type='number' id='wpp'></input> 
+                </>}<br></br>
                 <label>
                     <input type='radio' name='stationary' style={{marginRight:'5px'}}
-                    value={false} onChange={handleStationaryChange}></input>
+                    value={'false'} onChange={handleStationaryChange}></input>
                     No (if no, they will be fully functioning)
-                </label><br></br><br></br>
+                </label>
+                {stationary === 'false' && <>
+                    <br></br>What is the fullness?<br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(1.5)}></input> 1.5
+                    </label><br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(2)}></input> 2
+                    </label><br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(2.25)}></input> 2.25
+                    </label><br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(2.5)}></input> 2.5
+                    </label><br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(2.75)}></input> 2.75
+                    </label><br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(3)}></input> 3
+                    </label>
+                </>}<br></br><br></br>
             </div>
 
-            Will the panels be lined?
+            Lining preference
             <div>
                 <label>
-                    <input type='radio' name='lined' style={{marginRight:'5px'}}
-                    value={''} onChange={handleLinedChange}></input>
-                    No
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'unlined'} onChange={handleLinedChange}></input>
+                    Unlined
                 </label><br></br>
                 <label> 
-                    <input type='radio' name='lined' style={{marginRight:'5px'}}
+                    <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px'}}
                     value={'sheer'} onChange={handleLinedChange}></input>
-                    Yes
+                    Sheer lining
                 </label><br></br>
-                {(lined !== '') && <div>
-                    <label> 
-                        <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'sheer'} onChange={handleLinedChange}></input>
-                        Sheer lining
-                    </label><br></br>
-                    <label> 
-                        <input type='radio' name='liningType' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'lightFilter'} onChange={handleLinedChange}></input>
-                        Light filtering lining
-                    </label><br></br>
-                    <label> 
-                        <input type='radio' name='liningType' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'blackout'} onChange={handleLinedChange}></input>
-                        Blackout lining
-                    </label><br></br>
-                </div>}
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'lightweight light Filter'} onChange={handleLinedChange}></input>
+                    Light weight light filtering lining (Poly cotton)
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'lightFilter'} onChange={handleLinedChange}></input>
+                    Regular Light filtering lining (100% cotton)
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'blackout'} onChange={handleLinedChange}></input>
+                    Blackout lining
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Napped Sateen'} onChange={handleLinedChange}></input>
+                   Napped Sateen
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Lined and IStandard interlined'} onChange={handleLinedChange}></input>
+                   Lined and IStandard interlined
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Lined and Bump Interlined'} onChange={handleLinedChange}></input>
+                   Lined and Bump Interlined
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Self-Lined'} onChange={handleLinedChange}></input>
+                   Self-Lined
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Self-Lined and Blackout'} onChange={handleLinedChange}></input>
+                   Self-Lined and Blackout
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Self-Lined and standard Interlined'} onChange={handleLinedChange}></input>
+                   Self-Lined and standard Interlined
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'Self-Lined and Bump Interlined'} onChange={handleLinedChange}></input>
+                   Self-Lined and Bump Interlined
+                </label><br></br>
+                <label> 
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    value={'French Blackout'} onChange={handleLinedChange}></input>
+                   French Blackout = Face fabric + 3 layered linings
+                </label><br></br>
                 <br></br>
             </div>
 
@@ -408,22 +525,22 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             <div>
                 <label>
                     <input type='radio' name='pleat' style={{marginRight:'5px'}}
-                    value={'2top'} onChange={handlePleatChange}></input>
+                    value={'2top'} onChange={(e) => {handlePleatChange(e); setFullness(2*fullness);}}></input>
                     2 finger top tack
                 </label><br></br>
                 <label> 
                     <input type='radio' name='pleat' style={{marginRight:'5px'}}
-                    value={'2bot'} onChange={handlePleatChange}></input>
+                    value={'2bot'} onChange={(e) => {handlePleatChange(e); setFullness(2*fullness);}}></input>
                     2 finger botton tack
                 </label><br></br>
                 <label>
                     <input type='radio' name='pleat' style={{marginRight:'5px'}}
-                    value={'3top'} onChange={handlePleatChange}></input>
+                    value={'3top'} onChange={(e) => {handlePleatChange(e); setFullness(3*fullness);}}></input>
                     3 finger top tack
                 </label><br></br>
                 <label> 
                     <input type='radio' name='pleat' style={{marginRight:'5px'}}
-                    value={'3bot'} onChange={handlePleatChange}></input>
+                    value={'3bot'} onChange={(e) => {handlePleatChange(e); setFullness(3*fullness);}}></input>
                     3 finger bottom tack
                 </label><br></br>
                 <label>
@@ -434,22 +551,22 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 {(pleat === 'ripple') && <div>
                     <label> 
                         <input defaultChecked={true} type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'60%'} onChange={handleRipple}></input>
+                        value={'60%'} onChange={() => {handleRipple(); setFullness(1.6*fullness);}}></input>
                         60%
                     </label><br></br>
                     <label> 
                         <input type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'80%'} onChange={handleRipple}></input>
+                        value={'80%'} onChange={() => {handleRipple(); setFullness(1.8*fullness);}}></input>
                         80%
                     </label><br></br>
                     <label> 
                         <input type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'100%'} onChange={handleRipple}></input>
+                        value={'100%'} onChange={() => {handleRipple(); setFullness(2*fullness);}}></input>
                         100%
                     </label><br></br>
                     <label> 
                         <input type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'120%'} onChange={handleRipple}></input>
+                        value={'120%'} onChange={() => {handleRipple(); setFullness(2.2*fullness);}}></input>
                         120%
                     </label><br></br>
                 </div>}
@@ -606,12 +723,12 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 Are we railroaded?
                 <br></br><label> 
                     <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={true} onChange={handleMainRailroad}></input>
+                    value={'true'} onChange={handleMainRailroad}></input>
                     Yes
                 </label> <br></br>
                 <label>
                     <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={false} onChange={handleMainRailroad}></input>
+                    value={'false'} onChange={handleMainRailroad}></input>
                     No
                 </label><br></br>
             </div><br></br>
@@ -681,7 +798,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 Please specify where the contrast fabric will be used:
                 <input id='where'></input>
             </div><br></br>
-
+            {yardage}<br></br>
+            <button onClick={() =>  {setYardage(calcYardage())}}>Calculate yardage</button>
             <button onClick={submitForm}>Submit</button>
         </div>
     </>)
