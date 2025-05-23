@@ -12,6 +12,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
     const[com, setCom] = useState('');
     const[mainrailroad, setMainRailroad] = useState('');
     const[contrastrailroad, setContrastRailroad] = useState('');
+    const[panels, setPanels] = useState(2);
 
     const[units1, setUnits1] = useState('in');
     const[units2, setUnits2] = useState('in');
@@ -255,6 +256,32 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             </> 
         )}
 
+    const [yardage, setYardage] = useState(null);
+    const calcYardage = () => {
+        if (Number(document.getElementById('mainvert').value) === 0 || Number(mainVertical) === 0){
+            if (mount === 'inside'){
+                const cutWidth = (Number(document.getElementById('f2fw').value) + Number(f2fw)) * 0.75 + 3;
+                const widths = Math.ceil(cutWidth / (Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
+                const cutLength = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
+                const cutYards = (Math.round((cutLength / 36) * 4) / 4).toFixed(2);
+                setYardage(widths * cutYards);
+            }
+            else{
+                const widths = Math.ceil(4.0 + Number(document.getElementById('f2fw').value) + Number(f2fw)) / ((Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
+                const obHeight = Number(document.getElementById('abvf').value) + Number(abvf) + Number(document.getElementById('f2fh').value) + Number(f2fh);
+                const cutYards = (Math.round(((20.0 + obHeight) / 36) * 4) / 4).toFixed(2);
+                setYardage(widths * cutYards);
+            }
+        }
+        else{
+            const repeats = Math.ceil((20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh)) / (Number(document.getElementById('mainvert').value) + Number(mainVertical)));
+            const cutLength = repeats * (Number(document.getElementById('mainvert').value) + Number(mainVertical));
+            const cutYards = (Math.round((cutLength / 36) * 4) / 4).toFixed(2);
+            const wpp = Math.ceil((Number(document.getElementById('f2fw').value) + Number(f2fw)) / (Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
+            setYardage(wpp * cutYards * panels);
+        }
+    }
+
     return(
         <div style={{border: 'grey solid 1px', padding:'5px'}}>
             <h1>Roman Shades</h1>
@@ -351,7 +378,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 </div>}
             </div>
 
-            Will this be a stationary Roman?
+            <>
+            {/* Will this be a stationary Roman?
             <div>
                 <label> 
                     <input type='radio' name='stationary' style={{marginRight:'5px'}}
@@ -363,11 +391,12 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     value={'No'} onChange={handleStationary}></input>
                     No
                 </label><br></br><br></br>
-            </div>
+            </div> */}
+            </>
 
             Please select the operating function (pick 1):
             <div>
-            <label> 
+                <label> 
                     <input type='radio' name='opFunction' style={{marginRight:'5px'}}
                     value={'cordlock'} onChange={handleOpFunction}></input>
                     Cordlock
@@ -401,10 +430,10 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     </label> <br></br>
                     <label> 
                         <input type='radio' name='motorType' style={{marginRight:'5px', marginLeft:"25px"}}
-                        value={'hardwired'} onChange={handleMotorChange}></input>
-                        Hardwired
-                    </label> <br></br>
-                    {motorType === 'hardwired' && <div style={{marginLeft:'50px'}}>
+                        value={'plug in'} onChange={handleMotorChange}></input>
+                        Plug in
+                    </label> <br></br><br></br>
+                    {/* {motorType === 'hardwired' && <div style={{marginLeft:'50px'}}> */}
                         Is there an existing home-automation system?
                         <br></br><label> 
                             <input type='radio' defaultChecked={true} name='homeAuto' style={{marginRight:'5px'}}
@@ -417,7 +446,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                             Yes (what is it)?
                                 <input id='homeauto'></input>
                         </label><br></br>
-                    </div>}
+                    {/* </div>} */}
                 </div>}
                 <br></br>
             </div>
@@ -425,12 +454,12 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             Roman Shade Lining Preference:
             <div>
                 <label>
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px'}}
                     value={'unlined'} onChange={handleLinedChange}></input>
                     Unlined
                 </label><br></br>
                 <label> 
-                    <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px'}}
+                    <input type='radio' name='liningType'  style={{marginRight:'5px'}}
                     value={'sheer'} onChange={handleLinedChange}></input>
                     Sheer lining
                 </label><br></br>
@@ -490,6 +519,25 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                    French Blackout = Face fabric + 3 layered linings
                 </label><br></br>
                 <br></br>
+            </div>
+
+            Number of panels:
+            <div>
+                <label> 
+                    <input type='radio' name='panels' style={{marginRight:'5px'}}
+                    value={1} onChange={(e) => {setPanels(e)}}></input>
+                    1
+                </label> <br></br>
+                <label> 
+                    <input type='radio' name='panels' style={{marginRight:'5px'}}
+                    value={2} onChange={(e) => {setPanels(e)}}></input>
+                    2
+                </label> <br></br>
+                <label> 
+                    <input type='radio' name='panels' style={{marginRight:'5px'}}
+                    value={3} onChange={(e) => {setPanels(e)}}></input>
+                    3
+                </label> <br></br><br></br>
             </div>
 
             Are you using COM material?
@@ -557,16 +605,16 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     ></Dropdown>
                 </>}
                 <br></br>
-                Are we railroaded?
+                How are we running the fabric?
                 <br></br><label> 
                     <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={true} onChange={handleMainRailroad}></input>
-                    Yes
+                    value={'up the bolt'} onChange={handleMainRailroad}></input>
+                    Up the bolt
                 </label> <br></br>
                 <label>
                     <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={false} onChange={handleMainRailroad}></input>
-                    No
+                    value={'railroad'} onChange={handleMainRailroad}></input>
+                    Railroading
                 </label><br></br>
             </div><br></br>
 
@@ -636,7 +684,9 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 Please specify where the contrast fabric will be used:
                 <input id='where'></input>
             </div><br></br>
-
+            
+            {yardage}<br></br>
+            <button onClick={calcYardage}>Calculte yardage</button>
             <button onClick={submitForm}>Submit</button>
         </div>
     )

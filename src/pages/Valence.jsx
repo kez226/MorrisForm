@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { lessThan } from 'three/tsl';
 
 const Valance = ({pname, name, address, email, room, numWindow, uploads, estName}) => {
     const[windowImg, setWindowImg] = useState(null);
