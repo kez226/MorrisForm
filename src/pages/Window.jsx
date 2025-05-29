@@ -35,25 +35,30 @@ const Window = () => {
   const handleWindows = (event) => {setWindows(event.target.value);};
   const handleExistingChange = (event) => {setExistingTreatment(event.target.value);};
   const handleDraperyChange = (event) => {
-    if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
       setDrapery(event.target.checked);
-    }else{
-      alert('Please fill out all fields about your project');
-    }
+    // if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
+    //   setDrapery(event.target.checked);
+    // }else{
+    //   alert('Please fill out all fields about your project');
+    // }
   };
   const handleRomanChange = (event) => {
-    if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
+    // if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
+    //   setRoman(event.target.checked);
+    // }else{
+    //   alert('Please fill out all fields about your project');
+    // }
       setRoman(event.target.checked);
-    }else{
-      alert('Please fill out all fields about your project');
-    }
+
   };
   const handleValenceChange = (event) => {
-    if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
+    // if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
+    //   setValence(event.target.checked);
+    // }else{
+    //   alert('Please fill out all fields about your project');
+    // }
       setValence(event.target.checked);
-    }else{
-      alert('Please fill out all fields about your project');
-    }
+
   };
   const handleHardChange = (event) => {
     if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
@@ -63,18 +68,22 @@ const Window = () => {
     }
   };
   const handlePillow = (event) => {
-    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+    // if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+    //   setPillow(event.target.checked);
+    // }else{
+    //   alert('Please fill out all fields about your project');
+    // }
       setPillow(event.target.checked);
-    }else{
-      alert('Please fill out all fields about your project');
-    }
+
   };
   const handleCushion = (event) => {
-    if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+    // if(name !== '' && contact !== '' && pname !== '' && address !== ''){
+    //   setCushion(event.target.checked);
+    // }else{
+    //   alert('Please fill out all fields about your project');
+    // }
       setCushion(event.target.checked);
-    }else{
-      alert('Please fill out all fields about your project');
-    }
+
   };
 
   useEffect(() => {

@@ -22,6 +22,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
     const[units3, setUnits3] = useState('in');
     const[folderID, setFolderID] = useState(null);
     const[yardage, setYardage] = useState(null);
+    const[panels, setPanels] = useState(null);
+
 
     const fractions = [
         { label: '0', value: 0},
@@ -291,56 +293,98 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
 
     const calcYardage = () => {
         let yardage;
-        if (mainrailroad === 'false'){
-            if (stationary === 'true'){
-                const ypp = document.getElementById('wpp').value * 54 / 36;
-                const repeats = Math.ceil((Number(f2fh) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
-                const cl = repeats * (Number(mainVertical) + Number(document.getElementById('mainvert').value));
-                const cutYards = (cl + (8.0 - cl % 8)) / 36;
-                let fw = (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
-                if (fw == 0){
-                    fw = 54;
-                }
-                yardage = cutYards * Number(document.getElementById('wpp').value) * ((Number(document.getElementById('f2fw').value)+Number(f2fw)) / fw);
+        if(pleat === 'ripple'){
+            let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
+            if (fabWidth == 0){fabWidth = 54;}
+            let rw = (Number(f2fw) +  Number(document.getElementById('f2fw').value));
+            if (panels == 2){
+                rw = rw / 2;
             }
-            else if (stationary === 'false') {
-                const cw = 14.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * fullness;
-                let widths = cw / (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
-                widths = widths.toFixed(3);
-                if (widths % 1 <= .30){//round down to full width
-                    widths = Math.floor(widths);
-                }
-                else{//round up to nearest full width
-                    widths = Math.ceil(widths);
-                }
-                console.log(widths);
+            const pw = rw * Number(fullness) + 7;
+            const widths = Math.ceil(pw / fabWidth);
+            const cl = 14.0 + (Number(document.getElementById('f2fh').value)+Number(f2fh));
+            if (!mainVertical){
+                let ypp = cl / 36;
+                yardage = ypp * widths;
+            }
+            else{
                 const repeats = Math.ceil((Number(document.getElementById('f2fh').value) + Number(f2fh) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
                 const cl = repeats * (Number(mainVertical) + Number(document.getElementById('mainvert').value));
                 const cutYards = (cl + (8.0 - cl % 8)) / 36;
-                yardage = widths * cutYards;
+                yardage = cutYards * widths;
+            }
+            if (panels == 2){
+                yardage *= 2;
             }
         }
         else{
-            if (stationary === 'false') {
-                const cw = 14.0 + (parseInt(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;
-                let yardage = cw / 36;
-                let f = Math.floor(yardage);
-                if(yardage-f < 0.5){
-                    yardage = f;
+            if (mainrailroad === 'false'){
+                if (stationary === 'true'){
+                    if(!mainVertical){
+                        let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
+                        if (fabWidth == 0){
+                            fabWidth = 54;
+                        }
+                        const widths = Number(document.getElementById('wpp').value) / fabWidth;
+                        const ypp = widths * 54 / 36;
+                        yardage = ypp * panels;
+                    }
+                    else{
+                        const repeats = Math.ceil((Number(f2fh) +  Number(document.getElementById('f2fh').value) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
+                        const cl = repeats * (Number(mainVertical) + Number(document.getElementById('mainvert').value));
+                        const cutYards = (cl + (8.0 - cl % 8)) / 36;
+                        let fw = (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
+                        if (fw == 0){
+                            fw = 54;
+                        }
+                        //idk if this is right
+                        yardage = cutYards * Number(document.getElementById('wpp').value) * ((Number(document.getElementById('f2fw').value)+Number(f2fw)) / fw);
+                        //
+                    }
                 }
-                else {yardage = f+0.5;}
-                console.log(yardage);
-                const check = Number(document.getElementById('f2fh').value) + Number(f2fh) + 20;
-                console.log(check);
-                if (check > cw){alert("Height is too much by " + (check-cw));}
-                return (yardage);
+                else if (stationary === 'false') {
+                    const cw = 14.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * fullness;
+                    let widths = cw / (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
+                    widths = widths.toFixed(3);
+                    if (widths % 1 <= .30){//round down to full width
+                        widths = Math.floor(widths);
+                    }
+                    else{//round up to nearest full width
+                        widths = Math.ceil(widths);
+                    }
+                    let cutYards;
+                    if(!mainVertical){//no vertical repeat
+                        cutYards = (Number(f2fh) +  Number(document.getElementById('f2fh').value) + 20.0) / 36;
+                    }
+                    else{
+                        const repeats = Math.ceil((Number(document.getElementById('f2fh').value) + Number(f2fh) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
+                        const cl = repeats * (Number(mainVertical) + Number(document.getElementById('mainvert').value));
+                        cutYards = (cl + (8.0 - cl % 8)) / 36;
+                    }
+                    yardage = widths * cutYards;
+                }
             }
             else{
-                let fw = (Number(document.getElementById('f2fw').value)+ Number(f2fw)) / (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
-                yardage = (Number(document.getElementById('wpp').value) * 54 / 36) * fw;
+                if (stationary === 'false') {
+                    const cw = 14.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;
+                    let yardage = cw + (18) / 36;
+                    let f = Math.floor(yardage);
+                    if(yardage-f < 0.5){yardage = f;}
+                    else {yardage = f+0.5;}
+                    const check = Number(document.getElementById('f2fh').value) + Number(f2fh) + 20;
+                    if (check > cw){alert("Height is too much by " + (check-cw));}
+                    return (yardage);
+                }
+                else{
+                    let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
+                    if (fabWidth == 0){fabWidth = 54;}
+                    const widths = Number(document.getElementById('wpp').value) / fabWidth;
+                    const ypp = widths * 54 / 36;
+                    yardage = ypp * panels;
+                }
             }
         }
-        return (yardage);
+        setYardage(yardage);
     }
 
     return(<>
@@ -412,6 +456,26 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
 
             <br></br>
 
+            Number of panels:
+            <div>
+                <label> 
+                    <input type='radio' name='panels' style={{marginRight:'5px'}}
+                    value={1} onChange={(e) => {setPanels(e)}}></input>
+                    1
+                </label> <br></br>
+                <label> 
+                    <input type='radio' name='panels' style={{marginRight:'5px'}}
+                    value={2} onChange={(e) => {setPanels(e)}}></input>
+                    2
+                </label> <br></br>
+                {/* <label> 
+                    <input type='radio' name='panels' style={{marginRight:'5px'}}
+                    value={3} onChange={(e) => {setPanels(e)}}></input>
+                    3
+                </label> <br></br> */}
+                <br></br>
+            </div>
+
             Will the panels be stationary?
             <div>
                 <label style={{marginRight:'25px'}}> 
@@ -428,7 +492,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     value={'false'} onChange={handleStationaryChange}></input>
                     No (if no, they will be fully functioning)
                 </label>
-                {stationary === 'false' && <>
+                {stationary === 'false' &&<div>
                     <br></br>What is the fullness?<br></br>
                     <label>
                         <input type='radio' name='fullness' onClick={() => setFullness(1.5)}></input> 1.5
@@ -447,8 +511,9 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     </label><br></br>
                     <label>
                         <input type='radio' name='fullness' onClick={() => setFullness(3)}></input> 3
-                    </label>
-                </>}<br></br><br></br>
+                    </label><br></br><br></br>    
+                </div>}
+                <br></br><br></br>
             </div>
 
             Lining preference
@@ -525,23 +590,23 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             <div>
                 <label>
                     <input type='radio' name='pleat' style={{marginRight:'5px'}}
-                    value={'2top'} onChange={(e) => {handlePleatChange(e); setFullness(2*fullness);}}></input>
-                    2 finger top tack
+                    value={'2top'} onChange={handlePleatChange}></input>
+                    2 finger top tack (Recommended 2x fullness)
                 </label><br></br>
                 <label> 
                     <input type='radio' name='pleat' style={{marginRight:'5px'}}
-                    value={'2bot'} onChange={(e) => {handlePleatChange(e); setFullness(2*fullness);}}></input>
-                    2 finger botton tack
+                    value={'2bot'} onChange={handlePleatChange}></input>
+                    2 finger botton tack (Recommended 2x fullness)
                 </label><br></br>
                 <label>
                     <input type='radio' name='pleat' style={{marginRight:'5px'}}
-                    value={'3top'} onChange={(e) => {handlePleatChange(e); setFullness(3*fullness);}}></input>
-                    3 finger top tack
+                    value={'3top'} onChange={handlePleatChange}></input>
+                    3 finger top tack (Recommended 2.5x or 3x fullness)
                 </label><br></br>
                 <label> 
                     <input type='radio' name='pleat' style={{marginRight:'5px'}}
-                    value={'3bot'} onChange={(e) => {handlePleatChange(e); setFullness(3*fullness);}}></input>
-                    3 finger bottom tack
+                    value={'3bot'} onChange={handlePleatChange}></input>
+                    3 finger bottom tack (Recommended 2.5x or 3x fullness)
                 </label><br></br>
                 <label>
                     <input type='radio' name='pleat' style={{marginRight:'5px'}}
@@ -578,7 +643,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 </label><br></br><br></br>
             </div>
 
-            Do you need hardware?
+            {/* Do you need hardware?
             <div>
                 <label> 
                     <input type='radio' name='hardware' style={{marginRight:'5px'}}
@@ -653,7 +718,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     </div>}
                 </div>}
                 <br></br>
-            </div>
+            </div> */}
 
             Are you using COM material?
             <div>
@@ -799,8 +864,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 <input id='where'></input>
             </div><br></br>
             {yardage}<br></br>
-            <button onClick={() =>  {setYardage(calcYardage())}}>Calculate yardage</button>
-            <button onClick={submitForm}>Submit</button>
+            <button onClick={() =>  {calcYardage()}}>Calculate yardage</button>
+            {/* <button onClick={submitForm}>Submit</button> */}
         </div>
     </>)
 }

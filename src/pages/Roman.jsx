@@ -71,6 +71,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
     const handleMainHorizontal = (e) => {mainHorizontalChange(e.target.value);};
 
     //Contrast fabric units
+    const [contr, setContr] = useState(null);
     const handleUnits3 = (event) => {setUnits3(event.target.value);}
 
     const [contrastWidth, contrastWidthChange] = useState('');
@@ -258,25 +259,53 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
 
     const [yardage, setYardage] = useState(null);
     const calcYardage = () => {
-        if (Number(document.getElementById('mainvert').value) === 0 || Number(mainVertical) === 0){
+        //this is for solid fabric (no vertical repeat)
+        if (Number(document.getElementById('mainvert').value) === 0 && Number(mainVertical) === 0){
+            console.log("no vertical repeat");
+            //inside mounting
             if (mount === 'inside'){
+                if (document.getElementById('f2fw').value == 0 
+                || document.getElementById('mainwidth').value == 0
+                || document.getElementById('f2fh').value == 0
+                ){
+                    alert("Please fill out all relevant fields");
+                    return;
+                }
                 const cutWidth = (Number(document.getElementById('f2fw').value) + Number(f2fw)) * 0.75 + 3;
                 const widths = Math.ceil(cutWidth / (Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
                 const cutLength = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
                 const cutYards = (Math.round((cutLength / 36) * 4) / 4).toFixed(2);
                 setYardage(widths * cutYards);
             }
+            //outside mounting
             else{
+                if (document.getElementById('f2fw').value == 0 
+                || document.getElementById('abvf').value == 0 
+                || document.getElementById('mainwidth').value == 0
+                || document.getElementById('f2fh').value == 0
+                ){
+                    alert("Please fill out all relevant fields");
+                    return;
+                }
                 const widths = Math.ceil(4.0 + Number(document.getElementById('f2fw').value) + Number(f2fw)) / ((Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
                 const obHeight = Number(document.getElementById('abvf').value) + Number(abvf) + Number(document.getElementById('f2fh').value) + Number(f2fh);
                 const cutYards = (Math.round(((20.0 + obHeight) / 36) * 4) / 4).toFixed(2);
                 setYardage(widths * cutYards);
             }
         }
+        //fabrics with repeat
         else{
+            if (document.getElementById('f2fw').value == 0 
+                || document.getElementById('mainvert').value == 0 
+                || document.getElementById('mainwidth').value == 0
+                || document.getElementById('f2fh').value == 0
+                ){
+                    alert("Please fill out all relevant fields");
+                    return;
+                }
             const repeats = Math.ceil((20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh)) / (Number(document.getElementById('mainvert').value) + Number(mainVertical)));
             const cutLength = repeats * (Number(document.getElementById('mainvert').value) + Number(mainVertical));
-            const cutYards = (Math.round((cutLength / 36) * 4) / 4).toFixed(2);
+            const cutYards = (Math.ceil((cutLength / 36) * 4) / 4).toFixed(2);
             const wpp = Math.ceil((Number(document.getElementById('f2fw').value) + Number(f2fw)) / (Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
             setYardage(wpp * cutYards * panels);
         }
@@ -521,25 +550,6 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 <br></br>
             </div>
 
-            Number of panels:
-            <div>
-                <label> 
-                    <input type='radio' name='panels' style={{marginRight:'5px'}}
-                    value={1} onChange={(e) => {setPanels(e)}}></input>
-                    1
-                </label> <br></br>
-                <label> 
-                    <input type='radio' name='panels' style={{marginRight:'5px'}}
-                    value={2} onChange={(e) => {setPanels(e)}}></input>
-                    2
-                </label> <br></br>
-                <label> 
-                    <input type='radio' name='panels' style={{marginRight:'5px'}}
-                    value={3} onChange={(e) => {setPanels(e)}}></input>
-                    3
-                </label> <br></br><br></br>
-            </div>
-
             Are you using COM material?
             <div>
                 <label> 
@@ -613,13 +623,24 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 </label> <br></br>
                 <label>
                     <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={'railroad'} onChange={handleMainRailroad}></input>
+                    value={'railroad'} onChange={handleMainRailroad}/>
                     Railroading
-                </label><br></br>
-            </div><br></br>
+                </label><br/>
+            </div><br />
 
-            Contrast Fabric specifications:
+            Are we using contrast fabric?
             <div>
+                <label>
+                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContr("yes")}}/>
+                    Yes
+                </label> <br />
+                <label>
+                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContr(null)}}/>
+                    No
+                </label>
+            </div>
+            {contr == "yes" && <div> <br />
+                Contrast Fabric specifications: <br />
                 What units are the measurements in?
                 <label>
                     <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units3' onChange={handleUnits3}></input> Centimeters
@@ -670,24 +691,24 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     ></Dropdown>
                 </>}
                 <br></br>
-                Are we railroaded?
+                How are we running the fabric?
                 <br></br><label> 
                     <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
-                    value={true} onChange={handleContrastRailroad}></input>
-                    Yes
+                    value={false} onChange={handleContrastRailroad}></input>
+                    Up the bolt
                 </label> <br></br>
                 <label>
                     <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
-                    value={false} onChange={handleContrastRailroad}></input>
-                    No
+                    value={true} onChange={handleContrastRailroad}></input>
+                    Railroading
                 </label><br></br><br></br>
                 Please specify where the contrast fabric will be used:
                 <input id='where'></input>
-            </div><br></br>
+            </div>} <br />
             
             {yardage}<br></br>
-            <button onClick={calcYardage}>Calculte yardage</button>
-            <button onClick={submitForm}>Submit</button>
+            <button onClick={calcYardage}>Calculate yardage</button>
+            {/* <button onClick={submitForm}>Submit</button> */}
         </div>
     )
 }
