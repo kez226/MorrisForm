@@ -320,7 +320,12 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         else{
             if (mainrailroad === 'false'){
                 if (stationary === 'true'){
-                    if(!mainVertical){
+                    //up the bolt, stationary, no vertical repeat
+                    if(Number(document.getElementById('mainvert').value) === 0 && Number(mainVertical) === 0){
+                        if (document.getElementById('wpp').value == 0){
+                            alert("Please fill out all relevant fields");
+                            return;
+                        }
                         let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
                         if (fabWidth == 0){
                             fabWidth = 54;
@@ -329,7 +334,17 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         const ypp = widths * 54 / 36;
                         yardage = ypp * panels;
                     }
+                    //up the bolt, stationary, with vertical repeat
                     else{
+                        if (document.getElementById('wpp').value == 0
+                        || document.getElementById('f2fh').value == 0
+                        || document.getElementById('f2fw').value == 0
+                        || document.getElementById('mainvert').value == 0
+                        || document.getElementById('mainwidth').value == 0
+                        ){
+                            alert("Please fill out all relevant fields");
+                            return;
+                        }
                         const repeats = Math.ceil((Number(f2fh) +  Number(document.getElementById('f2fh').value) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
                         const cl = repeats * (Number(mainVertical) + Number(document.getElementById('mainvert').value));
                         const cutYards = (cl + (8.0 - cl % 8)) / 36;
@@ -342,7 +357,16 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         //
                     }
                 }
+                //up the bolt, functional
                 else if (stationary === 'false') {
+                    if (document.getElementById('wpp').value == 0
+                    || document.getElementById('f2fh').value == 0
+                    || document.getElementById('f2fw').value == 0
+                    || document.getElementById('mainwidth').value == 0
+                    ){
+                        alert("Please fill out all relevant fields");
+                        return;
+                    }
                     const cw = 14.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * fullness;
                     let widths = cw / (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
                     widths = widths.toFixed(3);
@@ -353,7 +377,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         widths = Math.ceil(widths);
                     }
                     let cutYards;
-                    if(!mainVertical){//no vertical repeat
+                    //no vertical repeat
+                    if(Number(document.getElementById('mainvert').value) === 0 && Number(mainVertical) === 0){
                         cutYards = (Number(f2fh) +  Number(document.getElementById('f2fh').value) + 20.0) / 36;
                     }
                     else{
@@ -364,8 +389,14 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     yardage = widths * cutYards;
                 }
             }
+            //railroaded
             else{
+                //functional
                 if (stationary === 'false') {
+                    if (document.getElementById('f2fh').value == 0 || document.getElementById('f2fw').value == 0){
+                        alert("Please fill out all relevant fields");
+                        return;
+                    }
                     const cw = 14.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;
                     let yardage = cw + (18) / 36;
                     let f = Math.floor(yardage);
@@ -375,7 +406,12 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     if (check > cw){alert("Height is too much by " + (check-cw));}
                     return (yardage);
                 }
+                //stationary
                 else{
+                    if (document.getElementById('wpp').value == 0){
+                        alert("Please fill out all relevant fields");
+                        return;
+                    }
                     let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
                     if (fabWidth == 0){fabWidth = 54;}
                     const widths = Number(document.getElementById('wpp').value) / fabWidth;
@@ -491,8 +527,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     <input type='radio' name='stationary' style={{marginRight:'5px'}}
                     value={'false'} onChange={handleStationaryChange}></input>
                     No (if no, they will be fully functioning)
-                </label>
-                {stationary === 'false' &&<div>
+                </label> <br />
+                {stationary === 'false' &&<>
                     <br></br>What is the fullness?<br></br>
                     <label>
                         <input type='radio' name='fullness' onClick={() => setFullness(1.5)}></input> 1.5
@@ -511,9 +547,9 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     </label><br></br>
                     <label>
                         <input type='radio' name='fullness' onClick={() => setFullness(3)}></input> 3
-                    </label><br></br><br></br>    
-                </div>}
-                <br></br><br></br>
+                    </label> <br />
+                </>}
+                <br></br> 
             </div>
 
             Lining preference

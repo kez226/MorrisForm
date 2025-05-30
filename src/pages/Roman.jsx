@@ -264,6 +264,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             console.log("no vertical repeat");
             //inside mounting
             if (mount === 'inside'){
+                console.log('inside');
                 if (document.getElementById('f2fw').value == 0 
                 || document.getElementById('mainwidth').value == 0
                 || document.getElementById('f2fh').value == 0
@@ -279,22 +280,24 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             }
             //outside mounting
             else{
-                if (document.getElementById('f2fw').value == 0 
+                console.log("outside");
+                if (document.getElementById('of2fw').value == 0 
                 || document.getElementById('abvf').value == 0 
                 || document.getElementById('mainwidth').value == 0
-                || document.getElementById('f2fh').value == 0
+                || document.getElementById('of2fh').value == 0
                 ){
                     alert("Please fill out all relevant fields");
                     return;
                 }
-                const widths = Math.ceil(4.0 + Number(document.getElementById('f2fw').value) + Number(f2fw)) / ((Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
-                const obHeight = Number(document.getElementById('abvf').value) + Number(abvf) + Number(document.getElementById('f2fh').value) + Number(f2fh);
+                const widths = Math.ceil(4.0 + Number(document.getElementById('of2fw').value) + Number(f2fw)) / ((Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
+                const obHeight = Number(document.getElementById('abvf').value) + Number(abvf) + Number(document.getElementById('of2fh').value) + Number(f2fh);
                 const cutYards = (Math.round(((20.0 + obHeight) / 36) * 4) / 4).toFixed(2);
                 setYardage(widths * cutYards);
             }
         }
         //fabrics with repeat
         else{
+            console.log("repeat");
             if (document.getElementById('f2fw').value == 0 
                 || document.getElementById('mainvert').value == 0 
                 || document.getElementById('mainwidth').value == 0
