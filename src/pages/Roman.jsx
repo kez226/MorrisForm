@@ -122,14 +122,14 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         }
         else{
             if (units1 !== 'in'){
-                formData.append('F2fw', document.getElementById('of2fw').value);
-                formData.append('F2fh', document.getElementById('of2fh').value);
+                formData.append('F2fw', document.getElementById('f2fw').value);
+                formData.append('F2fh', document.getElementById('f2fh').value);
                 formData.append('Abvc', document.getElementById('abvc').value);
                 formData.append('Abvf', document.getElementById('abvf').value);
             }
             else{
-                formData.append('F2fw', document.getElementById('of2fw').value + f2fw);
-                formData.append('F2fh', document.getElementById('of2fh').value + f2fh);
+                formData.append('F2fw', document.getElementById('f2fw').value + f2fw);
+                formData.append('F2fh', document.getElementById('f2fh').value + f2fh);
                 formData.append('Abvc', document.getElementById('abvc').value + abvc);
                 formData.append('Abvf', document.getElementById('abvf').value + abvf);
             }
@@ -259,6 +259,27 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
 
     const [yardage, setYardage] = useState(null);
     const calcYardage = () => {
+        if (mainrailroad === "railroad"){
+            if (document.getElementById('f2fw').value == 0 
+            || document.getElementById('mainwidth').value == 0
+            || document.getElementById('f2fh').value == 0
+            ){
+                alert("Please fill out all relevant fields");
+                return;
+            }
+            const panelHeight = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
+            const check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));
+            if (panelHeight > check){
+                alert("Height is too much by " + (panelHeight - check));
+                return;
+            }
+            let cutWidth = 14.0 + Number(document.getElementById('f2fw').value) + Number(f2fw);
+            cutWidth += 18 - (cutWidth % 18);
+            cutWidth = (cutWidth / 36);
+            setYardage(cutWidth);
+            console.log(cutWidth);
+            return;
+        }
         //this is for solid fabric (no vertical repeat)
         if (Number(document.getElementById('mainvert').value) === 0 && Number(mainVertical) === 0){
             console.log("no vertical repeat");
@@ -281,16 +302,16 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             //outside mounting
             else{
                 console.log("outside");
-                if (document.getElementById('of2fw').value == 0 
+                if (document.getElementById('f2fw').value == 0 
                 || document.getElementById('abvf').value == 0 
                 || document.getElementById('mainwidth').value == 0
-                || document.getElementById('of2fh').value == 0
+                || document.getElementById('f2fh').value == 0
                 ){
                     alert("Please fill out all relevant fields");
                     return;
                 }
-                const widths = Math.ceil(4.0 + Number(document.getElementById('of2fw').value) + Number(f2fw)) / ((Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
-                const obHeight = Number(document.getElementById('abvf').value) + Number(abvf) + Number(document.getElementById('of2fh').value) + Number(f2fh);
+                const widths = Math.ceil(4.0 + Number(document.getElementById('f2fw').value) + Number(f2fw)) / ((Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
+                const obHeight = Number(document.getElementById('abvf').value) + Number(abvf) + Number(document.getElementById('f2fh').value) + Number(f2fh);
                 const cutYards = (Math.round(((20.0 + obHeight) / 36) * 4) / 4).toFixed(2);
                 setYardage(widths * cutYards);
             }
@@ -368,7 +389,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     What are the approx. following dimensions for outside mounts: 
                     <br></br><label>
                         Frame-to-frame width:
-                        <input id='of2fw' style={{marginLeft:'291px'}}></input>
+                        <input id='f2fw' style={{marginLeft:'291px'}}></input>
                     </label>
                     {units1 === 'in' && <>
                         <Dropdown
@@ -378,7 +399,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     </>}<br></br>
                     <label >
                         Frame-to-frame height (to sill): 
-                        <input id='of2fh' style={{marginLeft:'232px'}}></input>
+                        <input id='f2fh' style={{marginLeft:'232px'}}></input>
                     </label>
                     {units1 === 'in' && <>
                         <Dropdown
