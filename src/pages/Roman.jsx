@@ -663,7 +663,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     No
                 </label>
             </div>
-            {contr == "yes" && <div> <br />
+            {contr === "yes" && <div> <br />
                 Contrast Fabric specifications: <br />
                 What units are the measurements in?
                 <label>
