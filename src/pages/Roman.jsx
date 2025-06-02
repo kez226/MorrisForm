@@ -274,7 +274,9 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 return;
             }
             let cutWidth = 14.0 + Number(document.getElementById('f2fw').value) + Number(f2fw);
-            cutWidth += 18 - (cutWidth % 18);
+            if(cutWidth % 18 !== 0){
+                cutWidth += 18 - (cutWidth % 18);
+            }
             cutWidth = (cutWidth / 36);
             setYardage(cutWidth);
             console.log(cutWidth);
@@ -296,8 +298,14 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 const cutWidth = (Number(document.getElementById('f2fw').value) + Number(f2fw)) * 0.75 + 3;
                 const widths = Math.ceil(cutWidth / (Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
                 const cutLength = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
-                const cutYards = (Math.round((cutLength / 36) * 4) / 4).toFixed(2);
+                const yardDiff = cutLength % 9;
+                let cutYards = cutLength;
+                if (yardDiff !== 0){
+                    cutYards += (9 - yardDiff);
+                }    
+                cutYards = (cutYards / 36).toFixed(2); 
                 setYardage(widths * cutYards);
+                return;
             }
             //outside mounting
             else{
@@ -312,8 +320,14 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 }
                 const widths = Math.ceil(4.0 + Number(document.getElementById('f2fw').value) + Number(f2fw)) / ((Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
                 const obHeight = Number(document.getElementById('abvf').value) + Number(abvf) + Number(document.getElementById('f2fh').value) + Number(f2fh);
-                const cutYards = (Math.round(((20.0 + obHeight) / 36) * 4) / 4).toFixed(2);
+                let cutYards = 20.0 + obHeight;
+                const yardDiff = cutYards % 9;
+                if (yardDiff !== 0){
+                    cutYards += (9 - yardDiff);
+                }    
+                cutYards = (cutYards / 36).toFixed(2); 
                 setYardage(widths * cutYards);
+                return;
             }
         }
         //fabrics with repeat
@@ -328,10 +342,16 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     return;
                 }
             const repeats = Math.ceil((20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh)) / (Number(document.getElementById('mainvert').value) + Number(mainVertical)));
-            const cutLength = repeats * (Number(document.getElementById('mainvert').value) + Number(mainVertical));
-            const cutYards = (Math.ceil((cutLength / 36) * 4) / 4).toFixed(2);
-            const wpp = Math.ceil((Number(document.getElementById('f2fw').value) + Number(f2fw)) / (Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
-            setYardage(wpp * cutYards * panels);
+            const cutLength = repeats * (Number(document.getElementById('mainvert').value) + Number(mainVertical)); 
+            const yardDiff = cutLength % 9;
+            let cutYards = cutLength;
+            if (yardDiff !== 0){
+                cutYards += (9 - yardDiff);
+            }    
+            cutYards = (cutYards / 36).toFixed(2); 
+            const widths = Math.ceil((Number(document.getElementById('f2fw').value) + Number(f2fw)) / (Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
+            setYardage(widths * cutYards);
+            return;
         }
     }
 
