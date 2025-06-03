@@ -394,8 +394,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     else{
                         const repeats = Math.ceil((Number(document.getElementById('f2fh').value) + Number(f2fh) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
                         const cl = repeats * (Number(mainVertical) + Number(document.getElementById('mainvert').value));
-                        cutYards = cl / 36;
                         cutYards += 9 - cutYards % 9;
+                        cutYards = cl / 36;
                     }
                     setYardage(widths * cutYards);
                     return;
