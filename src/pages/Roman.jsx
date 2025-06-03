@@ -267,19 +267,25 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 alert("Please fill out all relevant fields");
                 return;
             }
-            const panelHeight = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
+            if (mount === "outside" && document.getElementById('abvf').value == 0){
+                alert("Please fill out all relevant fields");
+                return;
+            }
+            let panelHeight = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
+            if (mount === "outside"){
+                panelHeight =+ Number(document.getElementById('abvf').value) + Number(abvf);
+            }
             const check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));
             if (panelHeight > check){
                 alert("Height is too much by " + (panelHeight - check));
                 return;
             }
-            let cutWidth = 14.0 + Number(document.getElementById('f2fw').value) + Number(f2fw);
+            let cutWidth = 6.0 + Number(document.getElementById('f2fw').value) + Number(f2fw);
             if(cutWidth % 18 !== 0){
                 cutWidth += 18 - (cutWidth % 18);
             }
             cutWidth = (cutWidth / 36);
             setYardage(cutWidth);
-            console.log(cutWidth);
             return;
         }
         //this is for solid fabric (no vertical repeat)
@@ -341,6 +347,10 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     alert("Please fill out all relevant fields");
                     return;
                 }
+            if (mount === "outside" && document.getElementById('abvf').value == 0){
+                alert("Please fill out all relevant fields");
+                return;
+            }
             const repeats = Math.ceil((20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh)) / (Number(document.getElementById('mainvert').value) + Number(mainVertical)));
             const cutLength = repeats * (Number(document.getElementById('mainvert').value) + Number(mainVertical)); 
             const yardDiff = cutLength % 9;
