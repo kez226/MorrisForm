@@ -301,7 +301,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             if (panels == 2){
                 rw = rw / 2;
             }
-            const pw = rw * Number(fullness) + 7;
+            const pw = rw * Number(fullness) + 7; //change to be 7 for one panel, 14 for two panel
             const widths = Math.ceil(pw / fabWidth);
             const cl = 14.0 + (Number(document.getElementById('f2fh').value)+Number(f2fh));
             if(Number(document.getElementById('mainvert').value) === 0 && Number(mainVertical) === 0){
@@ -412,9 +412,9 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         alert("Please fill out all relevant fields");
                         return;
                     }
-                    const cw = 14.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;
-                    let yardage = cw / 36;
-                    yardage += 9 - yardage % 9;
+                    let cw = 14.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;
+                    cw += 9 - cw % 9;
+                    yardage = cw / 36;
                     const check = Number(document.getElementById('f2fh').value) + Number(f2fh) + 20;
                     if (check > cw){alert("Height is too much by " + (check-cw));}
                     setYardage(yardage);
@@ -430,7 +430,6 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         return;
                     }
                     let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
-                    if (fabWidth == 0){fabWidth = 54;}
                     const widths = Number(document.getElementById('wpp').value) / fabWidth;
                     const ypp = widths * 54 / 36;
                     setYardage(ypp * panels);
@@ -544,27 +543,6 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     value={'false'} onChange={handleStationaryChange}></input>
                     No (if no, they will be fully functioning)
                 </label> <br />
-                {stationary === 'false' &&<>
-                    <br></br>What is the fullness?<br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(1.5)}></input> 1.5
-                    </label><br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(2)}></input> 2
-                    </label><br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(2.25)}></input> 2.25
-                    </label><br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(2.5)}></input> 2.5
-                    </label><br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(2.75)}></input> 2.75
-                    </label><br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(3)}></input> 3
-                    </label> <br />
-                </>}
                 <br></br> 
             </div>
 
@@ -692,7 +670,28 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     value={'other'} onChange={handlePleatChange}></input>
                     Other (Grommet, Rod-pocket, Cartridge, Tab-top … ):
                     <input type='text' id='pleat_other' placeholder='Other'></input>
-                </label><br></br><br></br>
+                </label><br></br>
+                {(pleat !== 'ripple') &&<>
+                    <br></br>What is the fullness?<br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(1.5)}></input> 1.5
+                    </label><br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(2)}></input> 2
+                    </label><br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(2.25)}></input> 2.25
+                    </label><br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(2.5)}></input> 2.5
+                    </label><br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(2.75)}></input> 2.75
+                    </label><br></br>
+                    <label>
+                        <input type='radio' name='fullness' onClick={() => setFullness(3)}></input> 3
+                    </label> <br />
+                </>} <br />
             </div>
 
             {/* Do you need hardware?

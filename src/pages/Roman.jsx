@@ -351,7 +351,9 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 alert("Please fill out all relevant fields");
                 return;
             }
-            const repeats = Math.ceil((20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh)) / (Number(document.getElementById('mainvert').value) + Number(mainVertical)));
+            let repeats;
+            if (mount === "outside"){repeats = Math.ceil((20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh) + Number(document.getElementById('abvf').value) + Number(abvf)) / (Number(document.getElementById('mainvert').value) + Number(mainVertical)));}
+            else{repeats = Math.ceil((20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh)) / (Number(document.getElementById('mainvert').value) + Number(mainVertical)));}
             const cutLength = repeats * (Number(document.getElementById('mainvert').value) + Number(mainVertical)); 
             const yardDiff = cutLength % 9;
             let cutYards = cutLength;
