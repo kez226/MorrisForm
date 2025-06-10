@@ -387,8 +387,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
     const [price, setPrice] = useState(null);
     const [stabilizer, setStabilizer] = useState(null);
     const calcPrice = () => {
-        if (document.getElementById('f2fw').value === 0
-        || document.getElementById('f2fh').value === 0
+        if (!document.getElementById('f2fw')
+        || !document.getElementById('f2fh')
         || !opFunction || !lined){
             alert("Please fill out all relevant fields");
             return;
