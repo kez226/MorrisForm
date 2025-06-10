@@ -35,6 +35,21 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         { label: '3/4', value: '.75' },
         { label: '7/8', value: '.875' }
     ];
+    const linings = {
+        "Unlined": 145.0,
+        "Sheer": 155.0,
+        'Lightweight Light Filter': 175.0,
+        'Light Filter': 175.0,
+        'Blackout': 210.0,
+        'Napped Sateen': 185.0,
+        'Lined and IStandard interlined': 245.0,
+        'Lined and Bump Interlined': 275.0,
+        'Self-Lined': 165.0,
+        'Self-Lined and Blackout': 255.0,
+        'Self-Lined and Standard Interlined': 225.0,
+        'Self-Lined and Bump Interlined': 265.0,
+        'French Blackout': 285.0
+    }
 
     const handleImageUpload = (event) => {
         if (event.target.files.length > 5){
@@ -338,6 +353,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             fabWidth = 54;
                         }
                         let cutYards = (20.0 + Number(f2fh) + Number(document.getElementById('f2fh').value)) / 36;
+                        if (pleat === 'ripple'){cutYards = (14.0 + Number(f2fh) + Number(document.getElementById('f2fh').value)) / 36;}
                         cutYards += 18 - (cutYards % 18);
                         const widths = (Number(f2fw) + Number(document.getElementById('f2fw').value)) / fabWidth;
                         setYardage(Number(document.getElementById('wpp').value) * widths / cutYards);
@@ -354,7 +370,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             alert("Please fill out all relevant fields");
                             return;
                         }
-                        const repeats = Math.ceil((Number(f2fh) +  Number(document.getElementById('f2fh').value) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
+                        let repeats = Math.ceil((Number(f2fh) +  Number(document.getElementById('f2fh').value) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
+                        if (pleat === 'ripple'){repeats = Math.ceil((Number(f2fh) +  Number(document.getElementById('f2fh').value) + 14.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));}
                         const cl = repeats * (Number(mainVertical) + Number(document.getElementById('mainvert').value));
                         let cutYards = cl / 36;
                         cutYards += 9 - cutYards % 9;
@@ -377,7 +394,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         alert("Please fill out all relevant fields");
                         return;
                     }
-                    const cw = 14.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * Number(fullness);
+                    let cw = 20.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * Number(fullness);
+                    if (pleat === 'ripple'){cw = 14.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * Number(fullness);}
                     let widths = cw / (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
                     widths = widths.toFixed(3);
                     if (widths % 1 <= .30){//round down to full width
@@ -412,7 +430,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         alert("Please fill out all relevant fields");
                         return;
                     }
-                    let cw = 14.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;
+                    let cw = 20.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;
+                    if (pleat === 'ripple'){cw = 14.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;}
                     cw += 9 - cw % 9;
                     yardage = cw / 36;
                     const check = Number(document.getElementById('f2fh').value) + Number(f2fh) + 20;
@@ -436,6 +455,11 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 }
             }
         }
+    }
+
+    const [price, setPrice] = useState(null);
+    const calcPrice = () => {
+        
     }
 
     return(<>
@@ -550,27 +574,27 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             <div>
                 <label>
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'unlined'} onChange={handleLinedChange}></input>
+                    value={'Unlined'} onChange={handleLinedChange}></input>
                     Unlined
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px'}}
-                    value={'sheer'} onChange={handleLinedChange}></input>
+                    value={'Sheer'} onChange={handleLinedChange}></input>
                     Sheer lining
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'lightweight light Filter'} onChange={handleLinedChange}></input>
+                    value={'Lightweight Light Filter'} onChange={handleLinedChange}></input>
                     Light weight light filtering lining (Poly cotton)
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'lightFilter'} onChange={handleLinedChange}></input>
+                    value={'Light Filter'} onChange={handleLinedChange}></input>
                     Regular Light filtering lining (100% cotton)
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'blackout'} onChange={handleLinedChange}></input>
+                    value={'Blackout'} onChange={handleLinedChange}></input>
                     Blackout lining
                 </label><br></br>
                 <label> 
@@ -580,8 +604,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Lined and IStandard interlined'} onChange={handleLinedChange}></input>
-                   Lined and IStandard interlined
+                    value={'Lined and IStandard Interlined'} onChange={handleLinedChange}></input>
+                   Lined and IStandard Interlined
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
@@ -600,8 +624,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Self-Lined and standard Interlined'} onChange={handleLinedChange}></input>
-                   Self-Lined and standard Interlined
+                    value={'Self-Lined and Standard Interlined'} onChange={handleLinedChange}></input>
+                   Self-Lined and Standard Interlined
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}

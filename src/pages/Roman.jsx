@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
+import { add, div } from 'three/tsl';
 
 const Roman = ({pname, name, address, email, room, numWindow, uploads, estName}) => {
     const[windowImg, setWindowImg] = useState(null);
     const[mount, setMount] = useState('');
     const[stationary,setStationary] = useState('');
-    const[opFunction, setOpFunction] = useState('');
+    const[opFunction, setOpFunction] = useState('cordlock');
     const[motorType, setMotorType] = useState('');
     // const[hardwired, setHardwired] = useState('');
     const[homeAuto, setHomeAuto] = useState('');
-    const[lined, setLined] = useState('');
+    const[lined, setLined] = useState('Unlined');
     const[com, setCom] = useState('');
     const[mainrailroad, setMainRailroad] = useState('');
     const[contrastrailroad, setContrastRailroad] = useState('');
@@ -92,6 +93,22 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         { label: '6/8', value: '.75' },
         { label: '7/8', value: '.875' }
     ];
+
+    const linings = {
+        "Unlined": 24.0,
+        "Sheer": 26.0,
+        'Lightweight Light Filter': 28.0,
+        'Light Filter': 28.0,
+        'Blackout': 32.0,
+        'Napped Sateen': 28.0,
+        'Lined and IStandard interlined': 35.0,
+        'Lined and Bump Interlined': 38.0,
+        'Self-Lined': 27.0,
+        'Self-Lined and Blackout': 32.0,
+        'Self-Lined and Standard Interlined': 35.0,
+        'Self-Lined and Bump Interlined': 38.0,
+        'French Blackout': 40.0
+    }
 
     const submitForm = (e) => {
         e.preventDefault();
@@ -367,6 +384,41 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         }
     }
 
+    const [price, setPrice] = useState(null);
+    const [stabilizer, setStabilizer] = useState(null);
+    const calcPrice = () => {
+        if (document.getElementById('f2fw').value === 0
+        || document.getElementById('f2fh').value === 0
+        || !opFunction || !lined){
+            alert("Please fill out all relevant fields");
+            return;
+        }
+        const sqFootage = Math.ceil(((Number(document.getElementById('f2fw').value) + Number(f2fw)) * (Number(document.getElementById('f2fh').value) + Number(f2fh))) / 144);
+        const basePrice = sqFootage * Number(linings[lined]);
+        let addPrice;
+        if (opFunction === "cordlock" || opFunction === "lift"){
+            if (!stabilizer){
+                alert("Please fill out all relevant fields");
+                return;
+            }
+            if (stabilizer === "yes"){
+                addPrice = 5.0 * sqFootage;
+            }
+        }
+        else if (opFunction === "cordless"){
+            addPrice = 30.0 * (Number(document.getElementById('f2fw').value) + Number(f2fw)) / 12;
+        }
+        else{//this is for motorized
+            addPrice = 650.0;
+            const extraFeet = Math.ceil(((Number(document.getElementById('f2fw').value) + Number(f2fw)) - 72) / 12);
+            if (extraFeet > 2)
+                addPrice += (extraFeet - 2) * 45.0;
+        }
+        console.log(basePrice);
+        console.log(addPrice);
+        setPrice(basePrice + addPrice);
+    }
+
     return(
         <div style={{border: 'grey solid 1px', padding:'5px'}}>
             <h1>Roman Shades</h1>
@@ -482,7 +534,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             Please select the operating function (pick 1):
             <div>
                 <label> 
-                    <input type='radio' name='opFunction' style={{marginRight:'5px'}}
+                    <input type='radio' name='opFunction' style={{marginRight:'5px'}} defaultChecked={true}
                     value={'cordlock'} onChange={handleOpFunction}></input>
                     Cordlock
                 </label> <br></br>
@@ -507,7 +559,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     value={'motorized'} onChange={handleOpFunction}></input>
                     Motorized (pick 1):
                 </label> <br></br>
-                {opFunction !== '' && opFunction !== 'cordlock' && opFunction !== 'cordless' && opFunction !== 'lift' &&  <div>
+                {opFunction === "motorized" &&  <div>
                     <label> 
                         <input type='radio' defaultChecked = {true} name='motorType' style={{marginRight:'5px', marginLeft:"25px"}}
                         value={'battery'} onChange={handleMotorChange}></input>
@@ -533,6 +585,11 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                         </label><br></br>
                     {/* </div>} */}
                 </div>}
+                {(opFunction === "cordlock" || opFunction === "lift") && <div>
+                    <br />Do you want to add stabilizer bars for structure?
+                    <br /><label><input type="radio" name='stablizer' onChange={() => setStabilizer("yes")}/> Yes</label>
+                    <br /><label><input type="radio" name='stablizer' onChange={() => setStabilizer("no")}/> No</label>
+                </div>}
                 <br></br>
             </div>
 
@@ -540,27 +597,27 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             <div>
                 <label>
                     <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px'}}
-                    value={'unlined'} onChange={handleLinedChange}></input>
+                    value={'Unlined'} onChange={handleLinedChange}></input>
                     Unlined
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType'  style={{marginRight:'5px'}}
-                    value={'sheer'} onChange={handleLinedChange}></input>
+                    value={'Sheer'} onChange={handleLinedChange}></input>
                     Sheer lining
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'lightweight light Filter'} onChange={handleLinedChange}></input>
+                    value={'Lightweight Light Filter'} onChange={handleLinedChange}></input>
                     Light weight light filtering lining (Poly cotton)
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'lightFilter'} onChange={handleLinedChange}></input>
+                    value={'Light Filter'} onChange={handleLinedChange}></input>
                     Regular Light filtering lining (100% cotton)
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'blackout'} onChange={handleLinedChange}></input>
+                    value={'Blackout'} onChange={handleLinedChange}></input>
                     Blackout lining
                 </label><br></br>
                 <label> 
@@ -570,7 +627,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Lined and IStandard interlined'} onChange={handleLinedChange}></input>
+                    value={'Lined and IStandard Interlined'} onChange={handleLinedChange}></input>
                    Lined and IStandard interlined
                 </label><br></br>
                 <label> 
@@ -590,8 +647,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Self-Lined and standard Interlined'} onChange={handleLinedChange}></input>
-                   Self-Lined and standard Interlined
+                    value={'Self-Lined and Standard Interlined'} onChange={handleLinedChange}></input>
+                   Self-Lined and Standard Interlined
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
@@ -764,6 +821,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             
             {yardage}<br></br>
             <button onClick={calcYardage}>Calculate yardage</button>
+            <br />{price}<br></br>
+            <button onClick={calcPrice}>Calculate pricing</button>
             {/* <button onClick={submitForm}>Submit</button> */}
         </div>
     )
