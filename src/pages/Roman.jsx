@@ -393,9 +393,17 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             alert("Please fill out all relevant fields");
             return;
         }
-        const sqFootage = Math.ceil(((Number(document.getElementById('f2fw').value) + Number(f2fw)) * (Number(document.getElementById('f2fh').value) + Number(f2fh))) / 144);
+        let sqFootage = (Number(document.getElementById('f2fw').value) + Number(f2fw)) * (Number(document.getElementById('f2fh').value) + Number(f2fh));
+        if (mount === "outside"){//outside
+            if (!document.getElementById('abvf')){
+                alert("Please fill out all relevant fields");
+                return;
+            }
+            sqFootage = (Number(document.getElementById('f2fw').value) + Number(f2fw)) * (Number(document.getElementById('f2fh').value) + Number(f2fh) + Number(document.getElementById('abvf').value) + Number(abvf));
+        }
+        sqFootage = Math.ceil(sqFootage / 144);
         const basePrice = sqFootage * Number(linings[lined]);
-        let addPrice;
+        let addPrice = 0;
         if (opFunction === "cordlock" || opFunction === "lift"){
             if (!stabilizer){
                 alert("Please fill out all relevant fields");
