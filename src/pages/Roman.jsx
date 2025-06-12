@@ -93,6 +93,13 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         }
     },[banding])
 
+    const [bead, setBead] = useState(null);
+
+    useEffect(() => {
+        if (opFunction !== "lift"){
+            setBead(null);
+        }
+    },[bead])
 
     const fractions = [
         { label: '0', value: 0},
@@ -587,9 +594,26 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     Clutch Lift
                 </label> <br></br>
                 {opFunction === 'lift' && <div>
+                    What color bead chain would you like? <br />
                     <label style={{marginLeft:'25px'}}>
-                        What color bead chain would you like?
-                        <input id='lift-color'></input>
+                        <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Steel")}}></input>
+                        Stainless Steel (standard)
+                    </label> <br />
+                    <label style={{marginLeft:'25px'}}>
+                        <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Antique")}}></input>
+                        Antique Brass
+                    </label> <br />
+                    <label style={{marginLeft:'25px'}}>
+                        <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Polished")}}></input>
+                        Polished Brass
+                    </label> <br />
+                    <label style={{marginLeft:'25px'}}>
+                        <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Black")}}></input>
+                        Black
+                    </label> <br />
+                    <label style={{marginLeft:'25px'}}>
+                        <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("White")}}></input>
+                        White
                     </label>
                 </div>}
                 <label> 
