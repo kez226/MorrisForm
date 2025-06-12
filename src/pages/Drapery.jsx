@@ -35,6 +35,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         { label: '3/4', value: '.75' },
         { label: '7/8', value: '.875' }
     ];
+
     const linings = {
         "Unlined": 145.0,
         "Sheer": 155.0,
@@ -42,7 +43,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         'Light Filter': 175.0,
         'Blackout': 210.0,
         'Napped Sateen': 185.0,
-        'Lined and IStandard interlined': 245.0,
+        'Lined and Standard Interlined': 245.0,
         'Lined and Bump Interlined': 275.0,
         'Self-Lined': 165.0,
         'Self-Lined and Blackout': 255.0,
@@ -353,7 +354,6 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             fabWidth = 54;
                         }
                         let cutYards = (20.0 + Number(f2fh) + Number(document.getElementById('f2fh').value)) / 36;
-                        if (pleat === 'ripple'){cutYards = (14.0 + Number(f2fh) + Number(document.getElementById('f2fh').value)) / 36;}
                         cutYards += 18 - (cutYards % 18);
                         const widths = (Number(f2fw) + Number(document.getElementById('f2fw').value)) / fabWidth;
                         setYardage(Number(document.getElementById('wpp').value) * widths / cutYards);
@@ -370,8 +370,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             alert("Please fill out all relevant fields");
                             return;
                         }
-                        let repeats = Math.ceil((Number(f2fh) +  Number(document.getElementById('f2fh').value) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
-                        if (pleat === 'ripple'){repeats = Math.ceil((Number(f2fh) +  Number(document.getElementById('f2fh').value) + 14.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));}
+                        const repeats = Math.ceil((Number(f2fh) +  Number(document.getElementById('f2fh').value) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
                         const cl = repeats * (Number(mainVertical) + Number(document.getElementById('mainvert').value));
                         let cutYards = cl / 36;
                         cutYards += 9 - cutYards % 9;
@@ -394,8 +393,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         alert("Please fill out all relevant fields");
                         return;
                     }
-                    let cw = 20.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * Number(fullness);
-                    if (pleat === 'ripple'){cw = 14.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * Number(fullness);}
+                    const cw = 14.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * Number(fullness);
                     let widths = cw / (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
                     widths = widths.toFixed(3);
                     if (widths % 1 <= .30){//round down to full width
@@ -425,23 +423,27 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 if (stationary === 'false') {
                     if (!document.getElementById('f2fh')
                     || !document.getElementById('f2fw')
+                    || !document.getElementById('mainwidth')
                     || !fullness
                     ){
                         alert("Please fill out all relevant fields");
                         return;
                     }
-                    let cw = 20.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;
-                    if (pleat === 'ripple'){cw = 14.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;}
+                    let cw = 14.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;
                     cw += 9 - cw % 9;
                     yardage = cw / 36;
-                    const check = Number(document.getElementById('f2fh').value) + Number(f2fh) + 20;
-                    if (check > cw){alert("Height is too much by " + (check-cw));}
+                    let check = Number(document.getElementById('f2fh').value) + Number(f2fh);
+                    if (pleat === "ripple"){check += 14}
+                    else{check += 20}
+                    let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
+                    if (check > fabWidth){alert("Height is too much by " + (check-fabWidth));}
                     setYardage(yardage);
                     return;
                 }
                 //stationary
                 else{
-                    if (!document.getElementById('wpp').value
+                    if (!document.getElementById('wpp')
+                    || !document.getElementById('f2fh')
                     || !document.getElementById('mainwidth')
                     || !panels
                     ){
@@ -451,6 +453,10 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
                     const widths = Number(document.getElementById('wpp').value) / fabWidth;
                     const ypp = widths * 54 / 36;
+                    let check = Number(document.getElementById('f2fh').value) + Number(f2fh);
+                    if (pleat === "ripple"){check += 14}
+                    else{check += 20}
+                    if (check > fabWidth){alert("Height is too much by " + (check-fabWidth));}
                     setYardage(ypp * panels);
                 }
             }
@@ -459,7 +465,15 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
 
     const [price, setPrice] = useState(null);
     const calcPrice = () => {
-        
+        if (!fullness || !document.getElementById("f2fw")
+        || !lined || !pleat){
+            alert("Please fill out all relevant fields");
+            return;
+        }
+        const widths = Math.ceil((Number(document.getElementById("f2fw").value) + Number(f2fw)) * fullness / 54.0);
+        let costPerWidth = linings[lined];
+        if (pleat === "ripple") {costPerWidth += 15;}
+        const basePrice = widths * costPerWidth;
     }
 
     return(<>
@@ -604,8 +618,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Lined and IStandard Interlined'} onChange={handleLinedChange}></input>
-                   Lined and IStandard Interlined
+                    value={'Lined and Standard Interlined'} onChange={handleLinedChange}></input>
+                   Lined and IStandard interlined
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
@@ -625,7 +639,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
                     value={'Self-Lined and Standard Interlined'} onChange={handleLinedChange}></input>
-                   Self-Lined and Standard Interlined
+                   Self-Lined and standard Interlined
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}

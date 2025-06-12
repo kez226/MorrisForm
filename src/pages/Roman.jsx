@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { add, div } from 'three/tsl';
 
 const Roman = ({pname, name, address, email, room, numWindow, uploads, estName}) => {
@@ -82,6 +82,16 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
     const handleContrastWidth = (e) => {contrastWidthChange(e.target.value);};
     const handleContrastVertical = (e) => {contrastVerticalChange(e.target.value);};
     const handleContrastHorizontal = (e) => {contrastHorizontalChange(e.target.value);};
+
+    const [banding, setBanding] = useState(false);
+    const [bandingType, setBandingType] = useState(null);
+
+    useEffect(() => {
+        if (!banding){
+            setBandingType(null);
+        }
+    },[banding])
+
 
     const fractions = [
         { label: '0', value: 0},
@@ -393,14 +403,17 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             alert("Please fill out all relevant fields");
             return;
         }
-        let sqFootage = (Number(document.getElementById('f2fw').value) + Number(f2fw)) * (Number(document.getElementById('f2fh').value) + Number(f2fh));
+        const width = Number(document.getElementById('f2fw').value) + Number(f2fw);
+        let height = Number(document.getElementById('f2fh').value) + Number(f2fh);
         if (mount === "outside"){//outside
             if (!document.getElementById('abvf')){
                 alert("Please fill out all relevant fields");
                 return;
             }
-            sqFootage = (Number(document.getElementById('f2fw').value) + Number(f2fw)) * (Number(document.getElementById('f2fh').value) + Number(f2fh) + Number(document.getElementById('abvf').value) + Number(abvf));
+            height += Number(document.getElementById('abvf').value) + Number(abvf);
         }
+        let sqFootage = width * height;
+        
         sqFootage = Math.ceil(sqFootage / 144);
         const basePrice = sqFootage * Number(linings[lined]);
         let addPrice = 0;
@@ -414,17 +427,33 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             }
         }
         else if (opFunction === "cordless"){
-            addPrice = 30.0 * (Number(document.getElementById('f2fw').value) + Number(f2fw)) / 12;
+            addPrice = 30.0 * (width) / 12;
         }
         else{//this is for motorized
             addPrice = 650.0;
-            const extraFeet = Math.ceil(((Number(document.getElementById('f2fw').value) + Number(f2fw)) - 72) / 12);
+            const extraFeet = Math.ceil(((width) - 72) / 12);
             if (extraFeet > 2)
                 addPrice += (extraFeet - 2) * 45.0;
         }
+        let bandingPrice = 0;
+        if (banding){
+            if (bandingType === "bottom"){
+                bandingPrice += Math.ceil(width / 12) * 13;
+            }
+            else if (bandingType === "sides"){
+                bandingPrice += 2 * Math.ceil(height / 12) * 13;
+            }
+            else if (bandingType === "bottom and sides"){
+                bandingPrice += 2 * Math.ceil(height / 12) * 13 + Math.ceil(width / 12) * 13;
+            }
+            else{
+                bandingPrice += 2 * (Math.ceil(height / 12) + Math.ceil(width / 12)) * 13;
+            }
+        }
         console.log(basePrice);
         console.log(addPrice);
-        setPrice(basePrice + addPrice);
+        console.log(bandingPrice);
+        setPrice(basePrice + addPrice + bandingPrice);
     }
 
     return(
@@ -611,22 +640,22 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 <label> 
                     <input type='radio' name='liningType'  style={{marginRight:'5px'}}
                     value={'Sheer'} onChange={handleLinedChange}></input>
-                    Sheer lining
+                    Sheer Lining
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
                     value={'Lightweight Light Filter'} onChange={handleLinedChange}></input>
-                    Light weight light filtering lining (Poly cotton)
+                    Light Weight Light Filtering Lining (Poly Cotton)
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
                     value={'Light Filter'} onChange={handleLinedChange}></input>
-                    Regular Light filtering lining (100% cotton)
+                    Regular Light Filtering Lining (100% Cotton)
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
                     value={'Blackout'} onChange={handleLinedChange}></input>
-                    Blackout lining
+                    Blackout Lining
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
@@ -635,8 +664,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Lined and IStandard Interlined'} onChange={handleLinedChange}></input>
-                   Lined and IStandard interlined
+                    value={'Lined and Standard Interlined'} onChange={handleLinedChange}></input>
+                   Lined and Standard Interlined
                 </label><br></br>
                 <label> 
                     <input type='radio' name='liningType' style={{marginRight:'5px'}}
@@ -748,6 +777,28 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     Railroading
                 </label><br/>
             </div><br />
+
+            Embellishments
+            <div>
+                <label>
+                    <input type="checkbox" style={{marginRight:'5px'}} onChange={() => {setBanding(!banding)}}/>
+                    Ready to use banding/trim
+                </label>
+                {banding && <div>
+                    <label style={{marginLeft:'25px'}}>
+                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("bottom")}}/>
+                    Bottom Only</label><br />
+                    <label style={{marginLeft:'25px'}}>
+                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("sides")}}/>
+                    Sides Only</label><br />
+                    <label style={{marginLeft:'25px'}}>
+                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("bottom and sides")}}/>
+                    Bottom and Sides Only</label><br />
+                    <label style={{marginLeft:'25px'}}>
+                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("all")}}/>
+                    All Sides</label><br />
+                </div>}
+            </div> <br />
 
             Are we using contrast fabric?
             <div>
