@@ -32,6 +32,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         if (event.target.files.length > 5){
             setWindowImg(null);
             alert("Please select no more than five files");
+            return;
         }
         else{
             for (const file of event.target.files){

@@ -56,7 +56,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         if (event.target.files.length > 5){
             setWindowImg(null);
             alert("Please select no more than five files");
-
+            return;
         }
         else{
             for (const file of event.target.files){
@@ -436,7 +436,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     if (pleat === "ripple"){check += 14}
                     else{check += 20}
                     let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
-                    if (check > fabWidth){alert("Height is too much by " + (check-fabWidth));}
+                    if (check > fabWidth){alert("Height is too much by " + (check-fabWidth)); return;}
                     setYardage(yardage);
                     return;
                 }
@@ -456,24 +456,51 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     let check = Number(document.getElementById('f2fh').value) + Number(f2fh);
                     if (pleat === "ripple"){check += 14}
                     else{check += 20}
-                    if (check > fabWidth){alert("Height is too much by " + (check-fabWidth));}
+                    if (check > fabWidth){alert("Height is too much by " + (check-fabWidth)); return;}
                     setYardage(ypp * panels);
                 }
             }
         }
     }
 
+    const [banding, setBanding] = useState(false);
+    const [bandingType, setBandingType] = useState(null);
+
+    useEffect(() => {
+        if (!banding){
+            setBandingType(null);
+        }
+    },[banding])
+
     const [price, setPrice] = useState(null);
     const calcPrice = () => {
-        if (!fullness || !document.getElementById("f2fw")
+        if (!fullness || !document.getElementById("f2fw") || !document.getElementById("f2fh")
         || !lined || !pleat){
             alert("Please fill out all relevant fields");
             return;
         }
-        const widths = Math.ceil((Number(document.getElementById("f2fw").value) + Number(f2fw)) * fullness / 54.0);
+        const width = Number(document.getElementById('f2fw').value) + Number(f2fw);
+        let height = Number(document.getElementById('f2fh').value) + Number(f2fh);
+        const widths = Math.ceil((width) * fullness / 54.0);
         let costPerWidth = linings[lined];
         if (pleat === "ripple") {costPerWidth += 15;}
         const basePrice = widths * costPerWidth;
+        let bandingPrice = 0;
+        if (banding){
+            if (bandingType === "bottom"){
+                bandingPrice += Math.ceil(width * fullness / 12)  * 13;
+            }
+            else if (bandingType === "sides"){
+                bandingPrice += 2 * Math.ceil(height / 12) * 13;
+            }
+            else if (bandingType === "bottom and sides"){
+                bandingPrice += 2 * Math.ceil(height / 12) * 13 + Math.ceil(width * fullness / 12) * 13;
+            }
+            else{
+                bandingPrice += 2 * (Math.ceil(height / 12) + Math.ceil(width  * fullness/ 12)) * 13;
+            }
+        }
+        setPrice(basePrice + bandingPrice);
     }
 
     return(<>
@@ -887,6 +914,28 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 </label><br></br>
             </div><br></br>
 
+             Embellishments
+            <div>
+                <label>
+                    <input type="checkbox" style={{marginRight:'5px'}} onChange={() => {setBanding(!banding)}}/>
+                    Ready to use banding/trim
+                </label>
+                {banding && <div>
+                    <label style={{marginLeft:'25px'}}>
+                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("bottom")}}/>
+                    Bottom Only</label><br />
+                    <label style={{marginLeft:'25px'}}>
+                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("sides")}}/>
+                    Sides Only</label><br />
+                    <label style={{marginLeft:'25px'}}>
+                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("bottom and sides")}}/>
+                    Bottom and Sides Only</label><br />
+                    <label style={{marginLeft:'25px'}}>
+                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("all")}}/>
+                    All Sides</label><br />
+                </div>}
+            </div> <br />
+
             Are we using contrast fabric?
             <div>
                 <label>
@@ -966,7 +1015,9 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             </div>
             </div>}
             {yardage}<br></br>
-            <button onClick={() =>  {calcYardage()}}>Calculate yardage</button>
+            <button onClick={() =>  {calcYardage()}}>Calculate yardage</button> <br />
+            {price}<br></br>
+            <button onClick={() =>  {calcPrice()}}>Calculate price</button>
             {/* <button onClick={submitForm}>Submit</button> */}
         </div>
     </>)
