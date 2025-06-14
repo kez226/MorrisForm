@@ -493,7 +493,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 {mount === 'inside' && <div>
                     What are the approx. following dimensions for inside mounts: 
                     <br></br><label>
-                        Frame-to-frame width:
+                        *Frame-to-frame width:
                         <input id='f2fw' style={{marginLeft:'78px'}}></input>
                     </label>
                     {units1 === 'in' && <>
@@ -503,7 +503,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                         ></Dropdown>
                     </>}<br></br>
                     <label >
-                        Frame-to-frame height (to sill): 
+                        *Frame-to-frame height (to sill): 
                         <input id='f2fh' style={{marginLeft:'19px'}}></input>
                     </label>
                     {units1 === 'in' && <>
@@ -517,7 +517,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 {mount === 'outside' && <div>
                     What are the approx. following dimensions for outside mounts: 
                     <br></br><label>
-                        Frame-to-frame width:
+                        *Frame-to-frame width:
                         <input id='f2fw' style={{marginLeft:'291px'}}></input>
                     </label>
                     {units1 === 'in' && <>
@@ -527,7 +527,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                         ></Dropdown>
                     </>}<br></br>
                     <label >
-                        Frame-to-frame height (to sill): 
+                        *Frame-to-frame height (to sill): 
                         <input id='f2fh' style={{marginLeft:'232px'}}></input>
                     </label>
                     {units1 === 'in' && <>
@@ -547,8 +547,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                         ></Dropdown>
                     </>}<br></br> */}
                     <label >
-                        How far above frame will unit be mounted for outside mounts:
-                        <input id='abvf' style={{marginLeft:'10px'}}></input>
+                        *How far above frame will unit be mounted for outside mounts:
+                        <input id='abvf' style={{marginLeft:'11px'}}></input>
                     </label>
                     {units1 === 'in' && <>
                         <Dropdown
@@ -760,8 +760,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     <input type='href' id='mainlink' placeholder=' ' style={{marginLeft:'13px'}}></input>
                 </label>
                 <br></br><label>
-                    Width:
-                    <input type='number' id='mainwidth' style={{marginLeft:'144px'}}></input>
+                    *Width:
+                    <input type='number' id='mainwidth' style={{marginLeft:'137px'}}></input>
                 </label>
                 {units2 === 'in' && <>
                     <Dropdown
@@ -792,7 +792,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 <br></br>
                 How are we running the fabric?
                 <br></br><label> 
-                    <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
+                    <input type='radio' name='mainrailroad' style={{marginRight:'5px'}} defaultChecked
                     value={'up the bolt'} onChange={handleMainRailroad}></input>
                     Up the bolt
                 </label> <br></br>
