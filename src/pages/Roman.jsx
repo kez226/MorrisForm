@@ -296,7 +296,6 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
     const calcYardage = () => {
         if (mainrailroad === "railroad"){
             if (document.getElementById('f2fw').value == 0 
-            || document.getElementById('mainwidth').value == 0
             || document.getElementById('f2fh').value == 0
             ){
                 alert("Please fill out all relevant fields");
@@ -310,7 +309,9 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             if (mount === "outside"){
                 panelHeight =+ Number(document.getElementById('abvf').value) + Number(abvf);
             }
-            const check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));
+            let check;
+            if (mainWidth === '') {check = 54;}
+            else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
             if (panelHeight > check){
                 alert("Height is too much by " + (panelHeight - check));
                 return;
@@ -330,14 +331,16 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             if (mount === 'inside'){
                 console.log('inside');
                 if (document.getElementById('f2fw').value == 0 
-                || document.getElementById('mainwidth').value == 0
                 || document.getElementById('f2fh').value == 0
                 ){
                     alert("Please fill out all relevant fields");
                     return;
                 }
                 const cutWidth = (Number(document.getElementById('f2fw').value) + Number(f2fw)) * 0.75 + 3;
-                const widths = Math.ceil(cutWidth / (Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
+                let check;
+                if (mainWidth === '') {check = 54;}
+                else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
+                const widths = Math.ceil(cutWidth /check);
                 const cutLength = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
                 const yardDiff = cutLength % 9;
                 let cutYards = cutLength;
@@ -353,13 +356,15 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 console.log("outside");
                 if (document.getElementById('f2fw').value == 0 
                 || document.getElementById('abvf').value == 0 
-                || document.getElementById('mainwidth').value == 0
                 || document.getElementById('f2fh').value == 0
                 ){
                     alert("Please fill out all relevant fields");
                     return;
                 }
-                const widths = Math.ceil(4.0 + Number(document.getElementById('f2fw').value) + Number(f2fw)) / ((Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
+                let check;
+                if (mainWidth === '') {check = 54;}
+                else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
+                const widths = Math.ceil(4.0 + Number(document.getElementById('f2fw').value) + Number(f2fw)) / check;
                 const obHeight = Number(document.getElementById('abvf').value) + Number(abvf) + Number(document.getElementById('f2fh').value) + Number(f2fh);
                 let cutYards = 20.0 + obHeight;
                 const yardDiff = cutYards % 9;
@@ -373,10 +378,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         }
         //fabrics with repeat
         else{
-            console.log("repeat");
             if (document.getElementById('f2fw').value == 0 
                 || document.getElementById('mainvert').value == 0 
-                || document.getElementById('mainwidth').value == 0
                 || document.getElementById('f2fh').value == 0
                 ){
                     alert("Please fill out all relevant fields");
@@ -396,7 +399,10 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 cutYards += (9 - yardDiff);
             }    
             cutYards = (cutYards / 36).toFixed(2); 
-            const widths = Math.ceil((Number(document.getElementById('f2fw').value) + Number(f2fw)) / (Number(document.getElementById('mainwidth').value) + Number(mainWidth)));
+            let check;
+            if (mainWidth === '') {check = 54;}
+            else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
+            const widths = Math.ceil((Number(document.getElementById('f2fw').value) + Number(f2fw)) / check);
             setYardage(widths * cutYards);
             return;
         }
