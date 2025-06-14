@@ -766,8 +766,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     <input type='href' id='mainlink' placeholder=' ' style={{marginLeft:'13px'}}></input>
                 </label>
                 <br></br><label>
-                    *Width:
-                    <input type='number' id='mainwidth' style={{marginLeft:'137px'}}></input>
+                    Width:
+                    <input type='number' id='mainwidth' style={{marginLeft:'144px'}}></input>
                 </label>
                 {units2 === 'in' && <>
                     <Dropdown
