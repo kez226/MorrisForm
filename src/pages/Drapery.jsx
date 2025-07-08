@@ -194,6 +194,14 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         formData.append('Mainhorizontal', document.getElementById('mainhorizontal').value + mainHorizontal);
         formData.append('Mainrailroad', mainrailroad);
 
+        if (!yardage || ! price){
+            alert("Please calculate yardage and price first");
+            return;
+        }
+        formData.append("Yardage", yardage);
+        formData.append("Price", price);
+        formData.append("Embellishments", bandingType);
+
         formData.append('Units3', units3);
         formData.append('Contrastvendor', document.getElementById('contrastvendor').value);
         formData.append('Contrastpattern', document.getElementById('contrastpattern').value);
@@ -311,6 +319,11 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
     const calcYardage = () => {
         let yardage;
         if(pleat === 'ripple'){
+            if ( !document.getElementById('f2fh') 
+            || !document.getElementById('f2fw') ){
+                alert("Please fill out all relevant fields");
+                return;
+            }
             let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
             if (fabWidth == 0){fabWidth = 54;}
             let rw = (Number(f2fw) +  Number(document.getElementById('f2fw').value));
@@ -343,16 +356,13 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     //up the bolt, stationary, no vertical repeat
                     if(Number(document.getElementById('mainvert').value) === 0 && Number(mainVertical) === 0){
                         if (!document.getElementById('wpp') 
-                        || !document.getElementById('mainwidth') 
                         || !document.getElementById('f2fh') 
                         || !document.getElementById('f2fw') ){
                             alert("Please fill out all relevant fields");
                             return;
                         }
                         let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
-                        if (fabWidth == 0){
-                            fabWidth = 54;
-                        }
+                        if (fabWidth == 0){fabWidth = 54;}
                         let cutYards = (20.0 + Number(f2fh) + Number(document.getElementById('f2fh').value)) / 36;
                         cutYards += 18 - (cutYards % 18);
                         const widths = (Number(f2fw) + Number(document.getElementById('f2fw').value)) / fabWidth;
@@ -365,7 +375,6 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         ||!document.getElementById('f2fh') 
                         || !document.getElementById('f2fw') 
                         || !document.getElementById('mainvert') 
-                        || !document.getElementById('mainwidth') 
                         ){
                             alert("Please fill out all relevant fields");
                             return;
@@ -375,9 +384,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         let cutYards = cl / 36;
                         cutYards += 9 - cutYards % 9;
                         let fw = (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
-                        if (fw == 0){
-                            fw = 54;
-                        }
+                        if (fw == 0){fw = 54;}
                         const widths = (Number(f2fw) + Number(document.getElementById('f2fw').value)) / fw;
                         setYardage(Number(document.getElementById('wpp').value) * widths / cutYards);
                         return;
@@ -387,14 +394,15 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 else if (stationary === 'false') {
                     if (!document.getElementById('f2fh') 
                     || !document.getElementById('f2fw') 
-                    || !document.getElementById('mainwidth') 
                     || !fullness 
                     ){
                         alert("Please fill out all relevant fields");
                         return;
                     }
                     const cw = 14.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * Number(fullness);
-                    let widths = cw / (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
+                    let width = Number(mainWidth) + Number(document.getElementById('mainwidth').value)
+                    if (width === 0){width = 54;}
+                    let widths = cw / width;
                     widths = widths.toFixed(3);
                     if (widths % 1 <= .30){//round down to full width
                         widths = Math.floor(widths);
@@ -423,7 +431,6 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 if (stationary === 'false') {
                     if (!document.getElementById('f2fh')
                     || !document.getElementById('f2fw')
-                    || !document.getElementById('mainwidth')
                     || !fullness
                     ){
                         alert("Please fill out all relevant fields");
@@ -436,6 +443,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     if (pleat === "ripple"){check += 14}
                     else{check += 20}
                     let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
+                    if (fabWidth === 0) {fabWidth = 54}
                     if (check > fabWidth){alert("Height is too much by " + (check-fabWidth)); return;}
                     setYardage(yardage);
                     return;
@@ -444,13 +452,13 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 else{
                     if (!document.getElementById('wpp')
                     || !document.getElementById('f2fh')
-                    || !document.getElementById('mainwidth')
                     || !panels
                     ){
                         alert("Please fill out all relevant fields");
                         return;
                     }
                     let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
+                    if (fabWidth === 0) {fabWidth = 54}
                     const widths = Number(document.getElementById('wpp').value) / fabWidth;
                     const ypp = widths * 54 / 36;
                     let check = Number(document.getElementById('f2fh').value) + Number(f2fh);
@@ -487,20 +495,21 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         const basePrice = widths * costPerWidth;
         let bandingPrice = 0;
         if (banding){
-            if (bandingType === "bottom"){
-                bandingPrice += Math.ceil(width * fullness / 12)  * 13;
+            if (document.getElementById("banding bottom").checked){
+                bandingPrice += Math.ceil(width * fullness / 12);
             }
-            else if (bandingType === "sides"){
-                bandingPrice += 2 * Math.ceil(height / 12) * 13;
+            if (document.getElementById("banding top").checked){
+                bandingPrice += Math.ceil(width * fullness / 12);
             }
-            else if (bandingType === "bottom and sides"){
-                bandingPrice += 2 * Math.ceil(height / 12) * 13 + Math.ceil(width * fullness / 12) * 13;
+            if (document.getElementById("banding inside").checked){
+                bandingPrice += 2 * Math.ceil((height + 10) / 12);
             }
-            else{
-                bandingPrice += 2 * (Math.ceil(height / 12) + Math.ceil(width  * fullness/ 12)) * 13;
+            if (document.getElementById("banding outside").checked){
+                bandingPrice += 2 * Math.ceil((height + 10) / 12);
             }
+            bandingPrice *= 13;
         }
-        setPrice(basePrice + bandingPrice);
+        setPrice(basePrice + " for yardage + " + bandingPrice + " for banding = " + (basePrice + bandingPrice));
     }
 
     return(<>
@@ -619,7 +628,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     Unlined
                 </label><br></br>
                 <label> 
-                    <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px'}}
+                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
                     value={'Sheer'} onChange={handleLinedChange}></input>
                     Sheer lining
                 </label><br></br>
@@ -711,22 +720,22 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 {(pleat === 'ripple') && <div>
                     <label> 
                         <input defaultChecked={true} type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'60%'} onChange={() => {handleRipple(); setFullness(1.6*fullness);}}></input>
+                        value={'60%'} onChange={(e) => {handleRipple(e); setFullness(1.6);}}></input>
                         60%
                     </label><br></br>
                     <label> 
                         <input type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'80%'} onChange={() => {handleRipple(); setFullness(1.8*fullness);}}></input>
+                        value={'80%'} onChange={(e) => {handleRipple(e); setFullness(1.8);}}></input>
                         80%
                     </label><br></br>
                     <label> 
                         <input type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'100%'} onChange={() => {handleRipple(); setFullness(2*fullness);}}></input>
+                        value={'100%'} onChange={(e) => {handleRipple(e); setFullness(2);}}></input>
                         100%
                     </label><br></br>
                     <label> 
                         <input type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'120%'} onChange={() => {handleRipple(); setFullness(2.2*fullness);}}></input>
+                        value={'120%'} onChange={(e) => {handleRipple(e); setFullness(2.2);}}></input>
                         120%
                     </label><br></br>
                 </div>}
@@ -922,17 +931,17 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 </label>
                 {banding && <div>
                     <label style={{marginLeft:'25px'}}>
-                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("bottom")}}/>
-                    Bottom Only</label><br />
+                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding bottom'/>
+                    Bottom</label><br />
                     <label style={{marginLeft:'25px'}}>
-                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("sides")}}/>
-                    Sides Only</label><br />
+                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding inside'/>
+                    Inside Edge</label><br />
                     <label style={{marginLeft:'25px'}}>
-                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("bottom and sides")}}/>
-                    Bottom and Sides Only</label><br />
+                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding outside'/>
+                    Outside Edge</label><br />
                     <label style={{marginLeft:'25px'}}>
-                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("all")}}/>
-                    All Sides</label><br />
+                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding top'/>
+                    Top</label><br />
                 </div>}
             </div> <br />
 
@@ -1013,11 +1022,9 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 Please specify where the contrast fabric will be used:
                 <input id='where'></input>
             </div>
-            </div>}
-            {yardage}<br></br>
-            <button onClick={() =>  {calcYardage()}}>Calculate yardage</button> <br />
-            {price}<br></br>
-            <button onClick={() =>  {calcPrice()}}>Calculate price</button>
+            </div>} <br />
+            <button onClick={() =>  {calcYardage()}}>Calculate yardage</button> {yardage}<br></br>
+            <button onClick={() =>  {calcPrice()}}>Calculate price</button> {price}<br></br>
             {/* <button onClick={submitForm}>Submit</button> */}
         </div>
     </>)

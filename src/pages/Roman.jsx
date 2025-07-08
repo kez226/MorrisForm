@@ -13,7 +13,6 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
     const[com, setCom] = useState('');
     const[mainrailroad, setMainRailroad] = useState('');
     const[contrastrailroad, setContrastRailroad] = useState('');
-    const[panels, setPanels] = useState(2);
 
     const[units1, setUnits1] = useState('in');
     const[units2, setUnits2] = useState('in');
@@ -104,11 +103,11 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
     const fractions = [
         { label: '0', value: 0},
         { label: '1/8', value: '.125' },
-        { label: '2/8', value: '.25' },
+        { label: '1/4', value: '.25' },
         { label: '3/8', value: '.375' },
-        { label: '4/8', value: '.5' },
+        { label: '1/2', value: '.5' },
         { label: '5/8', value: '.625' },
-        { label: '6/8', value: '.75' },
+        { label: '3/4', value: '.75' },
         { label: '7/8', value: '.875' }
     ];
 
@@ -146,28 +145,14 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         formData.append('Location', mount);
 
         if (mount === 'inside'){
-            if (units1 !== 'in'){
-                formData.append('F2fw', document.getElementById('f2fw').value);
-                formData.append('F2fh', document.getElementById('f2fh').value);
-            }
-            else{
-                formData.append('F2fw', document.getElementById('f2fw').value + f2fw);
-                formData.append('F2fh', document.getElementById('f2fh').value + f2fh);
-            }
+            formData.append('F2fw', document.getElementById('f2fw').value + f2fw);
+            formData.append('F2fh', document.getElementById('f2fh').value + f2fh);
         }
         else{
-            if (units1 !== 'in'){
-                formData.append('F2fw', document.getElementById('f2fw').value);
-                formData.append('F2fh', document.getElementById('f2fh').value);
-                formData.append('Abvc', document.getElementById('abvc').value);
-                formData.append('Abvf', document.getElementById('abvf').value);
-            }
-            else{
-                formData.append('F2fw', document.getElementById('f2fw').value + f2fw);
-                formData.append('F2fh', document.getElementById('f2fh').value + f2fh);
-                formData.append('Abvc', document.getElementById('abvc').value + abvc);
-                formData.append('Abvf', document.getElementById('abvf').value + abvf);
-            }
+            formData.append('F2fw', document.getElementById('f2fw').value + f2fw);
+            formData.append('F2fh', document.getElementById('f2fh').value + f2fh);
+            formData.append('Abvc', document.getElementById('abvc').value + abvc);
+            formData.append('Abvf', document.getElementById('abvf').value + abvf);
         }
 
         formData.append('Stationary', stationary);
@@ -202,6 +187,14 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                     .replace(/^\+|(\++)/g, '+');
         }
         formData.append('Mainlink', mainlink);
+
+        if (!yardage || ! price){
+            alert("Please calculate yardage and price first");
+            return;
+        }
+        formData.append("Yardage", yardage);
+        formData.append("Price", price);
+        formData.append("Embellishments", bandingType);
 
         formData.append('Units3', units3);
         formData.append('Contrastvendor', document.getElementById('contrastvendor').value);
@@ -437,7 +430,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 return;
             }
             if (stabilizer === "yes"){
-                addPrice = 5.0 * sqFootage;
+                addPrice = 4.0 * sqFootage;
             }
         }
         else if (opFunction === "cordless"){
@@ -451,23 +444,24 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         }
         let bandingPrice = 0;
         if (banding){
-            if (bandingType === "bottom"){
-                bandingPrice += Math.ceil(width / 12) * 13;
+            if (document.getElementById("banding bottom").checked){
+                bandingPrice += Math.ceil(width / 12);
             }
-            else if (bandingType === "sides"){
-                bandingPrice += 2 * Math.ceil(height / 12) * 13;
+            if (document.getElementById("banding top").checked){
+                bandingPrice += Math.ceil(width / 12);
             }
-            else if (bandingType === "bottom and sides"){
-                bandingPrice += 2 * Math.ceil(height / 12) * 13 + Math.ceil(width / 12) * 13;
+            if (document.getElementById("banding inside").checked){
+                bandingPrice += 2 * Math.ceil((height + 10) / 12);
             }
-            else{
-                bandingPrice += 2 * (Math.ceil(height / 12) + Math.ceil(width / 12)) * 13;
+            if (document.getElementById("banding outside").checked){
+                bandingPrice += 2 * Math.ceil((height + 10) / 12);
             }
+            bandingPrice *= 13;
         }
         console.log(basePrice);
         console.log(addPrice);
         console.log(bandingPrice);
-        setPrice(basePrice + addPrice + bandingPrice);
+        setPrice(basePrice + " for yardage + " + addPrice + " for operating function + " + bandingPrice + " for banding = " + (bandingPrice + basePrice + addPrice));
     }
 
     return(
@@ -817,17 +811,17 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 </label>
                 {banding && <div>
                     <label style={{marginLeft:'25px'}}>
-                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("bottom")}}/>
-                    Bottom Only</label><br />
+                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding bottom'/>
+                    Bottom</label><br />
                     <label style={{marginLeft:'25px'}}>
-                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("sides")}}/>
-                    Sides Only</label><br />
+                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding inside'/>
+                    Inside Edge</label><br />
                     <label style={{marginLeft:'25px'}}>
-                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("bottom and sides")}}/>
-                    Bottom and Sides Only</label><br />
+                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding outside'/>
+                    Outside Edge</label><br />
                     <label style={{marginLeft:'25px'}}>
-                        <input type="radio" name="banding-type" style={{marginRight:'5px'}} onChange={() => {setBandingType("all")}}/>
-                    All Sides</label><br />
+                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding top'/>
+                    Top</label><br />
                 </div>}
             </div> <br />
 
@@ -908,12 +902,28 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 Please specify where the contrast fabric will be used:
                 <input id='where'></input>
             </div>} <br />
-            
-            {yardage}<br></br>
-            <button onClick={calcYardage}>Calculate yardage</button>
-            <br />{price}<br></br>
-            <button onClick={calcPrice}>Calculate pricing</button>
-            {/* <button onClick={submitForm}>Submit</button> */}
+            {/* <div className='row'>
+                <div className='column'>
+                    <button onClick={calcYardage}>Calculate yardage</button> <br />
+                    {yardage}
+                </div>
+                <div className='column'>
+                    <button onClick={calcPrice}>Calculate pricing</button> <br />
+                    {price}
+                </div>
+                <div className='column'>
+                    <button onClick={submitForm}>Submit</button> 
+                </div>
+            </div> */}
+
+            <div className='column'>
+                <button onClick={calcYardage} style={{marginRight: '5px'}}>Calculate yardage</button> 
+                {yardage} <br />
+            </div>
+            <div className='column'>
+                <button onClick={calcPrice} style={{marginRight: '5px'}}>Calculate pricing</button> 
+                {price} <br />
+            </div>
         </div>
     )
 }
