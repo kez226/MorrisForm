@@ -319,8 +319,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
     const calcYardage = () => {
         let yardage;
         if(pleat === 'ripple'){
-            if ( !document.getElementById('f2fh') 
-            || !document.getElementById('f2fw') ){
+            if ( !document.getElementById('f2fh').value
+            || !document.getElementById('f2fw').value ){
                 alert("Please fill out all relevant fields");
                 return;
             }
@@ -355,9 +355,9 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 if (stationary === 'true'){
                     //up the bolt, stationary, no vertical repeat
                     if(Number(document.getElementById('mainvert').value) === 0 && Number(mainVertical) === 0){
-                        if (!document.getElementById('wpp') 
-                        || !document.getElementById('f2fh') 
-                        || !document.getElementById('f2fw') ){
+                        if (!document.getElementById('wpp').value
+                        || !document.getElementById('f2fh').value
+                        || !document.getElementById('f2fw').value){
                             alert("Please fill out all relevant fields");
                             return;
                         }
@@ -371,10 +371,10 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     }
                     //up the bolt, stationary, with vertical repeat
                     else{
-                        if (!document.getElementById('wpp') 
-                        ||!document.getElementById('f2fh') 
-                        || !document.getElementById('f2fw') 
-                        || !document.getElementById('mainvert') 
+                        if (!document.getElementById('wpp').value
+                        ||!document.getElementById('f2fh').value
+                        || !document.getElementById('f2fw').value
+                        || !document.getElementById('mainvert').value
                         ){
                             alert("Please fill out all relevant fields");
                             return;
@@ -392,8 +392,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 }
                 //up the bolt, functional
                 else if (stationary === 'false') {
-                    if (!document.getElementById('f2fh') 
-                    || !document.getElementById('f2fw') 
+                    if (!document.getElementById('f2fh').value
+                    || !document.getElementById('f2fw').value
                     || !fullness 
                     ){
                         alert("Please fill out all relevant fields");
@@ -429,8 +429,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             else{
                 //functional
                 if (stationary === 'false') {
-                    if (!document.getElementById('f2fh')
-                    || !document.getElementById('f2fw')
+                    if (!document.getElementById('f2fh').value
+                    || !document.getElementById('f2fw').value
                     || !fullness
                     ){
                         alert("Please fill out all relevant fields");
@@ -450,8 +450,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 }
                 //stationary
                 else{
-                    if (!document.getElementById('wpp')
-                    || !document.getElementById('f2fh')
+                    if (!document.getElementById('wpp').value
+                    || !document.getElementById('f2fh').value
                     || !panels
                     ){
                         alert("Please fill out all relevant fields");
@@ -482,7 +482,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
 
     const [price, setPrice] = useState(null);
     const calcPrice = () => {
-        if (!fullness || !document.getElementById("f2fw") || !document.getElementById("f2fh")
+        if (!fullness || !document.getElementById("f2fw").value || !document.getElementById("f2fh").value
         || !lined || !pleat){
             alert("Please fill out all relevant fields");
             return;

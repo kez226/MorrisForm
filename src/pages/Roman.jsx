@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { add, div } from 'three/tsl';
 
 const Roman = ({pname, name, address, email, room, numWindow, uploads, estName}) => {
     const[windowImg, setWindowImg] = useState(null);
@@ -98,7 +97,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         if (opFunction !== "lift"){
             setBead(null);
         }
-    },[bead])
+    },[opFunction])
 
     const fractions = [
         { label: '0', value: 0},
@@ -404,8 +403,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
     const [price, setPrice] = useState(null);
     const [stabilizer, setStabilizer] = useState(null);
     const calcPrice = () => {
-        if (!document.getElementById('f2fw')
-        || !document.getElementById('f2fh')
+        if (!document.getElementById('f2fw').value
+        || !document.getElementById('f2fh').value
         || !opFunction || !lined){
             alert("Please fill out all relevant fields");
             return;
@@ -413,7 +412,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         const width = Number(document.getElementById('f2fw').value) + Number(f2fw);
         let height = Number(document.getElementById('f2fh').value) + Number(f2fh);
         if (mount === "outside"){//outside
-            if (!document.getElementById('abvf')){
+            if (!document.getElementById('abvf').value){
                 alert("Please fill out all relevant fields");
                 return;
             }

@@ -4,13 +4,20 @@ const Cushions = ({pname, name, address, email, estName}) => {
     const[windowImg, setWindowImg] = useState(null);
     const [template, setTemplate] = useState('');
     const[units1, setUnits1] = useState('in');
+    const[length, setLength] = useState(0);
+    const handleLength = (e) => {setLength(e.target.value);}
+    const[depth, setDepth] = useState(0);
+    const handleDepth = (e) => {setDepth(e.target.value);}
+    const[thickness, setThickness] = useState(0);
+    const handleThickness = (e) => {setThickness(e.target.value);}
     const[units2, setUnits2] = useState('in');
     const[units3, setUnits3] = useState('in');
     const [insert, setInsert] = useState('');
     const [edge, setEdge] = useState('');
     const [edgeOther, setEdgeOther] = useState('');
     const [com, setCom] = useState('');
-
+    const [yardage, setYardage] = useState(null);
+    const [contrast, setContrast] = useState(false);
 
     const handleImageUpload = (event) => {
         if (event.target.files.length > 5){
@@ -44,7 +51,7 @@ const Cushions = ({pname, name, address, email, estName}) => {
 
     const handleUnits2 = (event) => {setUnits2(event.target.value);}
 
-    const [mainWidth, mainWidthChange] = useState('');
+    const [mainWidth, mainWidthChange] = useState(null);
     const [mainVertical, mainVerticalChange] = useState('');
     const [mainHorizontal, mainHorizontalChange] = useState('');
 
@@ -65,13 +72,13 @@ const Cushions = ({pname, name, address, email, estName}) => {
 
     const fractions = [
         { label: '0', value: 0},
-        { label: '1/8', value: '.125' },
-        { label: '1/4', value: '.25' },
-        { label: '3/8', value: '.375' },
-        { label: '1/2', value: '.5' },
-        { label: '5/8', value: '.625' },
-        { label: '3/4', value: '.75' },
-        { label: '7/8', value: '.875' }
+        { label: '1/8', value: .125 },
+        { label: '1/4', value: .25 },
+        { label: '3/8', value: .375 },
+        { label: '1/2', value: .5 },
+        { label: '5/8', value: .625 },
+        { label: '3/4', value: .75 },
+        { label: '7/8', value: .875 }
     ];
 
     const Dropdown =({ value, change}) => { 
@@ -207,6 +214,100 @@ const Cushions = ({pname, name, address, email, estName}) => {
         }
       }
 
+    const calcYardage = () => {
+        if (!document.getElementById('length').value || !document.getElementById('depth').value){
+            alert("Please fill out length and depth");
+            setYardage(null)
+            return;
+        }
+        let cutLength = length + Number(document.getElementById('length').value) + 1;
+        let cutWidth = depth + Number(document.getElementById('depth').value) + 1;
+        let fabWidth = mainWidth + Number(document.getElementById('mainwidth').value);
+        if (fabWidth === 0.0) {fabWidth = 54;}
+
+        let repeats = null;
+        let widths = 2;
+        if (mainrailroad){
+            //if both panels fit side by side in one fabric width
+            // you only need one width of fabric
+            if (cutWidth * 2 <= fabWidth){
+                widths--;
+            }
+            //panel too wide to fit in one piece
+            //top to bottom seem needed, and maybe pattern matching (not added yet)
+            else if (cutWidth > fabWidth){
+                //adding in the seam allowance and set number of widths to 2
+                cutWidth++;
+                if ((cutWidth - fabWidth) * 2 <= fabWidth){
+                    //only need one extra width of fabric for extra strip for both panels
+                    //no need to add allowance bc alr added to cutlength
+                    widths++;
+                }
+                else{
+                    //you need two extra widths of fabric for the two strips
+                    widths += 2;
+                }
+            }
+            //if mainvert is not empty (there is a vertical repeat)
+            if (!document.getElementById('mainvert')){
+                repeats = Math.ceil(cutWidth / (Number(document.getElementById('mainvert').value) + mainVertical));
+                let yardage = (widths * cutLength * repeats) / 36.0
+                if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+                setYardage(yardage);
+                console.log("widths = " + widths)
+                console.log("cutLength = " + cutLength)
+                console.log("repeats = " + repeats)
+            }
+            else{
+                let yardage = (widths * cutLength) / 36.0
+                if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+                setYardage(yardage);
+                console.log("widths = " + widths)
+                console.log("cutLength = " + cutLength)
+            }
+        }
+        //this is up the bolt
+        else{
+            //if both panels fit side by side in one fabric width
+            // you only need one width of fabric
+            if (cutLength * 2 <= fabWidth){
+                widths--;
+            }
+            //panel too wide to fit in one piece
+            //top to bottom seem needed, and maybe pattern matching (not added yet)
+            else if (cutLength > fabWidth){
+                //adding in the seam allowance and set number of widths to 2
+                cutLength++;
+                if ((cutLength - fabWidth) * 2 <= fabWidth){
+                    //only need one extra width of fabric for extra strip for both panels
+                    //no need to add allowance bc alr added to cutlength
+                    widths++;
+                }
+                else{
+                    //you need two extra widths of fabric for the two strips
+                    widths += 2;
+                }
+            }
+            //if mainvert is not empty (there is a vertical repeat)
+            if (!document.getElementById('mainvert')){
+                repeats = Math.ceil(cutLength / (Number(document.getElementById('mainvert').value) + mainVertical));
+                let yardage = (widths * cutWidth * repeats) / 36.0
+                if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+                setYardage(yardage);
+                console.log("widths = " + widths)
+                console.log("cutWidth = " + cutWidth)
+                console.log("repeats = " + repeats)
+            }
+            else{
+                let yardage = (widths * cutWidth) / 36.0
+                if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+                setYardage(yardage);
+                console.log("widths = " + widths)
+                console.log("cutWidth = " + cutWidth)
+            }
+        }
+    }
+
     return(<>
     <div style={{border: 'grey solid 1px', padding:'5px'}}>
         <h1>Cushions</h1>
@@ -235,16 +336,28 @@ const Cushions = ({pname, name, address, email, estName}) => {
                 style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
         </label>
         <br></br><label>
-            Width:
-            <input type='number' style={{marginLeft: '50px'}} id='width'></input>
-        </label>
-        <br></br><label>
-            Height:
-            <input type='number' style={{marginLeft: '45px'}} id='height'></input>
+            Length:
+            <input type='number' style={{marginLeft: '50px'}} id='length'></input>
+            <Dropdown
+                value = {length}
+                change = {handleLength}
+            ></Dropdown>
         </label>
         <br></br><label>
             Depth:
-            <input type='number' style={{marginLeft: '49px'}} id='depth'></input>
+            <input type='number' style={{marginLeft: '56px'}} id='depth'></input>
+            <Dropdown
+                value = {depth}
+                change = {handleDepth}
+            ></Dropdown>
+        </label>
+        <br></br><label>
+            Thickness:
+            <input type='number' style={{marginLeft: '27px'}} id='thickness'></input>
+            <Dropdown
+                value = {thickness}
+                change = {handleThickness}
+            ></Dropdown>
         </label>
         <br></br><br></br>
 
@@ -421,86 +534,103 @@ const Cushions = ({pname, name, address, email, estName}) => {
                     ></Dropdown>
                 </>}
                 <br></br>
-                Are we railroaded?
+                How are we running the fabric?
                 <br></br><label> 
+                    <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
+                    value={false} onChange={handleMainRailroad} defaultChecked={true}></input>
+                    Up the bolt
+                </label> <br></br>
+                <label>
                     <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
                     value={true} onChange={handleMainRailroad}></input>
-                    Yes
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={false} onChange={handleMainRailroad}></input>
-                    No
+                    Railroaded
                 </label><br></br>
             </div><br></br>
-
-            Contrast Fabric specifications:
+            
+            Are we using contrast fabric?
             <div>
-                What units are the measurements in?
                 <label>
-                    <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units3' onChange={handleUnits3}></input> Centimeters
-                    <input value='in' type='radio' name='units3' onChange={handleUnits3}
-                        style={{marginLeft:'25px'}} checked={units3 === 'in'}></input> Inches
-                </label>
-                <br></br><label>
-                    Vendor:
-                    <input type='text' id='contrastvendor' style={{marginLeft:'135px'}}></input>
-                </label>
-                <br></br><label>
-                    Pattern name & number:
-                    <input type='text' id='contrastpattern' style={{marginLeft:'15px'}}></input>
-                </label>
-                <br></br><label>
-                    Link to fabric if available:
-                    <input type='href' id='contrlink' style={{marginLeft:'13px'}}></input>
-                </label><br></br><label>
-                    Width:
-                    <input type='number' id='contrastwidth' style={{marginLeft:'144px'}}></input>
-                </label>
-                {units3 === 'in' && <>
-                    <Dropdown
-                        value = {contrastWidth}
-                        change = {handleContrastWidth}
-                    ></Dropdown>
-                </>}
-                <br></br><label>
-                    Vertical repeat:
-                    <input type='number' id='contrastvert' style={{marginLeft:'81px'}}></input>
-                </label>
-                {units3 === 'in' && <>
-                    <Dropdown
-                        value = {contrastVertical}
-                        change = {handleContrastVertical}
-                    ></Dropdown>
-                </>}
-                <br></br>
-                <label>
-                    Horizontal repeat:
-                    <input type='number' id='contrasthorizontal' style={{marginLeft:'61px'}}></input>
-                </label>
-                {units3 === 'in' && <>
-                    <Dropdown
-                        value = {contrastHorizontal}
-                        change = {handleContrastHorizontal}
-                    ></Dropdown>
-                </>}
-                <br></br>
-                Are we railroaded?
-                <br></br><label> 
-                    <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
-                    value={true} onChange={handleContrastRailroad}></input>
+                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContrast(true)}}/>
                     Yes
-                </label> <br></br>
+                </label> <br />
                 <label>
-                    <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
-                    value={false} onChange={handleContrastRailroad}></input>
+                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContrast(false)}}/>
                     No
-                </label><br></br><br></br>
-                Please specify where the contrast fabric will be used:
-                <input id='where'></input>
-            </div><br></br>
+                </label>
+            </div>
+            {contrast && <>
+                Contrast Fabric specifications:
+                <div>
+                    What units are the measurements in?
+                    <label>
+                        <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units3' onChange={handleUnits3}></input> Centimeters
+                        <input value='in' type='radio' name='units3' onChange={handleUnits3}
+                            style={{marginLeft:'25px'}} checked={units3 === 'in'}></input> Inches
+                    </label>
+                    <br></br><label>
+                        Vendor:
+                        <input type='text' id='contrastvendor' style={{marginLeft:'135px'}}></input>
+                    </label>
+                    <br></br><label>
+                        Pattern name & number:
+                        <input type='text' id='contrastpattern' style={{marginLeft:'15px'}}></input>
+                    </label>
+                    <br></br><label>
+                        Link to fabric if available:
+                        <input type='href' id='contrlink' style={{marginLeft:'13px'}}></input>
+                    </label><br></br><label>
+                        Width:
+                        <input type='number' id='contrastwidth' style={{marginLeft:'144px'}}></input>
+                    </label>
+                    {units3 === 'in' && <>
+                        <Dropdown
+                            value = {contrastWidth}
+                            change = {handleContrastWidth}
+                        ></Dropdown>
+                    </>}
+                    <br></br><label>
+                        Vertical repeat:
+                        <input type='number' id='contrastvert' style={{marginLeft:'81px'}}></input>
+                    </label>
+                    {units3 === 'in' && <>
+                        <Dropdown
+                            value = {contrastVertical}
+                            change = {handleContrastVertical}
+                        ></Dropdown>
+                    </>}
+                    <br></br>
+                    <label>
+                        Horizontal repeat:
+                        <input type='number' id='contrasthorizontal' style={{marginLeft:'61px'}}></input>
+                    </label>
+                    {units3 === 'in' && <>
+                        <Dropdown
+                            value = {contrastHorizontal}
+                            change = {handleContrastHorizontal}
+                        ></Dropdown>
+                    </>}
+                    <br></br>
+                    Are we railroaded?
+                    <br></br><label> 
+                        <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
+                        value={true} onChange={handleContrastRailroad}></input>
+                        Yes
+                    </label> <br></br>
+                    <label>
+                        <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
+                        value={false} onChange={handleContrastRailroad}></input>
+                        No
+                    </label><br></br><br></br>
+                    Please specify where the contrast fabric will be used:
+                    <input id='where'></input>
+                </div>
+            </>}
 
-            <button onClick={submitForm}>Submit</button>
+
+            <br /><button onClick={calcYardage}>Calculate Yardage</button>
+            {yardage}
+
+            <br /><button onClick={submitForm}>Submit</button>
     </div>
     </>)
 }
