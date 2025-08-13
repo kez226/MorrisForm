@@ -220,10 +220,11 @@ const Cushions = ({pname, name, address, email, estName}) => {
             setYardage(null)
             return;
         }
+        let yardage = 0;
         let cutLength = length + Number(document.getElementById('length').value) + 1;
         let cutWidth = depth + Number(document.getElementById('depth').value) + 1;
         let fabWidth = mainWidth + Number(document.getElementById('mainwidth').value);
-        if (fabWidth === 0.0) {fabWidth = 54;}
+        if (fabWidth === 0.0) {fabWidth = 54.0;}
 
         let repeats = null;
         let widths = 2;
@@ -251,19 +252,21 @@ const Cushions = ({pname, name, address, email, estName}) => {
             //if mainvert is not empty (there is a vertical repeat)
             if (!document.getElementById('mainvert')){
                 repeats = Math.ceil(cutWidth / (Number(document.getElementById('mainvert').value) + mainVertical));
-                let yardage = (widths * cutLength * repeats) / 36.0
+                yardage = (widths * cutLength * repeats) / 36.0
                 if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
-                setYardage(yardage);
+                // setYardage(yardage);
                 console.log("widths = " + widths)
                 console.log("cutLength = " + cutLength)
                 console.log("repeats = " + repeats)
+                console.log("yardage: " + yardage)
             }
             else{
-                let yardage = (widths * cutLength) / 36.0
+                yardage = (widths * cutLength) / 36.0
                 if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
-                setYardage(yardage);
+                // setYardage(yardage);
                 console.log("widths = " + widths)
                 console.log("cutLength = " + cutLength)
+                console.log("yardage: " + yardage)
             }
         }
         //this is up the bolt
@@ -291,21 +294,37 @@ const Cushions = ({pname, name, address, email, estName}) => {
             //if mainvert is not empty (there is a vertical repeat)
             if (!document.getElementById('mainvert')){
                 repeats = Math.ceil(cutLength / (Number(document.getElementById('mainvert').value) + mainVertical));
-                let yardage = (widths * cutWidth * repeats) / 36.0
+                yardage = (widths * cutWidth * repeats) / 36.0
                 if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
-                setYardage(yardage);
+                // setYardage(yardage);
                 console.log("widths = " + widths)
                 console.log("cutWidth = " + cutWidth)
                 console.log("repeats = " + repeats)
+                console.log("yardage: " + yardage)
             }
             else{
-                let yardage = (widths * cutWidth) / 36.0
+                yardage = (widths * cutWidth) / 36.0
                 if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
-                setYardage(yardage);
+                // setYardage(yardage);
                 console.log("widths = " + widths)
                 console.log("cutWidth = " + cutWidth)
+                console.log("yardage: " + yardage)
             }
         }
+
+        let cutHeight = thickness + Number(document.getElementById('thickness').value) + 1;
+        let boxLength = 2 * (cutLength + cutWidth) + 2;
+        let numBoxStrips = Math.ceil(boxLength / fabWidth)
+
+        //multiply the number of strips by the cut height and add to final yardage
+        let add = numBoxStrips * cutHeight / 36.0
+        if (add % 0.25 != 0){add += 0.25 - (add % 0.25)}
+        console.log("boxing: " + add)
+        yardage += add
+        if (edge === 'Welt' && edgeOther ==='Self-welt'){yardage += 0.5}
+        console.log("welt: " + 0.5)
+
+        setYardage(yardage)
     }
 
     return(<>
