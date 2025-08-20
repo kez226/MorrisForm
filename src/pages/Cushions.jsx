@@ -42,7 +42,7 @@ const Cushions = ({pname, name, address, email, estName}) => {
     const handleEdgeOther = (e) => {setEdgeOther(e.target.value);}
     const handleUnits1 = (e) => {setUnits1(e.target.value);}
 
-    const[mainrailroad, setMainRailroad] = useState('');
+    const[mainrailroad, setMainRailroad] = useState("utb");
     const[contrastrailroad, setContrastRailroad] = useState('');
     const handleMainRailroad = (event) => {setMainRailroad(event.target.value);}
     const handleContrastRailroad = (event) => {setContrastRailroad(event.target.value);}
@@ -228,7 +228,8 @@ const Cushions = ({pname, name, address, email, estName}) => {
 
         let repeats = null;
         let widths = 2;
-        if (mainrailroad){
+        if (mainrailroad === "rr"){
+            console.log("railroad")
             //if both panels fit side by side in one fabric width
             // you only need one width of fabric
             if (cutWidth * 2 <= fabWidth){
@@ -249,25 +250,23 @@ const Cushions = ({pname, name, address, email, estName}) => {
                     widths += 2;
                 }
             }
-            //if mainvert is not empty (there is a vertical repeat)
-            if (!document.getElementById('mainvert')){
-                repeats = Math.ceil(cutWidth / (Number(document.getElementById('mainvert').value) + mainVertical));
-                yardage = (widths * cutLength * repeats) / 36.0
-                if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
-                // setYardage(yardage);
-                console.log("widths = " + widths)
-                console.log("cutLength = " + cutLength)
-                console.log("repeats = " + repeats)
-                console.log("yardage: " + yardage)
-            }
-            else{
-                yardage = (widths * cutLength) / 36.0
-                if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+            // //if mainvert is not empty (there is a vertical repeat)
+            // if (document.getElementById('mainvert').value){
+            //     repeats = Math.ceil(cutWidth / (Number(document.getElementById('mainvert').value) + mainVertical));
+            //     yardage = (widths * cutLength * repeats)
+            //     // setYardage(yardage);
+            //     console.log("widths = " + widths)
+            //     console.log("cutLength = " + cutLength)
+            //     console.log("repeats = " + repeats)
+            //     console.log("yardage: " + yardage)
+            // }
+            // else{
+                yardage = (widths * cutLength)
                 // setYardage(yardage);
                 console.log("widths = " + widths)
                 console.log("cutLength = " + cutLength)
                 console.log("yardage: " + yardage)
-            }
+            // }
         }
         //this is up the bolt
         else{
@@ -291,23 +290,21 @@ const Cushions = ({pname, name, address, email, estName}) => {
                     widths += 2;
                 }
             }
-            //if mainvert is not empty (there is a vertical repeat)
-            if (!document.getElementById('mainvert')){
-                repeats = Math.ceil(cutLength / (Number(document.getElementById('mainvert').value) + mainVertical));
-                yardage = (widths * cutWidth * repeats) / 36.0
-                if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+            //if mainvert is empty (there is no vertical repeat)
+            if (!document.getElementById('mainvert').value){
+                yardage = (widths * cutWidth)
+                // setYardage(yardage);
+                console.log("widths = " + widths)
+                console.log("cutWidth = " + cutWidth)
+                console.log("yardage: " + yardage)
+            }
+            else{
+                repeats = Math.ceil(cutWidth / (Number(document.getElementById('mainvert').value) + mainVertical));
+                yardage = (widths * cutWidth * repeats)
                 // setYardage(yardage);
                 console.log("widths = " + widths)
                 console.log("cutWidth = " + cutWidth)
                 console.log("repeats = " + repeats)
-                console.log("yardage: " + yardage)
-            }
-            else{
-                yardage = (widths * cutWidth) / 36.0
-                if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
-                // setYardage(yardage);
-                console.log("widths = " + widths)
-                console.log("cutWidth = " + cutWidth)
                 console.log("yardage: " + yardage)
             }
         }
@@ -316,13 +313,42 @@ const Cushions = ({pname, name, address, email, estName}) => {
         let boxLength = 2 * (cutLength + cutWidth) + 2;
         let numBoxStrips = Math.ceil(boxLength / fabWidth)
 
-        //multiply the number of strips by the cut height and add to final yardage
-        let add = numBoxStrips * cutHeight / 36.0
-        if (add % 0.25 != 0){add += 0.25 - (add % 0.25)}
-        console.log("boxing: " + add)
-        yardage += add
-        if (edge === 'Welt' && edgeOther ==='Self-welt'){yardage += 0.5}
-        console.log("welt: " + 0.5)
+        //no fabric repeat
+        if (!document.getElementById('mainvert').value){
+            //multiply the number of strips by the cut height and add to final yardage
+            let add = numBoxStrips * cutHeight
+            console.log("boxing: " + add)
+            yardage += add
+            yardage = yardage / 36.0
+            if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+        }
+        //with vertical fabric repeat so we need to make sure we have enough
+        //repeats with the pattern
+        else{
+            let add = repeats * cutHeight
+            console.log("box: " + add)
+            console.log("repeats: " + repeats)
+            console.log("cutHeight: " + cutHeight)
+            yardage += add
+            yardage = yardage / 36.0
+            if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+
+            //check if we have enough excess fabric for other boxing panels
+            let useYardage =(2 * (cutLength * cutWidth) + cutHeight * boxLength) / 1296
+            console.log("used yardage: " + useYardage)
+            console.log("yardage: " + yardage)
+
+            //if we don't have enough fabric, set to amount we use
+            if (useYardage > yardage){
+                yardage = useYardage;
+                if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+            }
+        }
+        
+        if (edge === 'Welt' && edgeOther ==='Self-welt'){
+            yardage += 0.5; 
+            console.log("welt: " + 0.5)
+        }
 
         setYardage(yardage)
     }
@@ -467,24 +493,6 @@ const Cushions = ({pname, name, address, email, estName}) => {
                     Cord / trim with lip
                 </label>
             </>}
-            <br></br><label>
-                <input type='radio' name='edge' value={'Flange'}                
-                style={{marginRight: '5px'}} onChange={handleEdge}></input>
-                Flange
-            </label>
-            {edge === 'Flange' && 
-            <>
-                <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' name='welt' value={'Self-flange'} defaultChecked={true}
-                    style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
-                    Self-flange
-                </label>
-                <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' name='welt' value={'Contrast flange'}
-                    style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
-                    Contrast flange
-                </label>
-            </>}
         </div>
 
         <br></br>
@@ -556,12 +564,12 @@ const Cushions = ({pname, name, address, email, estName}) => {
                 How are we running the fabric?
                 <br></br><label> 
                     <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={false} onChange={handleMainRailroad} defaultChecked={true}></input>
+                    value={"utb"} onChange={handleMainRailroad} defaultChecked={true}></input>
                     Up the bolt
                 </label> <br></br>
                 <label>
                     <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={true} onChange={handleMainRailroad}></input>
+                    value={"rr"} onChange={handleMainRailroad}></input>
                     Railroaded
                 </label><br></br>
             </div><br></br>
