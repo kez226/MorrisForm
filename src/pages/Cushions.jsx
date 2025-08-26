@@ -320,7 +320,7 @@ const Cushions = ({pname, name, address, email, estName}) => {
             console.log("boxing: " + add)
             yardage += add
             yardage = yardage / 36.0
-            if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+            if (yardage % 0.25 !== 0){yardage += 0.25 - (yardage % 0.25)}
         }
         //with vertical fabric repeat so we need to make sure we have enough
         //repeats with the pattern
@@ -331,18 +331,18 @@ const Cushions = ({pname, name, address, email, estName}) => {
             console.log("cutHeight: " + cutHeight)
             yardage += add
             yardage = yardage / 36.0
-            if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+            if (yardage % 0.25 !== 0){yardage += 0.25 - (yardage % 0.25)}
 
-            //check if we have enough excess fabric for other boxing panels
-            let useYardage =(2 * (cutLength * cutWidth) + cutHeight * boxLength) / 1296
-            console.log("used yardage: " + useYardage)
-            console.log("yardage: " + yardage)
+            // //check if we have enough excess fabric for other boxing panels
+            // let useYardage =(2 * (cutLength * cutWidth) + cutHeight * boxLength) / 1296
+            // console.log("used yardage: " + useYardage)
+            // console.log("yardage: " + yardage)
 
-            //if we don't have enough fabric, set to amount we use
-            if (useYardage > yardage){
-                yardage = useYardage;
-                if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
-            }
+            // //if we don't have enough fabric, set to amount we use
+            // if (useYardage > yardage){
+            //     yardage = useYardage;
+            //     if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
+            // }
         }
         
         if (edge === 'Welt' && edgeOther ==='Self-welt'){
