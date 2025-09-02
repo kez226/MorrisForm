@@ -224,7 +224,7 @@ const Cushions = ({pname, name, address, email, estName}) => {
         let cutLength = length + Number(document.getElementById('length').value) + 1;
         let cutWidth = depth + Number(document.getElementById('depth').value) + 1;
         let fabWidth = mainWidth + Number(document.getElementById('mainwidth').value);
-        if (fabWidth === 0.0) {fabWidth = 54.0;}
+        if (fabWidth == 0) {fabWidth = 54.0;}
 
         let repeats = null;
         let widths = 2;
@@ -250,23 +250,12 @@ const Cushions = ({pname, name, address, email, estName}) => {
                     widths += 2;
                 }
             }
-            // //if mainvert is not empty (there is a vertical repeat)
-            // if (document.getElementById('mainvert').value){
-            //     repeats = Math.ceil(cutWidth / (Number(document.getElementById('mainvert').value) + mainVertical));
-            //     yardage = (widths * cutLength * repeats)
-            //     // setYardage(yardage);
-            //     console.log("widths = " + widths)
-            //     console.log("cutLength = " + cutLength)
-            //     console.log("repeats = " + repeats)
-            //     console.log("yardage: " + yardage)
-            // }
-            // else{
-                yardage = (widths * cutLength)
-                // setYardage(yardage);
-                console.log("widths = " + widths)
-                console.log("cutLength = " + cutLength)
-                console.log("yardage: " + yardage)
-            // }
+            yardage = (widths * cutLength)
+            yardage += 9 - (yardage % 9)
+            yardage = yardage / 36.0
+            console.log("widths = " + widths)
+            console.log("cutLength = " + cutLength)
+            console.log("yardage: " + yardage)
         }
         //this is up the bolt
         else{

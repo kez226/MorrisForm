@@ -10,6 +10,8 @@ const Pillows = ({pname, name, address, email, estName}) => {
     const [edge, setEdge] = useState('');
     const [edgeOther, setEdgeOther] = useState('');
     const[com, setCom] = useState('');
+    const [contrast, setContrast] = useState(false);
+    const [yardage, setYardage] = useState(null);
 
     const handleImageUpload = (event) => {
         if (event.target.files.length > 5){
@@ -206,6 +208,100 @@ const Pillows = ({pname, name, address, email, estName}) => {
         }
       }
 
+    const calcYardage = () => {
+        if (!document.getElementById('length').value || !document.getElementById('depth').value){
+            alert("Please fill out length and depth");
+            setYardage(null)
+            return;
+        }
+        let yardage = 0;
+        let cutLength =  Number(document.getElementById('length').value) + 1;
+        let cutWidth =  Number(document.getElementById('depth').value) + 1;
+        let fabWidth = mainWidth + Number(document.getElementById('mainwidth').value);
+        if (fabWidth == 0) {fabWidth = 54.0;}
+
+        let repeats = null;
+        let widths = 2;
+        if (mainrailroad === "rr"){
+            console.log("railroad")
+            //if both panels fit side by side in one fabric width
+            // you only need one width of fabric
+            if (cutWidth * 2 <= fabWidth){
+                widths--;
+            }
+            //panel too wide to fit in one piece
+            //top to bottom seem needed, and maybe pattern matching (not added yet)
+            else if (cutWidth > fabWidth){
+                //adding in the seam allowance and set number of widths to 2
+                cutWidth++;
+                if ((cutWidth - fabWidth) * 2 <= fabWidth){
+                    //only need one extra width of fabric for extra strip for both panels
+                    //no need to add allowance bc alr added to cutlength
+                    widths++;
+                }
+                else{
+                    //you need two extra widths of fabric for the two strips
+                    widths += 2;
+                }
+            }
+            yardage = (widths * cutLength)
+            console.log("widths = " + widths)
+            console.log("cutLength = " + cutLength)
+            console.log("yardage: " + yardage)
+        }
+        //this is up the bolt
+        else{
+            //if both panels fit side by side in one fabric width
+            // you only need one width of fabric
+            if (cutLength * 2 <= fabWidth){
+                widths--;
+            }
+            //panel too wide to fit in one piece
+            //top to bottom seem needed, and maybe pattern matching (not added yet)
+            else if (cutLength > fabWidth){
+                //adding in the seam allowance and set number of widths to 2
+                cutLength++;
+                if ((cutLength - fabWidth) * 2 <= fabWidth){
+                    //only need one extra width of fabric for extra strip for both panels
+                    //no need to add allowance bc alr added to cutlength
+                    widths++;
+                }
+                else{
+                    //you need two extra widths of fabric for the two strips
+                    widths += 2;
+                }
+            }
+            //if mainvert is empty (there is no vertical repeat)
+            if (!document.getElementById('mainvert').value){
+                yardage = (widths * cutWidth)
+                // setYardage(yardage);
+                console.log("widths = " + widths)
+                console.log("cutWidth = " + cutWidth)
+                console.log("yardage: " + yardage)
+            }
+            else{
+                repeats = Math.ceil(cutWidth / (Number(document.getElementById('mainvert').value) + mainVertical));
+                yardage = (widths * cutWidth * repeats)
+                // setYardage(yardage);
+                console.log("widths = " + widths)
+                console.log("cutWidth = " + cutWidth)
+                console.log("repeats = " + repeats)
+                console.log("yardage: " + yardage)
+                console.log("main width: " + fabWidth)
+            }
+        }
+
+        yardage = yardage / 36.0
+        if (yardage % 0.25 !== 0){yardage += 0.25 - (yardage % 0.25)}
+        
+        if (edge === 'Welt' && edgeOther ==='Self-welt'){
+            yardage += 0.5; 
+            console.log("welt: " + 0.5)
+        }
+
+        setYardage(yardage)
+    }
+
     return(<>
     <div style={{border: 'grey solid 1px', padding:'5px'}}>
         <h1>Pillows</h1>
@@ -239,12 +335,12 @@ const Pillows = ({pname, name, address, email, estName}) => {
                 style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
         </label>
         <br></br><label>
-            Size (based on cover dimension, not insert):
-            <input type='number' style={{marginLeft: '48px'}} id='size'></input>
+            Length:
+            <input type='number' style={{marginLeft: '48px'}} id='length'></input>
         </label>
         <br></br><label>
-            Quantity:
-            <input type='number' style={{marginLeft: '300px'}} id='quantity'></input>
+            Depth:
+            <input type='number' style={{marginLeft: '54px'}} id='depth'></input>
         </label>
         <br></br><br></br>
 
@@ -421,19 +517,31 @@ const Pillows = ({pname, name, address, email, estName}) => {
                     ></Dropdown>
                 </>}
                 <br></br>
-                Are we railroaded?
+                How are we running the fabric
                 <br></br><label> 
                     <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={true} onChange={handleMainRailroad}></input>
-                    Yes
+                    value={'utb'} onChange={handleMainRailroad}></input>
+                    Up the bolt
                 </label> <br></br>
                 <label>
                     <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={false} onChange={handleMainRailroad}></input>
-                    No
+                    value={'rr'} onChange={handleMainRailroad}></input>
+                    Railroaded
                 </label><br></br>
             </div><br></br>
 
+            Are we using contrast fabric?
+            <div>
+                <label>
+                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContrast(true)}}/>
+                    Yes
+                </label> <br />
+                <label>
+                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContrast(false)}}/>
+                    No
+                </label>
+            </div>
+            {contrast && <>
             Contrast Fabric specifications:
             <div>
                 What units are the measurements in?
@@ -499,7 +607,10 @@ const Pillows = ({pname, name, address, email, estName}) => {
                 Please specify where the contrast fabric will be used:
                 <input id='where'></input>
             </div><br></br>
-
+            </>}
+            
+            <br /><button onClick={calcYardage}>Calculate Yardage</button>
+            {yardage}
             <button onClick={submitForm}>Submit</button>
     </div>
     </>)
