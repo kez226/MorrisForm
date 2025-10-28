@@ -214,133 +214,133 @@ const Cushions = ({pname, name, address, email, estName}) => {
         }
       }
 
+    
     const calcYardage = () => {
+        // Input validation
         if (!document.getElementById('length').value || !document.getElementById('depth').value){
             alert("Please fill out length and depth");
             setYardage(null)
             return;
         }
-        let yardage = 0;
-        let cutLength = length + Number(document.getElementById('length').value) + 1;
-        let cutWidth = depth + Number(document.getElementById('depth').value) + 1;
+
+        // Convert inputs to numbers
+        let lengthCalc = length + Number(document.getElementById('length').value);
+        let depthCalc = depth + Number(document.getElementById('depth').value);
+        let thicknessCalc = thickness + Number(document.getElementById('thickness').value);
+        let mainvertCalc = Number(document.getElementById('mainvert').value) + mainVertical;
+
+        // Default fabric width if not provided or zero
         let fabWidth = mainWidth + Number(document.getElementById('mainwidth').value);
-        if (fabWidth == 0) {fabWidth = 54.0;}
+        if (fabWidth === 0) { fabWidth = 54.0; }
 
-        let repeats = null;
-        let widths = 2;
-        if (mainrailroad === "rr"){
-            console.log("railroad")
-            //if both panels fit side by side in one fabric width
-            // you only need one width of fabric
-            if (cutWidth * 2 <= fabWidth){
-                widths--;
-            }
-            //panel too wide to fit in one piece
-            //top to bottom seem needed, and maybe pattern matching (not added yet)
-            else if (cutWidth > fabWidth){
-                //adding in the seam allowance and set number of widths to 2
-                cutWidth++;
-                if ((cutWidth - fabWidth) * 2 <= fabWidth){
-                    //only need one extra width of fabric for extra strip for both panels
-                    //no need to add allowance bc alr added to cutlength
-                    widths++;
-                }
-                else{
-                    //you need two extra widths of fabric for the two strips
-                    widths += 2;
-                }
-            }
-            yardage = (widths * cutLength)
-            yardage += 9 - (yardage % 9)
-            yardage = yardage / 36.0
-            console.log("widths = " + widths)
-            console.log("cutLength = " + cutLength)
-            console.log("yardage: " + yardage)
-        }
-        //this is up the bolt
-        else{
-            //if both panels fit side by side in one fabric width
-            // you only need one width of fabric
-            if (cutLength * 2 <= fabWidth){
-                widths--;
-            }
-            //panel too wide to fit in one piece
-            //top to bottom seem needed, and maybe pattern matching (not added yet)
-            else if (cutLength > fabWidth){
-                //adding in the seam allowance and set number of widths to 2
-                cutLength++;
-                if ((cutLength - fabWidth) * 2 <= fabWidth){
-                    //only need one extra width of fabric for extra strip for both panels
-                    //no need to add allowance bc alr added to cutlength
-                    widths++;
-                }
-                else{
-                    //you need two extra widths of fabric for the two strips
-                    widths += 2;
-                }
-            }
-            //if mainvert is empty (there is no vertical repeat)
-            if (!document.getElementById('mainvert').value){
-                yardage = (widths * cutWidth)
-                // setYardage(yardage);
-                console.log("widths = " + widths)
-                console.log("cutWidth = " + cutWidth)
-                console.log("yardage: " + yardage)
-            }
-            else{
-                repeats = Math.ceil(cutWidth / (Number(document.getElementById('mainvert').value) + mainVertical));
-                yardage = (widths * cutWidth * repeats)
-                // setYardage(yardage);
-                console.log("widths = " + widths)
-                console.log("cutWidth = " + cutWidth)
-                console.log("repeats = " + repeats)
-                console.log("yardage: " + yardage)
-            }
-        }
+        // --- Panel Sizing Formulas (based on PDF) ---
+        const seamAllowance = 0.5;
+        // const roundingReduction = 0.25; // 0.25 inches per edge - accounted for in plate/boxing additions
 
-        let cutHeight = thickness + Number(document.getElementById('thickness').value) + 1;
-        let boxLength = 2 * (cutLength + cutWidth) + 2;
-        let numBoxStrips = Math.ceil(boxLength / fabWidth)
+        // Plate Panels (Top and Bottom)
+        // Formula: Finished cushion dimension + 0.5 inches per side
+        // This 0.5" includes 0.25" rounding reduction + 0.25" seam allowance per edge
+        const plateCutLength = lengthCalc + seamAllowance; // Length + 0.5"
+        const plateCutWidth = depthCalc + seamAllowance;   // Depth + 0.5"
 
-        //no fabric repeat
-        if (!document.getElementById('mainvert').value){
-            //multiply the number of strips by the cut height and add to final yardage
-            let add = numBoxStrips * cutHeight
-            console.log("boxing: " + add)
-            yardage += add
-            yardage = yardage / 36.0
-            if (yardage % 0.25 !== 0){yardage += 0.25 - (yardage % 0.25)}
-        }
-        //with vertical fabric repeat so we need to make sure we have enough
-        //repeats with the pattern
-        else{
-            let add = repeats * cutHeight
-            console.log("box: " + add)
-            console.log("repeats: " + repeats)
-            console.log("cutHeight: " + cutHeight)
-            yardage += add
-            yardage = yardage / 36.0
-            if (yardage % 0.25 !== 0){yardage += 0.25 - (yardage % 0.25)}
+        // Boxing Panels (Side Strips)
+        // Boxing width formula: Thickness + 0.5 inches
+        const boxingCutWidth = thicknessCalc + seamAllowance; // Thickness + 0.5"
 
-            // //check if we have enough excess fabric for other boxing panels
-            // let useYardage =(2 * (cutLength * cutWidth) + cutHeight * boxLength) / 1296
-            // console.log("used yardage: " + useYardage)
-            // console.log("yardage: " + yardage)
+        // Continuous Boxing Configuration (Left, Front, Right sides)
+        // Boxing length formula: Left side + Front side + Right side + 4 extra inches
+        // Using plateCutLength and plateCutWidth for side dimensions as per PDF example (24.5" for 24" cushion)
+        const continuousBoxingCutLength = plateCutLength + plateCutWidth + plateCutLength + 4;
 
-            // //if we don't have enough fabric, set to amount we use
-            // if (useYardage > yardage){
-            //     yardage = useYardage;
-            //     if (yardage % 0.25 != 0){yardage += 0.25 - (yardage % 0.25)}
-            // }
-        }
-        
-        if (edge === 'Welt' && edgeOther ==='Self-welt'){
-            yardage += 0.5; 
-            console.log("welt: " + 0.5)
+        // Zipper Plaque Panel (Back side)
+        // Plaque width formula: Thickness + 1.75 inches
+        const plaqueCutWidth = thicknessCalc + 1.75;
+        // Plaque length formula: Back side dimension + 4 inches
+        const plaqueCutLength = plateCutWidth + 4; // Assuming 'depth' is the back side, so plateCutWidth is its dimension
+
+        // --- Simplified Fabric Yardage Calculation (Approximation of Nesting) ---
+        // The PDF describes an interactive nesting process, which is complex to replicate programmatically.
+        // This implementation will use a simplified approach to estimate yardage by considering the total area
+        // and then trying to fit pieces within the fabric width, similar to the original function's intent.
+        // It will prioritize fitting pieces side-by-side or stacking them to minimize waste.
+
+        let totalFabricLengthNeeded = 0; // This will accumulate the total length of fabric required on the roll in inches
+        let currentFabricWidthUsed = 0; // Tracks how much of the fabric width is currently occupied
+        let maxRowHeight = 0; // Tracks the height of the current row of pieces
+
+        // Helper function to add a piece to the layout
+        const addPiece = (pieceLength, pieceWidth) => {
+            // If the piece can fit in the current row (side-by-side)
+            if (currentFabricWidthUsed + pieceWidth <= fabWidth) {
+                currentFabricWidthUsed += pieceWidth;
+                maxRowHeight = Math.max(maxRowHeight, pieceLength);
+            } else {
+                // If it doesn't fit, start a new row
+                totalFabricLengthNeeded += maxRowHeight; // Add the height of the completed row
+                currentFabricWidthUsed = pieceWidth; // Start new row with this piece
+                maxRowHeight = pieceLength;
+            }
+        };
+
+        // Determine orientation based on mainrailroad
+        if (mainrailroad === "rr") {
+            // Railroaded: Fabric pattern runs across the width.
+            // Pieces are rotated 90 degrees conceptually for layout.
+            // plateCutLength becomes width, plateCutWidth becomes length for layout purposes.
+
+            // Two plates
+            addPiece(plateCutWidth, plateCutLength); // Piece 1: (length, width) -> (plateCutWidth, plateCutLength)
+            addPiece(plateCutWidth, plateCutLength); // Piece 2
+
+            // Continuous Boxing Strip
+            addPiece(boxingCutWidth, continuousBoxingCutLength); // (length, width) -> (boxingCutWidth, continuousBoxingCutLength)
+
+            // Zipper Plaque
+            addPiece(plaqueCutWidth, plaqueCutLength); // (length, width) -> (plaqueCutWidth, plaqueCutLength)
+
+        } else {
+            // Up the bolt: Fabric pattern runs along the length.
+            // Pieces are laid out as is.
+
+            // Two plates
+            addPiece(plateCutLength, plateCutWidth); // Piece 1: (length, width) -> (plateCutLength, plateCutWidth)
+            addPiece(plateCutLength, plateCutWidth); // Piece 2
+
+            // Continuous Boxing Strip
+            addPiece(continuousBoxingCutLength, boxingCutWidth); // (length, width) -> (continuousBoxingCutLength, boxingCutWidth)
+
+            // Zipper Plaque
+            addPiece(plaqueCutLength, plaqueCutWidth); // (length, width) -> (plaqueCutLength, plaqueCutWidth)
         }
 
-        setYardage(yardage)
-    }
+        // Add the height of the last row
+        totalFabricLengthNeeded += maxRowHeight;
+
+
+        // --- Pattern Matching Considerations (Simplified) ---
+        // The PDF mentions vertical pattern match (along fabric length) and horizontal pattern match (across fabric width).
+        // For simplicity, if a vertical repeat (mainvert) is provided, we'll round up the total length needed
+        // to the nearest multiple of the repeat, ensuring pattern alignment.
+        if (mainvertCalc > 0) {
+            const repeatValue = mainvertCalc; // Assuming mainvert is the vertical repeat in inches
+            totalFabricLengthNeeded = Math.ceil(totalFabricLengthNeeded / repeatValue) * repeatValue;
+        }
+
+        // Convert total length in inches to yards
+        let calculatedYardage = totalFabricLengthNeeded / 36.0;
+
+        // Round up to the nearest 0.25 yard as per common practice in fabric calculation
+        // The original code had `if (yardage % 0.25 !== 0){yardage += 0.25 - (yardage % 0.25)}`
+        calculatedYardage = Math.ceil(calculatedYardage * 4) / 4; // Rounds up to nearest 0.25
+
+        // Add extra for 'Welt' and 'Self-welt' as in original code
+        if (edge === 'Welt' && edgeOther === 'Self-welt') {
+            calculatedYardage += 0.5;
+        }
+
+        setYardage(calculatedYardage);
+        console.log("Calculated Yardage:", calculatedYardage);
+    };
 
     return(<>
     <div style={{border: 'grey solid 1px', padding:'5px'}}>

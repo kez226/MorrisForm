@@ -43,6 +43,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         }
     }
     const handleMount = (event) => {setMount(event.target.value);}
+    const [type, setType] = useState('flat');
+    const handleType = (event) => {setType(event.target.value);}
     const handleStationary = (event) =>{setStationary(event.target.value);}
     const handleOpFunction = (event) => {setOpFunction(event.target.value);
         if (event.target.value === 'motorized'){setMotorType('battery')}
@@ -284,8 +286,17 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             </> 
         )}
 
+    // Helper function to calculate the hobbled fabric addition
+    const calculateHobbledAddition = (shadeHeight) => {
+        if (type !== "hobbled") {
+            return shadeHeight;
+        }
+        // Add 5 inches for every 8 inches of height (shade height only)
+        return Math.ceil(shadeHeight / 8) * 5;
+    };
+
     const [yardage, setYardage] = useState(null);
-    const calcYardage = () => {
+    const calcYardageOld = () => {
         if (mainrailroad === "railroad"){
             if (document.getElementById('f2fw').value == 0 
             || document.getElementById('f2fh').value == 0
@@ -297,24 +308,52 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 alert("Please fill out all relevant fields");
                 return;
             }
-            let panelHeight = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
-            if (mount === "outside"){
-                panelHeight =+ Number(document.getElementById('abvf').value) + Number(abvf);
-            }
-            let check;
-            if (mainWidth === '') {check = 54;}
-            else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
-            if (panelHeight > check){
-                alert("Height is too much by " + (panelHeight - check));
+            if (type === "london"){
+                let panelHeight = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
+                if (mount === "outside"){
+                    panelHeight =+ Number(document.getElementById('abvf').value) + Number(abvf);
+                }
+                let check;
+                if (mainWidth === '') {check = 54;}
+                else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
+                if (panelHeight > check){
+                    alert("Height is too much by " + (panelHeight - check));
+                    return;
+                }
+                let cutWidth = 6.0 + Number(document.getElementById('f2fw').value) + Number(f2fw);
+                if(cutWidth % 18 !== 0){
+                    cutWidth += 18 - (cutWidth % 18);
+                }
+                calculateHobbledAddition(cutWidth);
+                cutWidth = (cutWidth / 36);
+                setYardage(cutWidth);
                 return;
             }
-            let cutWidth = 6.0 + Number(document.getElementById('f2fw').value) + Number(f2fw);
-            if(cutWidth % 18 !== 0){
-                cutWidth += 18 - (cutWidth % 18);
+            else{
+                let panelHeight = 24.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
+                if (mount === "outside"){
+                    panelHeight =+ Number(document.getElementById('abvf').value) + Number(abvf);
+                }
+                let check;
+                if (mainWidth === '') {check = 54;}
+                else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
+                if (panelHeight > check){
+                    alert("Height is too much by " + (panelHeight - check));
+                    return;
+                }
+
+                // do i still need the +6 for london hear?
+                let cutWidth = 6.0 + Number(document.getElementById('f2fw').value) + Number(f2fw);
+                let pleats = Number(document.getElementById('london-pleats').value);
+                if (!pleats || pleats <= 0){pleats = 1;}
+                cutWidth += 12 * pleats;
+                if(cutWidth % 18 !== 0){
+                    cutWidth += 18 - (cutWidth % 18);
+                }
+                cutWidth = (cutWidth / 36);
+                setYardage(cutWidth);
+                return;
             }
-            cutWidth = (cutWidth / 36);
-            setYardage(cutWidth);
-            return;
         }
         //this is for solid fabric (no vertical repeat)
         if (Number(document.getElementById('mainvert').value) === 0 && Number(mainVertical) === 0){
@@ -333,15 +372,28 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 if (mainWidth === '') {check = 54;}
                 else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
                 const widths = Math.ceil(cutWidth /check);
-                const cutLength = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
-                const yardDiff = cutLength % 9;
-                let cutYards = cutLength;
-                if (yardDiff !== 0){
-                    cutYards += (9 - yardDiff);
-                }    
-                cutYards = (cutYards / 36).toFixed(2); 
-                setYardage(widths * cutYards);
-                return;
+                if (type != "london"){
+                    const cutLength = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
+                    const yardDiff = cutLength % 9;
+                    let cutYards = cutLength;
+                    if (yardDiff !== 0){
+                        cutYards += (9 - yardDiff);
+                    }    
+                    calculateHobbledAddition(cutYards);
+                    cutYards = (cutYards / 36).toFixed(2); 
+                    setYardage(widths * cutYards);
+                    return;
+                } else{
+                    const cutLength = 24.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
+                    const yardDiff = cutLength % 9;
+                    let cutYards = cutLength;
+                    if (yardDiff !== 0){
+                        cutYards += (9 - yardDiff);
+                    }    
+                    cutYards = (cutYards / 36).toFixed(2); 
+                    setYardage(widths * cutYards);
+                    return;
+                }
             }
             //outside mounting
             else{
@@ -363,6 +415,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 if (yardDiff !== 0){
                     cutYards += (9 - yardDiff);
                 }    
+                calculateHobbledAddition(cutYards);
                 cutYards = (cutYards / 36).toFixed(2); 
                 setYardage(widths * cutYards);
                 return;
@@ -390,6 +443,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             if (yardDiff !== 0){
                 cutYards += (9 - yardDiff);
             }    
+            calculateHobbledAddition(cutYards);
             cutYards = (cutYards / 36).toFixed(2); 
             let check;
             if (mainWidth === '') {check = 54;}
@@ -399,6 +453,245 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
             return;
         }
     }
+    const calcYardage = () => {
+        if (mainrailroad === "railroad") {
+            if (
+                document.getElementById("f2fw").value == 0 ||
+                document.getElementById("f2fh").value == 0
+            ) {
+                alert("Please fill out all relevant fields");
+                return;
+            }
+            if (mount === "outside" && document.getElementById("abvf").value == 0) {
+                alert("Please fill out all relevant fields");
+                return;
+            }
+
+            // --- Railroaded Fabrics ---
+            if (type === "london") {
+                let panelHeight =
+                    24.0 + Number(document.getElementById("f2fh").value) + Number(f2fh);
+                if (mount === "outside") {
+                    panelHeight += Number(document.getElementById("abvf").value) + Number(abvf);
+                }
+
+                let check;
+                if (mainWidth === "") {
+                    check = 54;
+                } else {
+                    check = Number(document.getElementById("mainwidth").value) + Number(mainWidth);
+                }
+                if (panelHeight > check) {
+                    alert("Height is too much by " + (panelHeight - check));
+                    return;
+                }
+
+                // Width + pleats for London
+                let cutWidth = 6.0 + Number(document.getElementById("f2fw").value) + Number(f2fw);
+                let pleats = Number(document.getElementById("london-pleats").value);
+                if (!pleats || pleats <= 0) pleats = 1;
+                cutWidth += 12 * pleats;
+
+                if (cutWidth % 18 !== 0) {
+                    cutWidth += 18 - (cutWidth % 18);
+                }
+
+                cutWidth = cutWidth / 36;
+                setYardage(cutWidth);
+                return;
+            } else {
+                // Non-London (standard) railroaded
+                let panelHeight =
+                    20.0 + Number(document.getElementById("f2fh").value) + Number(f2fh);
+                if (mount === "outside") {
+                    panelHeight += Number(document.getElementById("abvf").value) + Number(abvf);
+                }
+
+                let check;
+                if (mainWidth === "") {
+                    check = 54;
+                } else {
+                    check = Number(document.getElementById("mainwidth").value) + Number(mainWidth);
+                }
+                if (panelHeight > check) {
+                    alert("Height is too much by " + (panelHeight - check));
+                    return;
+                }
+
+                let cutWidth = 6.0 + Number(document.getElementById("f2fw").value) + Number(f2fw);
+                if (cutWidth % 18 !== 0) {
+                    cutWidth += 18 - (cutWidth % 18);
+                }
+                cutWidth = cutWidth / 36;
+                setYardage(cutWidth);
+                return;
+            }
+        }
+
+        // --- SOLID FABRIC (no vertical repeat) ---
+        if (
+            Number(document.getElementById("mainvert").value) === 0 &&
+            Number(mainVertical) === 0
+        ) {
+            console.log("no vertical repeat");
+
+            // Inside mount
+            if (mount === "inside") {
+                console.log("inside");
+                if (
+                    document.getElementById("f2fw").value == 0 ||
+                    document.getElementById("f2fh").value == 0
+                ) {
+                    alert("Please fill out all relevant fields");
+                    return;
+                }
+
+                // --- Width + Pleats ---
+                let cutWidth = (Number(document.getElementById("f2fw").value) + Number(f2fw)) * 0.75 + 3;
+                if (type === "london"){
+                    let pleats = Number(document.getElementById("london-pleats").value);
+                    if (!pleats || pleats <= 0) pleats = 1;
+                    cutWidth += 12 * pleats;
+                }
+
+                let check;
+                if (mainWidth === "") {
+                    check = 54;
+                } else {
+                    check = Number(document.getElementById("mainwidth").value) + Number(mainWidth);
+                }
+                const widths = Math.ceil(cutWidth / check);
+
+                // --- Height ---
+                const baseAdd = type === "london" ? 24.0 : 20.0;
+                let cutLength = baseAdd + Number(document.getElementById("f2fh").value) + Number(f2fh);
+
+                const yardDiff = cutLength % 9;
+                if (yardDiff !== 0) cutLength += 9 - yardDiff;
+
+                calculateHobbledAddition(cutLength);
+                cutLength = (cutLength / 36).toFixed(2);
+                setYardage(widths * cutLength);
+                return;
+            }
+
+            // Outside mount
+            else {
+                console.log("outside");
+                if (
+                    document.getElementById("f2fw").value == 0 ||
+                    document.getElementById("abvf").value == 0 ||
+                    document.getElementById("f2fh").value == 0
+                ) {
+                    alert("Please fill out all relevant fields");
+                    return;
+                }
+
+                let check;
+                if (mainWidth === "") {
+                    check = 54;
+                } else {
+                    check = Number(document.getElementById("mainwidth").value) + Number(mainWidth);
+                }
+
+                // --- Width + Pleats ---
+                let cutWidth =
+                    4.0 + Number(document.getElementById("f2fw").value) + Number(f2fw);
+                if (type === "london"){
+                    let pleats = Number(document.getElementById("london-pleats").value);
+                    if (!pleats || pleats <= 0) pleats = 1;
+                    cutWidth += 12 * pleats;
+                }
+
+                const widths = Math.ceil(cutWidth / check);
+
+                // --- Height ---
+                const baseAdd = type === "london" ? 24.0 : 20.0;
+                const obHeight =
+                    Number(document.getElementById("abvf").value) +
+                    Number(abvf) +
+                    Number(document.getElementById("f2fh").value) +
+                    Number(f2fh);
+                let cutYards = baseAdd + obHeight;
+
+                const yardDiff = cutYards % 9;
+                if (yardDiff !== 0) cutYards += 9 - yardDiff;
+
+                calculateHobbledAddition(cutYards);
+                cutYards = (cutYards / 36).toFixed(2);
+                setYardage(widths * cutYards);
+                return;
+            }
+        }
+
+        // --- FABRICS WITH REPEAT ---
+        else {
+            if (
+                document.getElementById("f2fw").value == 0 ||
+                document.getElementById("mainvert").value == 0 ||
+                document.getElementById("f2fh").value == 0
+            ) {
+                alert("Please fill out all relevant fields");
+                return;
+            }
+            if (mount === "outside" && document.getElementById("abvf").value == 0) {
+                alert("Please fill out all relevant fields");
+                return;
+            }
+
+            // --- Repeats calculation ---
+            const baseAdd = type === "london" ? 24.0 : 20.0;
+            let repeats;
+            if (mount === "outside") {
+                repeats = Math.ceil(
+                    (baseAdd +
+                        Number(document.getElementById("f2fh").value) +
+                        Number(f2fh) +
+                        Number(document.getElementById("abvf").value) +
+                        Number(abvf)) /
+                        (Number(document.getElementById("mainvert").value) + Number(mainVertical))
+                );
+            } else {
+                repeats = Math.ceil(
+                    (baseAdd +
+                        Number(document.getElementById("f2fh").value) +
+                        Number(f2fh)) /
+                        (Number(document.getElementById("mainvert").value) + Number(mainVertical))
+                );
+            }
+
+            const cutLength =
+                repeats *
+                (Number(document.getElementById("mainvert").value) + Number(mainVertical));
+
+            const yardDiff = cutLength % 9;
+            let cutYards = cutLength;
+            if (yardDiff !== 0) cutYards += 9 - yardDiff;
+
+            calculateHobbledAddition(cutYards);
+            cutYards = (cutYards / 36).toFixed(2);
+
+            // --- Width + Pleats ---
+            let cutWidth = Number(document.getElementById("f2fw").value) + Number(f2fw);
+            if (type === "london"){
+                let pleats = Number(document.getElementById("london-pleats").value);
+                if (!pleats || pleats <= 0) pleats = 1;
+                cutWidth += 12 * pleats;
+            }
+
+            let check;
+            if (mainWidth === "") {
+                check = 54;
+            } else {
+                check = Number(document.getElementById("mainwidth").value) + Number(mainWidth);
+            }
+            const widths = Math.ceil(cutWidth / check);
+
+            setYardage(widths * cutYards);
+            return;
+        }
+    };
+
 
     const [price, setPrice] = useState(null);
     const [stabilizer, setStabilizer] = useState(null);
@@ -477,6 +770,43 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
                 <input value='in' type='radio' name='units1' onChange={handleUnits1}
                     style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
             </label><br></br> */}
+
+            What kind of Roman is this?
+            <div>
+                <label>
+                    <input type='radio' name='type' style={{marginRight:'5px'}}
+                    onChange={handleType} value={'flat'} defaultChecked={true}>
+                    </input>
+                    Flat
+                </label> <br />
+                <label>
+                    <input type='radio' name='type' style={{marginRight:'5px'}}
+                    onChange={handleType} value={'relaxed'} >
+                    </input>
+                    Relaxed
+                </label> <br />
+                <label>
+                    <input type='radio' name='type' style={{marginRight:'5px'}}
+                    onChange={handleType} value={'hobbled'} >
+                    </input>
+                    Hobbled
+                </label> <br />
+                <label>
+                    <input type='radio' name='type' style={{marginRight:'5px'}}
+                    onChange={handleType} value={'london'} >
+                    </input>
+                    London
+                </label> <br />
+                {type === 'london' && <div>
+                    <label style={{marginLeft:'25px'}}>
+                        How many pleats do you want? <br />
+                        <input type="text" name='london-pleats' ></input>
+                    </label> <br />
+                </div>} <br />
+            </div>
+
+
+
             Where are we mounting?
             <div>
                 <label> 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import '../styles.css'
 //import .env;
 
 const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName}) => {
@@ -302,19 +303,19 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         }
       }
     
-    const Dropdown =({ value, change}) => { 
-    return( 
-        <>
-            <select value={value} onChange={(e) => change(e)} style={{width: '50px'}}>
-                {fractions.map((fraction) => (
-                <option key={fraction.value} value={fraction.value}
-                >
-                    {fraction.label}
-                </option>
-                ))}
-            </select>
-        </> 
-    )}
+    const Dropdown =({ value, change}) => {
+        return(
+            <>
+                <select value={value} onChange={(e) => change(e)} className="select-input fixed-width-input">
+                    {fractions.map((fraction) => (
+                    <option key={fraction.value} value={fraction.value}>
+                        {fraction.label}
+                    </option>
+                    ))}
+                </select>
+            </>
+        )
+    }
 
     const calcYardage = () => {
         let yardage;
@@ -513,520 +514,454 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
     }
 
     return(<>
-        <div style={{border: 'grey solid 1px', padding:'5px'}}>
+        <div className="container">
             <h1>Drapery</h1>
-            <label>
+            <label className="file-upload-label">
                 Please load a photo of the window:
-                <input type='file' onChange={handleImageUpload} style={{marginLeft:'15px'}} multiple></input>
+                <input type='file' onChange={handleImageUpload} multiple></input>
             </label><br></br><br></br>
 
-            
-            What are the approximate dimensions of the following?<br></br>
-            {/* What units are the measurements in?
-            <label>
-                <input style={{marginLeft:'25px'}} value='cm' type='radio' name='units1' onChange={handleUnits1}></input> Centimeters
-                <input value='in' type='radio' name='units1' onChange={handleUnits1}
-                    style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
-            </label> */}
-            <div>
-                <label>
-                    Rod width: 
-                    <input type='number' id='f2fw' style={{marginLeft:'100px'}}></input>
-                </label>
-                {units1 === 'in' && <>
+            <div className="form-section">
+                <h4>What are the approximate dimensions of the following?</h4>
+                <div className='row dimensions-section'>
+                <div className='column'>
+                    <label>
+                    Rod width:
+                    <input className='fixed-width-input' type='number' id='f2fw'></input>
+                    </label>
+                    {units1 ==='in' && <>
                     <Dropdown
-                        value = {f2fw}
-                        change = {handlef2fw}
+                        value={f2fw}
+                        change={handlef2fw}
                     ></Dropdown>
-                </>}<br></br>
-                <label>
+                    </>}<br></br>
+                </div>
+                <div className='column'>
+                    <label>
                     Drapery height:
-                    <input type='number' id='f2fh' style={{marginLeft:'65px'}}></input><br></br>
-                </label>
-                {units1 === 'in' && <>
+                    <input className='fixed-width-input' type='number' id='f2fh'></input><br></br>
+                    </label>
+                    {units1 ==='in' && <>
                     <Dropdown
-                        value = {f2fh}
-                        change = {handlef2fh}
+                        value={f2fh}
+                        change={handlef2fh}
                     ></Dropdown>
-                </>}<br></br>
-                {/* <label>
-                    Above frame to ceiling:
-                    <input type='number' id='abvf' style={{marginLeft:'68px'}}></input>
-                </label>
-                {units1 === 'in' && <>
-                    <Dropdown
-                        value = {abvf}
-                        change = {handleabvf}
-                    ></Dropdown>
-                </>}<br></br>
-                <label>
-                    Below sill to floor:
-                    <input type='number' id='bsill' style={{marginLeft:'107px'}}></input>
-                </label>
-                {units1 === 'in' && <>
-                    <Dropdown
-                        value = {bsill}
-                        change = {handlebsill}
-                    ></Dropdown>
-                </>}<br></br> */}
-            {/* How far above frame will hardware be mounted (if known)?
-            <br></br><input type='number' id='mountabvf'></input>
-            {units1 === 'in' && <>
-                <Dropdown
-                    value = {mountabvf}
-                    change = {handlemountabvf}
-                ></Dropdown>
-            </>}<br></br> */}
+                    </>}
+                </div>
+                </div>
             </div>
 
-            <br></br>
-
-            Number of panels:
-            <div>
-                <label> 
-                    <input type='radio' name='panels' style={{marginRight:'5px'}}
+            <div className="form-section">
+                <h4>Number of panels:</h4>
+                <div>
+                <label className="radio-label">
+                    <input type='radio' name='panels'
                     onChange={(e) => {setPanels(1)}}></input>
                     1
-                </label> <br></br>
-                <label> 
-                    <input type='radio' name='panels' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='panels'
                     onChange={(e) => {setPanels(2)}}></input>
                     2
-                </label> <br></br>
-                {/* <label> 
-                    <input type='radio' name='panels' style={{marginRight:'5px'}}
-                    value={3} onChange={(e) => {setPanels(e)}}></input>
-                    3
-                </label> <br></br> */}
-                <br></br>
+                </label>
+                </div>
             </div>
 
-            Will the panels be stationary?
-            <div>
-                <label style={{marginRight:'25px'}}> 
-                    <input type='radio' name='stationary' style={{marginRight:'5px'}}
+            <div className="form-section">
+                <h4>Will the panels be stationary?</h4>
+                <div>
+                <label className="radio-label">
+                    <input type='radio' name='stationary'
                     value={'true'} onChange={handleStationaryChange}></input>
                     Yes
-                </label>  
-                {stationary === 'true' && <>
+                </label>
+                {stationary === 'true' && <div className="sub-option-indent">
+                    <label>
                     What is the width per panel?
-                    <input type='number' id='wpp'></input> 
-                </>}<br></br>
-                <label>
-                    <input type='radio' name='stationary' style={{marginRight:'5px'}}
+                    <input type='number' id='wpp' className='fixed-width-input'></input>
+                    </label>
+                </div>}
+                <label className="radio-label">
+                    <input type='radio' name='stationary'
                     value={'false'} onChange={handleStationaryChange}></input>
                     No (if no, they will be fully functioning)
-                </label> <br />
-                <br></br> 
+                </label>
+                </div>
             </div>
 
-            Lining preference
-            <div>
-                <label>
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+            <div className="form-section">
+                <h4>Lining preference</h4>
+                <div>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Unlined'} onChange={handleLinedChange}></input>
                     Unlined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Sheer'} onChange={handleLinedChange}></input>
                     Sheer lining
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Lightweight Light Filter'} onChange={handleLinedChange}></input>
                     Light weight light filtering lining (Poly cotton)
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Light Filter'} onChange={handleLinedChange}></input>
                     Regular Light filtering lining (100% cotton)
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Blackout'} onChange={handleLinedChange}></input>
                     Blackout lining
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Napped Sateen'} onChange={handleLinedChange}></input>
-                   Napped Sateen
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    Napped Sateen
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Lined and Standard Interlined'} onChange={handleLinedChange}></input>
-                   Lined and IStandard interlined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    Lined and IStandard interlined
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Lined and Bump Interlined'} onChange={handleLinedChange}></input>
-                   Lined and Bump Interlined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    Lined and Bump Interlined
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Self-Lined'} onChange={handleLinedChange}></input>
-                   Self-Lined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    Self-Lined
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Self-Lined and Blackout'} onChange={handleLinedChange}></input>
-                   Self-Lined and Blackout
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    Self-Lined and Blackout
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Self-Lined and Standard Interlined'} onChange={handleLinedChange}></input>
-                   Self-Lined and standard Interlined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    Self-Lined and standard Interlined
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'Self-Lined and Bump Interlined'} onChange={handleLinedChange}></input>
-                   Self-Lined and Bump Interlined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                    Self-Lined and Bump Interlined
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
                     value={'French Blackout'} onChange={handleLinedChange}></input>
-                   French Blackout = Face fabric + 3 layered linings
-                </label><br></br>
-                <br></br>
+                    French Blackout = Face fabric + 3 layered linings
+                </label>
+                </div>
             </div>
 
-            What style pleat would you like (please see images below):
-            <div>
-                <label>
-                    <input type='radio' name='pleat' style={{marginRight:'5px'}}
+            <div className="form-section">
+                <h4>What style pleat would you like (please see images below):</h4>
+                <div>
+                <label className="radio-label">
+                    <input type='radio' name='pleat'
                     value={'2top'} onChange={handlePleatChange}></input>
                     2 finger top tack (Recommended 2x fullness)
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='pleat' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='pleat'
                     value={'2bot'} onChange={handlePleatChange}></input>
                     2 finger botton tack (Recommended 2x fullness)
-                </label><br></br>
-                <label>
-                    <input type='radio' name='pleat' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='pleat'
                     value={'3top'} onChange={handlePleatChange}></input>
                     3 finger top tack (Recommended 2.5x or 3x fullness)
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='pleat' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='pleat'
                     value={'3bot'} onChange={handlePleatChange}></input>
                     3 finger bottom tack (Recommended 2.5x or 3x fullness)
-                </label><br></br>
-                <label>
-                    <input type='radio' name='pleat' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='pleat'
                     value={'ripple'} onChange={handlePleatChange}></input>
                     Ripplefold
-                </label><br></br>
-                {(pleat === 'ripple') && <div>
-                    <label> 
-                        <input defaultChecked={true} type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'60%'} onChange={(e) => {handleRipple(e); setFullness(1.6);}}></input>
-                        60%
-                    </label><br></br>
-                    <label> 
-                        <input type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'80%'} onChange={(e) => {handleRipple(e); setFullness(1.8);}}></input>
-                        80%
-                    </label><br></br>
-                    <label> 
-                        <input type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'100%'} onChange={(e) => {handleRipple(e); setFullness(2);}}></input>
-                        100%
-                    </label><br></br>
-                    <label> 
-                        <input type='radio' name='ripple%' id='ripple%' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'120%'} onChange={(e) => {handleRipple(e); setFullness(2.2);}}></input>
-                        120%
-                    </label><br></br>
+                </label>
+                {(pleat === 'ripple') && <div className="sub-option-indent">
+                    <label className="radio-label">
+                    <input defaultChecked={true} type='radio' name='ripple%'
+                    value={'60%'} onChange={(e) => {handleRipple(e); setFullness(1.6);}}></input>
+                    60%
+                    </label>
+                    <label className="radio-label">
+                    <input type='radio' name='ripple%'
+                    value={'80%'} onChange={(e) => {handleRipple(e); setFullness(1.8);}}></input>
+                    80%
+                    </label>
+                    <label className="radio-label">
+                    <input type='radio' name='ripple%'
+                    value={'100%'} onChange={(e) => {handleRipple(e); setFullness(2);}}></input>
+                    100%
+                    </label>
+                    <label className="radio-label">
+                    <input type='radio' name='ripple%'
+                    value={'120%'} onChange={(e) => {handleRipple(e); setFullness(2.2);}}></input>
+                    120%
+                    </label>
                 </div>}
-                <label> 
-                    <input type='radio' name='pleat' style={{marginRight:'5px'}}
+                <label className="radio-label">
+                    <input type='radio' name='pleat'
                     value={'other'} onChange={handlePleatChange}></input>
                     Other (Grommet, Rod-pocket, Cartridge, Tab-top … ):
-                    <input type='text' id='pleat_other' placeholder='Other'></input>
-                </label><br></br>
+                    <input type='text' id='pleat_other' placeholder='Other' className='fixed-width-input'></input>
+                </label>
                 {(pleat !== 'ripple') &&<>
-                    <br></br>What is the fullness?<br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(1.5)}></input> 1.5
-                    </label><br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(2)}></input> 2
-                    </label><br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(2.25)}></input> 2.25
-                    </label><br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(2.5)}></input> 2.5
-                    </label><br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(2.75)}></input> 2.75
-                    </label><br></br>
-                    <label>
-                        <input type='radio' name='fullness' onClick={() => setFullness(3)}></input> 3
-                    </label> <br />
+                    <br></br><h4>What is the fullness?</h4>
+                    <label className="radio-label">
+                    <input type='radio' name='fullness' onClick={() => setFullness(1.5)}></input> 1.5
+                    </label>
+                    <label className="radio-label">
+                    <input type='radio' name='fullness' onClick={() => setFullness(2)}></input> 2
+                    </label>
+                    <label className="radio-label">
+                    <input type='radio' name='fullness' onClick={() => setFullness(2.25)}></input> 2.25
+                    </label>
+                    <label className="radio-label">
+                    <input type='radio' name='fullness' onClick={() => setFullness(2.5)}></input> 2.5
+                    </label>
+                    <label className="radio-label">
+                    <input type='radio' name='fullness' onClick={() => setFullness(2.75)}></input> 2.75
+                    </label>
+                    <label className="radio-label">
+                    <input type='radio' name='fullness' onClick={() => setFullness(3)}></input> 3
+                    </label>
                 </>} <br />
+                </div>
             </div>
 
-            {/* Do you need hardware?
-            <div>
-                <label> 
-                    <input type='radio' name='hardware' style={{marginRight:'5px'}}
-                    value={'false'} onChange={handleHardwareChange}></input>
-                    No
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='hardware' style={{marginRight:'5px'}}
-                    value={'true'} onChange={handleHardwareChange}></input>
-                    Yes
-                </label><br></br>
-                {hardware === 'true' && <div>
-                    <label> 
-                        <input type='radio' defaultChecked={true} name='hardwareType' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'non-decorative'} onChange={handleHardwareTypeChange}></input>
-                        Non-decorative
-                    </label> <br></br>
-                    <label>
-                        <input type='radio' name='hardwareType' style={{marginRight:'5px', marginLeft:'25px'}}
-                        value={'decorative'} onChange={handleHardwareTypeChange}></input>
-                        Decorative (pick one):
-                    </label><br></br>
-                    {hardwareType === 'decorative' && <div>
-                        <label> 
-                            <input type='radio' defaultChecked={true} name='hardwareDecorativeType' style={{marginRight:'5px', marginLeft:'50px'}}
-                            value={'track'} onChange={handleHardwareDecorativeTypeChange}></input>
-                            Track / mechanical
-                        </label> <br></br>
-                        <label>
-                            <input type='radio' name='hardwareDecorativeType' style={{marginRight:'5px', marginLeft:'50px'}}
-                            value={'rings'} onChange={handleHardwareDecorativeTypeChange}></input>
-                            Pole with rings
-                        </label><br></br>
-                        {hardwareDecorativeType === 'rings' && <div>
-                            <label style={{marginRight:'5px', marginLeft:'50px'}}>
-                                Please provide details:  (wood, metal, diameter, color, finial ….): 
-                                <input id='rings'></input>
-                            </label>
-                        </div>}
-                        <label>
-                            <input type='radio' name='hardwareDecorativeType' style={{marginRight:'5px', marginLeft:'50px'}}
-                            value={'motorized'} onChange={handleHardwareDecorativeTypeChange}></input>
-                            Motorized hardware?
-                        </label><br></br>
-                        {hardwareDecorativeType === 'motorized' && <div style={{marginRight:'5px', marginLeft:'50px'}}>
-                            Will it be hardwired?
-                            <br></br><label>
-                                <input type='radio' defaultChecked={true} name='hardwired' style={{marginRight:'5px', marginLeft:'25px'}}
-                                value={'false'} onChange={handleHardwiredChange}></input>
-                                No
-                            </label><br></br>
-                            <label>
-                                <input type='radio' name='hardwired' style={{marginRight:'5px', marginLeft:'25px'}}
-                                value={'true'} onChange={handleHardwiredChange}></input>
-                                Yes
-                            </label><br></br>
-                            {hardwired === 'true' && <div style={{marginRight:'5px', marginLeft:'25px'}}>
-                                Is there an existing home-automation system?
-                                <br></br><label>
-                                    <input type='radio' defaultChecked={true} name='homeAuto' style={{marginRight:'5px', marginLeft:'25px'}}
-                                    value={'false'} onChange={handleHomeAuto}></input>
-                                    No
-                                </label><br></br>
-                                <label>
-                                    <input type='radio' name='homeAuto' style={{marginRight:'5px', marginLeft:'25px'}}
-                                    value={'true'} onChange={handleHomeAuto}></input>
-                                    Yes (what is it)? 
-                                    <input id='homeauto'></input>
-                                </label><br></br>
-                            </div>}
-                        </div>}
-                    </div>}
-                </div>}
-                <br></br>
-            </div> */}
-
-            Are you using COM material?
-            <div>
-                <label> 
-                    <input type='radio' name='COM' style={{marginRight:'5px'}}
+            <div className="form-section">
+                <h4>Are you using COM material?</h4>
+                <div>
+                <label className="radio-label">
+                    <input type='radio' name='COM'
                     value={'yes'} onChange={handleCom}></input>
                     Yes
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='COM' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='COM'
                     value={'no'} onChange={handleCom}></input>
                     No (you will purchase your material from Plaza Park Interiors)
-                </label><br></br>
-            </div><br></br>
+                </label>
+                </div>
+            </div>
 
-            Main Fabric specifications:  Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.
-            <br></br>
-            <div>
-                What units are the measurements in?
-                <label>
-                    <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units2' onChange={handleUnits2}></input> Centimeters
+            <div className="form-section">
+                <h4>Main Fabric specifications: <small>Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.</small></h4>
+                <div>
+                <label>What units are the measurements in?</label>
+                <label className="radio-label sub-option-indent">
+                    <input value='cm' type='radio' name='units2' onChange={handleUnits2}></input> Centimeters
+                </label>
+                <label className="radio-label sub-option-indent">
                     <input value='in' type='radio' name='units2' onChange={handleUnits2}
-                        style={{marginLeft:'25px'}} checked={units2 === 'in'}></input> Inches
+                    checked={units2 === 'in'}></input> Inches
                 </label>
-                <br></br><label>
+                <br></br>
+                <label>
                     Vendor:
-                    <input type='text' id='mainvendor' style={{marginLeft:'135px'}}></input>
+                    <br />
+                    <input type='text' id='mainvendor' className='fixed-width-input'></input>
                 </label>
-                <br></br><label>
+                <br></br>
+                <label>
                     Pattern name & number:
-                    <input type='text' id='mainpattern' style={{marginLeft:'15px'}}></input>
+                    <br />
+                    <input type='text' id='mainpattern' className='fixed-width-input'></input>
                 </label>
-                <br></br><label>
+                <br></br>
+                <label>
                     Link to fabric if available:
-                    <input type='href' id='mainlink' placeholder=' ' style={{marginLeft:'13px'}}></input>
-                </label><br></br><label>
+                    <br />
+                    <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
+                </label><br></br>
+                <label>
                     Width:
-                    <input type='number' id='mainwidth' style={{marginLeft:'144px'}}></input>
+                    <br />
+                    <input type='number' id='mainwidth' className='fixed-width-input'></input>
                 </label>
                 {units2 === 'in' && <>
                     <Dropdown
-                        value = {mainWidth}
-                        change = {handleMainWidth}
-                    ></Dropdown>
-                </>}
-                <br></br><label>
-                    Vertical repeat:
-                    <input type='number' id='mainvert' style={{marginLeft:'81px'}}></input>
-                </label>
-                {units2 === 'in' && <>
-                    <Dropdown
-                        value = {mainVertical}
-                        change = {handleMainVertical}
-                    ></Dropdown>
-                </>}
-                <br></br><label>
-                    Horizontal repeat:
-                    <input type='number' id='mainhorizontal' style={{marginLeft:'61px'}}></input>
-                </label>
-                {units2 === 'in' && <>
-                    <Dropdown
-                        value = {mainHorizontal}
-                        change = {handleMainHorizontal}
+                    value={mainWidth}
+                    change={handleMainWidth}
                     ></Dropdown>
                 </>}
                 <br></br>
-                How are we running the fabric?
-                <br></br><label> 
-                    <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
+                <label>
+                    Vertical repeat:
+                    <br />
+                    <input type='number' id='mainvert' className='fixed-width-input'></input>
+                </label>
+                {units2 === 'in' && <>
+                    <Dropdown
+                    value={mainVertical}
+                    change={handleMainVertical}
+                    ></Dropdown>
+                </>}
+                <br></br>
+                <label>
+                    Horizontal repeat:
+                    <br />
+                    <input type='number' id='mainhorizontal' className='fixed-width-input'></input>
+                </label>
+                {units2 === 'in' && <>
+                    <Dropdown
+                    value={mainHorizontal}
+                    change={handleMainHorizontal}
+                    ></Dropdown>
+                </>}
+                <br></br>
+                <label>How are we running the fabric?</label>
+                <label className="radio-label">
+                    <input type='radio' name='mainrailroad'
                     value={'false'} onChange={handleMainRailroad}></input>
                     Up the bolt
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='mainrailroad'
                     value={'true'} onChange={handleMainRailroad}></input>
                     Railroading
-                </label><br></br>
-            </div><br></br>
+                </label>
+                </div>
+            </div>
 
-             Embellishments
-            <div>
-                <label>
-                    <input type="checkbox" style={{marginRight:'5px'}} onChange={() => {setBanding(!banding)}}/>
+            <div className="form-section">
+                <h4>Embellishments</h4>
+                <div>
+                <label className="checkbox-label">
+                    <input type="checkbox" onChange={() => {setBanding(!banding)}}/>
                     Ready to use banding/trim
                 </label>
-                {banding && <div>
-                    <label style={{marginLeft:'25px'}}>
-                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding bottom'/>
-                    Bottom</label><br />
-                    <label style={{marginLeft:'25px'}}>
-                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding inside'/>
-                    Inside Edge</label><br />
-                    <label style={{marginLeft:'25px'}}>
-                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding outside'/>
-                    Outside Edge</label><br />
-                    <label style={{marginLeft:'25px'}}>
-                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding top'/>
-                    Top</label><br />
+                {banding && <div className="sub-option-indent">
+                    <label className="checkbox-label">
+                    <input type="checkbox" name="banding-type" id='banding bottom'/>
+                    Bottom
+                    </label>
+                    <label className="checkbox-label">
+                    <input type="checkbox" name="banding-type" id='banding inside'/>
+                    Inside Edge
+                    </label>
+                    <label className="checkbox-label">
+                    <input type="checkbox" name="banding-type" id='banding outside'/>
+                    Outside Edge
+                    </label>
+                    <label className="checkbox-label">
+                    <input type="checkbox" name="banding-type" id='banding top'/>
+                    Top
+                    </label>
                 </div>}
-            </div> <br />
+                </div>
+            </div>
 
-            Are we using contrast fabric?
-            <div>
-                <label>
-                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContr("yes")}}/>
+            <div className="form-section">
+                <h4>Are we using contrast fabric?</h4>
+                <div>
+                <label className="radio-label">
+                    <input type="radio" name="contrast" onClick={() => {setContr("yes")}}/>
                     Yes
-                </label> <br />
-                <label>
-                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContr(null)}}/>
+                </label>
+                <label className="radio-label">
+                    <input type="radio" name="contrast" onClick={() => {setContr(null)}}/>
                     No
                 </label>
-            </div>
-            {contr === "yes" && <div> <br />
-            Contrast Fabric specifications:
-            <div>
-                What units are the measurements in?
-                <label>
-                    <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units3' onChange={handleUnits3}></input> Centimeters
+                </div>
+                {contr === "yes" && <div className="sub-option-indent">
+                <h4>Contrast Fabric specifications:</h4>
+                <div>
+                    <label>What units are the measurements in?</label>
+                    <label className="radio-label sub-option-indent">
+                    <input value='cm' type='radio' name='units3' onChange={handleUnits3}></input> Centimeters
+                    </label>
+                    <label className="radio-label sub-option-indent">
                     <input value='in' type='radio' name='units3' onChange={handleUnits3}
-                        style={{marginLeft:'25px'}} checked={units3 === 'in'}></input> Inches
-                </label>
-                <br></br><label>
+                    checked={units3 === 'in'}></input> Inches
+                    </label>
+                    <br></br>
+                    <label>
                     Vendor:
-                    <input type='text' id='contrastvendor' style={{marginLeft:'135px'}}></input>
-                </label>
-                <br></br><label>
+                    <input type='text' id='contrastvendor' className='fixed-width-input'></input>
+                    </label>
+                    <br></br>
+                    <label>
                     Pattern name & number:
-                    <input type='text' id='contrastpattern' style={{marginLeft:'15px'}}></input>
-                </label>
-                <br></br><label>
+                    <input type='text' id='contrastpattern' className='fixed-width-input'></input>
+                    </label>
+                    <br></br>
+                    <label>
                     Link to fabric if available:
-                    <input type='href' id='contrlink' style={{marginLeft:'13px'}}></input>
-                </label><br></br><label>
+                    <input type='href' id='contrlink' className='full-width-input'></input>
+                    </label><br></br>
+                    <label>
                     Width:
-                    <input type='number' id='contrastwidth' style={{marginLeft:'144px'}}></input>
-                </label>
-                {units3 === 'in' && <>
+                    <input type='number' id='contrastwidth' className='fixed-width-input'></input>
+                    </label>
+                    {units3 === 'in' && <>
                     <Dropdown
-                        value = {contrastWidth}
-                        change = {handleContrastWidth}
+                        value={contrastWidth}
+                        change={handleContrastWidth}
                     ></Dropdown>
-                </>}
-                <br></br><label>
+                    </>}
+                    <br></br>
+                    <label>
                     Vertical repeat:
-                    <input type='number' id='contrastvert' style={{marginLeft:'81px'}}></input>
-                </label>
-                {units3 === 'in' && <>
+                    <input type='number' id='contrastvert' className='fixed-width-input'></input>
+                    </label>
+                    {units3 === 'in' && <>
                     <Dropdown
-                        value = {contrastVertical}
-                        change = {handleContrastVertical}
+                        value={contrastVertical}
+                        change={handleContrastVertical}
                     ></Dropdown>
-                </>}
-                <br></br>
-                <label>
+                    </>}
+                    <br></br>
+                    <label>
                     Horizontal repeat:
-                    <input type='number' id='contrasthorizontal' style={{marginLeft:'61px'}}></input>
-                </label>
-                {units3 === 'in' && <>
+                    <input type='number' id='contrasthorizontal' className='fixed-width-input'></input>
+                    </label>
+                    {units3 === 'in' && <>
                     <Dropdown
-                        value = {contrastHorizontal}
-                        change = {handleContrastHorizontal}
+                        value={contrastHorizontal}
+                        change={handleContrastHorizontal}
                     ></Dropdown>
-                </>}
-                <br></br>
-                Are we railroaded?
-                <br></br><label> 
-                    <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
+                    </>}
+                    <br></br>
+                    <label>Are we railroaded?</label>
+                    <label className="radio-label">
+                    <input type='radio' name='contrastrailroad'
                     value={true} onChange={handleContrastRailroad}></input>
                     Yes
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
+                    </label>
+                    <label className="radio-label">
+                    <input type='radio' name='contrastrailroad'
                     value={false} onChange={handleContrastRailroad}></input>
                     No
-                </label><br></br><br></br>
-                Please specify where the contrast fabric will be used:
-                <input id='where'></input>
+                    </label><br></br><br></br>
+                    <label>
+                    Please specify where the contrast fabric will be used:
+                    <input id='where' className='full-width-input'></input>
+                    </label>
+                </div>
+                </div>}
             </div>
-            </div>} <br />
-            <button onClick={() =>  {calcYardage()}}>Calculate yardage</button> {yardage}<br></br>
-            <button onClick={() =>  {calcPrice()}}>Calculate price</button> {price}<br></br>
-            {/* <button onClick={submitForm}>Submit</button> */}
-        </div>
+
+            <div className="button-group">
+                <button onClick={() => {calcYardage()}}>Calculate yardage</button>
+                {yardage}<br></br>
+                <button onClick={() => {calcPrice()}}>Calculate price</button>
+                {price}<br></br>
+            </div>
+            </div>
+
+
     </>)
 }
 
