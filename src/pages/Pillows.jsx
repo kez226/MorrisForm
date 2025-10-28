@@ -208,7 +208,7 @@ const Pillows = ({pname, name, address, email, estName}) => {
         }
       }
 
-    const calcYardage = () => {
+    const calcYardageOld = () => {
         if (!document.getElementById('length').value || !document.getElementById('depth').value){
             alert("Please fill out length and depth");
             setYardage(null)
@@ -302,6 +302,179 @@ const Pillows = ({pname, name, address, email, estName}) => {
         setYardage(yardage)
     }
 
+    function calcYardage() {
+        if (pillowType === 'Square') {
+            // --- Input Validation and Setup ---
+            if (!document.getElementById('length').value || !document.getElementById('depth').value){
+                alert("Please fill out length and depth");
+                setYardage(null)
+                return;
+            }
+
+            // Convert inputs to numbers
+            let W_FABRIC = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
+            if (W_FABRIC == 0) {W_FABRIC = 54.0;}
+            const R_VERT = Number(mainVertical) + Number(document.getElementById("mainvert")) || 0;
+
+            let cutLength =  Number(document.getElementById('length').value) + 1;
+            let cutWidth =  Number(document.getElementById('depth').value) + 1;
+
+            // --- Panel Sizing ---
+            // Based on the observed website output (e.g., 18x18 pillow on 54" fabric -> 0.5 yards),
+            // the calculator uses the pillow form dimensions (A and B) as the cut dimensions for the main panel.
+            const panelCutWidth = cutLength;
+            const panelCutLength = cutWidth;
+
+            // Total number of panels needed (2 per pillow: Front and Back)
+            const totalPanelsNeeded = 2;
+
+            // --- Layout Optimization (Nesting) ---
+            let totalFabricLengthNeeded = 0;
+
+            // The logic is to fit as many panels as possible side-by-side across the fabric width (W_FABRIC).
+            // We check both orientations (A across W_FABRIC, or B across W_FABRIC) for optimal yield.
+
+            let piecesAcross = 0;
+            let pieceLength = 0;
+
+            // 1. Try laying the panel width (A) across the fabric width (W_FABRIC)
+            const piecesAcross_A = Math.floor(W_FABRIC / panelCutWidth);
+            const lengthPerCut_A = panelCutLength;
+
+            // 2. Try laying the panel length (B) across the fabric width (W_FABRIC)
+            const piecesAcross_B = Math.floor(W_FABRIC / panelCutLength);
+            const lengthPerCut_B = panelCutWidth;
+
+            // Choose the orientation that yields more pieces across the width
+            if (piecesAcross_A >= piecesAcross_B) {
+                piecesAcross = piecesAcross_A;
+                pieceLength = lengthPerCut_A;
+            } else {
+                // This means the pillow is rotated 90 degrees for the cut
+                piecesAcross = piecesAcross_B;
+                pieceLength = lengthPerCut_B;
+            }
+
+            if (piecesAcross === 0) {
+                console.error("Pillow is too large to fit on the fabric width.");
+                return null;
+            }
+
+            // Calculate the number of "cuts" (lengths) needed from the fabric roll
+            const cutsNeeded = Math.ceil(totalPanelsNeeded / piecesAcross);
+
+            // Total fabric length is the number of cuts multiplied by the length of each cut
+            totalFabricLengthNeeded = cutsNeeded * pieceLength;
+
+            // --- Pattern Matching Consideration ---
+            if (R_VERT > 0) {
+                // Round up the total length needed to the nearest multiple of the vertical repeat
+                totalFabricLengthNeeded = Math.ceil(totalFabricLengthNeeded / R_VERT) * R_VERT;
+            }
+
+            // --- Final Yardage Calculation ---
+            // Convert total length in inches to yards
+            let calculatedYardage = totalFabricLengthNeeded / 36.0;
+
+            // Round up to the nearest 0.25 yard (as seen in the box cushion code)
+            calculatedYardage = Math.ceil(calculatedYardage * 4) / 4;
+
+            setYardage(calculatedYardage);
+        }else{
+            // --- Input Validation and Setup ---
+            if (!document.getElementById('length').value || !document.getElementById('depth').value){
+                alert("Please fill out length and depth");
+                setYardage(null)
+                return;
+            }
+
+            const D = Number(document.getElementById('depth').value) + 1;
+            const L = Number(document.getElementById('length').value) + 1;
+            let W_FABRIC = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
+            if (W_FABRIC == 0) {W_FABRIC = 54.0;}
+            const R_VERT = Number(mainVertical) + Number(document.getElementById("mainvert")) || 0;
+            const PI = Math.PI;
+
+            // --- Piece Sizing (Based on Sewing Logic) ---
+            // 1. End Circles (Cut as a square/rectangle for nesting purposes)
+            // D_cut = Diameter + 0.5 inches (for seam allowance)
+            const D_CUT = D + 0.5;
+            const circleCutSize = D_CUT;
+
+            // 2. Barrel Piece (a rectangle)
+            // L_barrel = Length + 0.5 inches (for seam allowance on the two ends)
+            const L_BARREL = L + 0.5;
+            // W_barrel = Circumference + Closure Overlap (2 inches, as stated on the webpage)
+            const W_BARREL = (PI * D) + 2.0;
+
+            // --- Total Pieces Needed ---
+            const barrelPiecesNeeded = 1;
+            const circlePiecesNeeded = 2;
+
+            // --- Layout Optimization (Nesting) ---
+            let totalFabricLength = 0;
+            let currentWidth = 0;
+            let maxRowLen = 0;
+
+            // Helper to add a piece (length, width)
+            const addPieceToLayout = (len, wid, count) => {
+                for (let i = 0; i < count; i++) {
+                    // Check if piece fits in the current row
+                    if (currentWidth + wid <= W_FABRIC) {
+                        currentWidth += wid;
+                        maxRowLen = Math.max(maxRowLen, len);
+                    } else {
+                        // Start a new row
+                        totalFabricLength += maxRowLen;
+                        currentWidth = wid;
+                        maxRowLen = len;
+                    }
+                }
+            };
+
+            // 1. Barrel Pieces (Q pieces) - Choose the best orientation for the barrel piece
+            // Orientation 1: L_BARREL along warp (length), W_BARREL across fabric (width)
+            const barrelLen1 = L_BARREL;
+            const barrelWid1 = W_BARREL;
+            const piecesAcross1 = Math.floor(W_FABRIC / barrelWid1);
+
+            // Orientation 2: W_BARREL along warp (length), L_BARREL across fabric (width)
+            const barrelLen2 = W_BARREL;
+            const barrelWid2 = L_BARREL;
+            const piecesAcross2 = Math.floor(W_FABRIC / barrelWid2);
+
+            // Choose the orientation that allows more pieces across or has a shorter length if pieces across are equal
+            // This is a robust nesting heuristic.
+            if (piecesAcross1 * barrelLen1 <= piecesAcross2 * barrelLen2) {
+                addPieceToLayout(barrelLen1, barrelWid1, barrelPiecesNeeded);
+            } else {
+                addPieceToLayout(barrelLen2, barrelWid2, barrelPiecesNeeded);
+            }
+
+            // 2. End Circles (2*Q pieces) - Treat as squares
+            addPieceToLayout(circleCutSize, circleCutSize, circlePiecesNeeded);
+
+            // Add the length of the last row
+            totalFabricLength += maxRowLen;
+
+            // --- Pattern Matching Consideration ---
+            if (R_VERT > 0) {
+                // Round up the total length needed to the nearest multiple of the vertical repeat
+                totalFabricLength = Math.ceil(totalFabricLength / R_VERT) * R_VERT;
+            }
+
+            // --- Final Yardage Calculation ---
+            // Convert total length in inches to yards
+            let calculatedYardage = totalFabricLength / 36.0;
+
+            // Round up to the nearest 0.25 yard
+            calculatedYardage = Math.ceil(calculatedYardage * 4) / 4;
+
+            return calculatedYardage;
+        }
+    }
+
+
     return(<>
     <div style={{border: 'grey solid 1px', padding:'5px'}}>
         <h1>Pillows</h1>
@@ -316,11 +489,11 @@ const Pillows = ({pname, name, address, email, estName}) => {
             value={'Square'} onChange={handlePillow}></input>
             Square
         </label>
-        <br></br><label>
+        {/* <br></br><label>
             <input type='radio' name='pillow type' style={{marginRight:'5px'}}
             value={'Rectangular'} onChange={handlePillow}></input>
             Rectangular lumbars
-        </label>
+        </label> */}
         <br></br><label>
             <input type='radio' name='pillow type' style={{marginRight:'5px'}}
             value={'Round'} onChange={handlePillow}></input>

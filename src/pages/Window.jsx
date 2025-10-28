@@ -1,4 +1,5 @@
 import '../App.css';
+import '../styles.css'
 
 import Drapery from './Drapery';
 import Roman from './Roman';
@@ -107,110 +108,93 @@ const Window = () => {
     .catch(err => console.log(err));
   }
 
-  return(<>
-    <div style={{padding:'5px'}}> <div style={{border: 'grey solid 1px', padding:'5px'}}>
-      <h1>Window Treatments</h1>
+  return(<><div>
+    <div className="main-content-wrapper">
+      <div className="container">
+        <h1>Window Treatments</h1>
 
-      <h3 style={{padding: '10px'}}>
-        Pricing is based on the information provided.  Plaza Park Interiors must take accurate on-site 
-        field measurements before manufacturing window treatments.  Prices are subject to change accordingly. 
-      </h3>
-      <h3 style={{padding: '10px'}}>
-        Please note typical soft window treatments timelines are 4-6 weeks from receipt of fabric,
-        hardware and deposit <br></br>(if completion is needed sooner a rush fee may apply). 
-      </h3>
+        <h3 className="info-text">
+          Pricing is based on the information provided. Plaza Park Interiors must take accurate on-site
+          field measurements before manufacturing window treatments. Prices are subject to change accordingly.
+        </h3>
+        <h3 className="info-text">
+          Please note typical soft window treatments timelines are 4-6 weeks from receipt of fabric,
+          hardware and deposit <br></br>(if completion is needed sooner a rush fee may apply).
+        </h3>
 
-      <div style={{marginLeft: '20px', paddingBottom: '20px'}}>
-        <div className="row">
-          <div className='column'>
-            <label>Project Name: </label><br></br>
-            <input type='text' id='pname' style={{width: '200px'}} onChange={handlePName}></input>
+        <div className="form-group-indent">
+          <div className="row">
+            <div className='column'>
+              <label>Project Name: </label><br></br>
+              <input type='text' id='pname' className='fixed-width-input full-width-input' onChange={handlePName}></input>
+            </div>
+            <div className='column'>
+              <label>Estimator Name: </label><br></br>
+              <input type='text' id='estname' className='fixed-width-input full-width-input' onChange={handleEstNameChange}></input>
+            </div>
+            <div className='column'>
+              <label>Customer Name: </label><br></br>
+              <input type='text' id='name' className='fixed-width-input full-width-input' onChange={handleNameChange}></input>
+            </div>
+            <div className='column'>
+              <label>Address: </label><br></br>
+              <input type='text' id='address' className='fixed-width-input full-width-input' onChange={handleAddress}></input>
+            </div>
+            <div className='column'>
+              <label>Email: </label><br></br>
+              <input type='email' id='contact' className='fixed-width-input full-width-input' onChange={handleContactChange}></input>
+            </div>
+            <br></br><br></br><br></br>
+            <div className='column'>
+              <label>Room: </label><br></br>
+              <input type='text' id='room' className='fixed-width-input full-width-input' onChange={handleRoom} value={room}></input>
+            </div>
+            <div className='column'>
+              <label>Number of windows: </label><br></br>
+              <input type='number' id='windowNum' className='fixed-width-input full-width-input' onChange={handleWindows} value={windows}></input>
+            </div>
+            <div className='column'></div>
           </div>
-          <div className='column'>
-            <label>Estimator Name: </label><br></br>
-            <input type='text' id='estname' style={{width: '200px'}} onChange={handleEstNameChange}></input>
-          </div>
-          <div className='column'>
-            <label>Customer Name: </label><br></br>
-            <input type='text' id='name' style={{width: '200px'}} onChange={handleNameChange}></input>
-          </div>
-          <div className='column'>
-            <label>Address: </label><br></br>
-            <input type='text' id='address' style={{width: '200px'}} onChange={handleAddress}></input>
-          </div>
-          <div className='column'>
-            <label>Email: </label><br></br>
-            <input type='email' id='contact' style={{width: '200px'}} onChange={handleContactChange}></input>
-          </div>
-          <br></br><br></br><br></br>
-          <div className='column'>
-            <label>Room: </label><br></br>
-            <input type='text' id='room' style={{width: '200px'}} onChange={handleRoom} value={room}></input>
-          </div>
-          <div className='column'>
-            <label>Number of windows: </label><br></br>
-            <input type='number' id='windowNum' style={{width: '200px'}} onChange={handleWindows} value={windows}></input>
-          </div>
-          <div className='column'></div>
-        </div>
-        <br></br>
-
-          {/* Are there existing window treatments Plaza Park needs to take down / dispose of?
-          <br></br><label> 
-            <input type='radio' name='existingTreatment' style={{marginRight:'5px'}}
-            value={true} onChange={handleExistingChange}></input>
-            Yes
-          </label> <br></br>
-          <label>
-            <input type='radio' name='existingTreatment' style={{marginRight:'5px'}}
-            value={false} onChange={handleExistingChange}></input>
-            No
-          </label><br></br><br></br> */}
-
-          What type of treatment are you interested in:
           <br></br>
-          <div>
-            Window treatments:
-            <br></br>
-            <label>
-              <input type='checkbox' style={{marginRight:'5px'}}
+
+          <br></br>
+          <div className="form-section">
+            <h4>Window treatments:</h4>
+            <label className="checkbox-label">
+              <input type='checkbox'
               checked={drapery} onChange={handleDraperyChange}></input>
               Drapery
             </label>
-            <br></br>
-            <label>
-              <input type='checkbox' style={{marginRight:'5px'}}
+            <label className="checkbox-label">
+              <input type='checkbox'
               checked={roman} onChange={handleRomanChange}></input>
               Roman shades
-            </label><br></br>
-            <label>
-              <input type='checkbox' style={{marginRight:'5px'}}
+            </label>
+            <label className="checkbox-label">
+              <input type='checkbox'
               checked={valence} onChange={handleValenceChange}></input>
               Valance / cornice
-            </label><br></br>
-            {/* <label>
-              <input type='checkbox' style={{marginRight:'5px'}}
-              checked={hard} onChange={handleHardChange}></input>
-              Hard treatments (roller shades, woven woods, wood blinds, honeycomb shade, sheer shade)
-            </label> */}
-          </div><br></br>
+            </label>
+          </div>
 
-          <div>
-            Pillows/cushions:
-            <br></br>
-            <label>
-              <input type='checkbox' style={{marginRight:'5px'}}
+          <div className="form-section">
+            <h4>Pillows/cushions:</h4>
+            <label className="checkbox-label">
+              <input type='checkbox'
               checked={pillows} onChange={handlePillow}></input>
               Pillows
-            </label><br></br>
-            <label>
-              <input type='checkbox' style={{marginRight:'5px'}}
+            </label>
+            <label className="checkbox-label">
+              <input type='checkbox'
               checked={cushions} onChange={handleCushion}></input>
               Cushions
             </label>
           </div>
+        </div>
       </div>
-    </div></div>
+    </div>
+
+    </div>
 
     {/* <button onClick={testFolder}>button</button> */}
 
