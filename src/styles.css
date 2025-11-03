@@ -229,7 +229,7 @@ input.fixed-width-input {
 .dimensions-section input[type="number"] {
   display: inline-block;
   width: auto; /* Allow width to be controlled by fixed-width-input class */
-  margin-left: 10px;
+  /* margin-left: 10px; */
 }
 
 .sub-option-indent {

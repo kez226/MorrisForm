@@ -516,17 +516,18 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
     return(<>
         <div className="container">
             <h1>Drapery</h1>
-            <label className="file-upload-label">
+            <div className="form-group-indent">
+            {/* <label className="file-upload-label">
                 Please load a photo of the window:
                 <input type='file' onChange={handleImageUpload} multiple></input>
-            </label><br></br><br></br>
+            </label><br></br><br></br> */}
 
             <div className="form-section">
                 <h4>What are the approximate dimensions of the following?</h4>
                 <div className='row dimensions-section'>
                 <div className='column'>
                     <label>
-                    Rod width:
+                    Rod width: <br />
                     <input className='fixed-width-input' type='number' id='f2fw'></input>
                     </label>
                     {units1 ==='in' && <>
@@ -538,7 +539,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 </div>
                 <div className='column'>
                     <label>
-                    Drapery height:
+                    Drapery height: <br />
                     <input className='fixed-width-input' type='number' id='f2fh'></input><br></br>
                     </label>
                     {units1 ==='in' && <>
@@ -552,8 +553,9 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             </div>
 
             <div className="form-section">
+                <div className='row dimensions-section'>
+                <div className='column'>
                 <h4>Number of panels:</h4>
-                <div>
                 <label className="radio-label">
                     <input type='radio' name='panels'
                     onChange={(e) => {setPanels(1)}}></input>
@@ -565,11 +567,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     2
                 </label>
                 </div>
-            </div>
-
-            <div className="form-section">
+                <div className='column'>
                 <h4>Will the panels be stationary?</h4>
-                <div>
                 <label className="radio-label">
                     <input type='radio' name='stationary'
                     value={'true'} onChange={handleStationaryChange}></input>
@@ -587,76 +586,6 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     No (if no, they will be fully functioning)
                 </label>
                 </div>
-            </div>
-
-            <div className="form-section">
-                <h4>Lining preference</h4>
-                <div>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Unlined'} onChange={handleLinedChange}></input>
-                    Unlined
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Sheer'} onChange={handleLinedChange}></input>
-                    Sheer lining
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Lightweight Light Filter'} onChange={handleLinedChange}></input>
-                    Light weight light filtering lining (Poly cotton)
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Light Filter'} onChange={handleLinedChange}></input>
-                    Regular Light filtering lining (100% cotton)
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Blackout'} onChange={handleLinedChange}></input>
-                    Blackout lining
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Napped Sateen'} onChange={handleLinedChange}></input>
-                    Napped Sateen
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Lined and Standard Interlined'} onChange={handleLinedChange}></input>
-                    Lined and IStandard interlined
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Lined and Bump Interlined'} onChange={handleLinedChange}></input>
-                    Lined and Bump Interlined
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Self-Lined'} onChange={handleLinedChange}></input>
-                    Self-Lined
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Self-Lined and Blackout'} onChange={handleLinedChange}></input>
-                    Self-Lined and Blackout
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Self-Lined and Standard Interlined'} onChange={handleLinedChange}></input>
-                    Self-Lined and standard Interlined
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'Self-Lined and Bump Interlined'} onChange={handleLinedChange}></input>
-                    Self-Lined and Bump Interlined
-                </label>
-                <label className="radio-label">
-                    <input type='radio' name='liningType'
-                    value={'French Blackout'} onChange={handleLinedChange}></input>
-                    French Blackout = Face fabric + 3 layered linings
-                </label>
                 </div>
             </div>
 
@@ -736,8 +665,80 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     <label className="radio-label">
                     <input type='radio' name='fullness' onClick={() => setFullness(3)}></input> 3
                     </label>
-                </>} <br />
+                </>}
                 </div>
+            </div>
+
+            <div className="form-section">
+                <h4>Main Fabric specifications: <small>Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.</small></h4>
+                <div>
+                {/* <label>What units are the measurements in?</label>
+                <label className="radio-label">
+                    <input value='cm' type='radio' name='units2' onChange={handleUnits2}></input> Centimeters
+                </label>
+                <label className="radio-label">
+                    <input value='in' type='radio' name='units2' onChange={handleUnits2}
+                    checked={units2 === 'in'}></input> Inches
+                </label> 
+                <br />
+                */}
+                <div className='row dimensions-section'>
+                        <div className='column'>
+                        <label>
+                            Width:
+                            <br />
+                            <input type='number' id='mainwidth' className='fixed-width-input'></input>
+                        </label>
+                        {units2 === 'in' && <>
+                            <Dropdown
+                            value={mainWidth}
+                            change={handleMainWidth}
+                            ></Dropdown>
+                        </>}
+                    </div>
+                <br />
+                <div className='column'>
+                <label>
+                    Vertical repeat:
+                    <br />
+                    <input type='number' id='mainvert' className='fixed-width-input'></input>
+                </label>
+                {units2 === 'in' && <>
+                    <Dropdown
+                    value={mainVertical}
+                    change={handleMainVertical}
+                    ></Dropdown>
+                </>}
+                </div>
+                <br />
+                <div className='column'>
+                <label>
+                    Horizontal repeat:
+                    <br />
+                    <input type='number' id='mainhorizontal' className='fixed-width-input'></input>
+                </label>
+                {units2 === 'in' && <>
+                    <Dropdown
+                    value={mainHorizontal}
+                    change={handleMainHorizontal}
+                    ></Dropdown>
+                </>}
+                </div>
+                </div>
+                <label>How are we running the fabric?</label>
+                <label className="radio-label">
+                    <input type='radio' name='mainrailroad'
+                    value={'false'} onChange={handleMainRailroad}></input>
+                    Up the bolt
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='mainrailroad'
+                    value={'true'} onChange={handleMainRailroad}></input>
+                    Railroading
+                </label>
+                </div> <br />
+                <button onClick={() => {calcYardage()}}>Calculate yardage</button>
+                {yardage}<br></br>
             </div>
 
             <div className="form-section">
@@ -754,83 +755,101 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     No (you will purchase your material from Plaza Park Interiors)
                 </label>
                 </div>
+                <br />
+                <div className='row dimensions-section'>
+                    <div className='column'> 
+                    <label>
+                        Vendor:
+                        <br />
+                        <input type='text' id='mainvendor' className='fixed-width-input'></input>
+                    </label>
+                    <br></br>
+                    </div>
+                    <div className='column'> 
+                    <label>
+                        Pattern name & number:
+                        <br />
+                        <input type='text' id='mainpattern' className='fixed-width-input'></input>
+                    </label>
+                    </div>
+                    <br></br>
+                    <div className='column'> 
+                    <label>
+                        Link to fabric if available:
+                        <br />
+                        <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
+                    </label>
+                    </div>
+                </div>
             </div>
 
             <div className="form-section">
-                <h4>Main Fabric specifications: <small>Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.</small></h4>
+                <h4>Lining preference</h4>
                 <div>
-                <label>What units are the measurements in?</label>
-                <label className="radio-label sub-option-indent">
-                    <input value='cm' type='radio' name='units2' onChange={handleUnits2}></input> Centimeters
-                </label>
-                <label className="radio-label sub-option-indent">
-                    <input value='in' type='radio' name='units2' onChange={handleUnits2}
-                    checked={units2 === 'in'}></input> Inches
-                </label>
-                <br></br>
-                <label>
-                    Vendor:
-                    <br />
-                    <input type='text' id='mainvendor' className='fixed-width-input'></input>
-                </label>
-                <br></br>
-                <label>
-                    Pattern name & number:
-                    <br />
-                    <input type='text' id='mainpattern' className='fixed-width-input'></input>
-                </label>
-                <br></br>
-                <label>
-                    Link to fabric if available:
-                    <br />
-                    <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
-                </label><br></br>
-                <label>
-                    Width:
-                    <br />
-                    <input type='number' id='mainwidth' className='fixed-width-input'></input>
-                </label>
-                {units2 === 'in' && <>
-                    <Dropdown
-                    value={mainWidth}
-                    change={handleMainWidth}
-                    ></Dropdown>
-                </>}
-                <br></br>
-                <label>
-                    Vertical repeat:
-                    <br />
-                    <input type='number' id='mainvert' className='fixed-width-input'></input>
-                </label>
-                {units2 === 'in' && <>
-                    <Dropdown
-                    value={mainVertical}
-                    change={handleMainVertical}
-                    ></Dropdown>
-                </>}
-                <br></br>
-                <label>
-                    Horizontal repeat:
-                    <br />
-                    <input type='number' id='mainhorizontal' className='fixed-width-input'></input>
-                </label>
-                {units2 === 'in' && <>
-                    <Dropdown
-                    value={mainHorizontal}
-                    change={handleMainHorizontal}
-                    ></Dropdown>
-                </>}
-                <br></br>
-                <label>How are we running the fabric?</label>
                 <label className="radio-label">
-                    <input type='radio' name='mainrailroad'
-                    value={'false'} onChange={handleMainRailroad}></input>
-                    Up the bolt
+                    <input type='radio' name='liningType'
+                    value={'Unlined'} onChange={handleLinedChange}></input>
+                    Unlined
                 </label>
                 <label className="radio-label">
-                    <input type='radio' name='mainrailroad'
-                    value={'true'} onChange={handleMainRailroad}></input>
-                    Railroading
+                    <input type='radio' name='liningType'
+                    value={'Sheer'} onChange={handleLinedChange}></input>
+                    Sheer lining
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
+                    value={'Lightweight Light Filter'} onChange={handleLinedChange}></input>
+                    Light weight light filtering lining (Poly cotton)
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
+                    value={'Light Filter'} onChange={handleLinedChange}></input>
+                    Regular Light filtering lining (100% cotton)
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
+                    value={'Blackout'} onChange={handleLinedChange}></input>
+                    Blackout lining
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
+                    value={'Napped Sateen'} onChange={handleLinedChange}></input>
+                    Napped Sateen
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
+                    value={'Lined and Standard Interlined'} onChange={handleLinedChange}></input>
+                    Lined and IStandard interlined
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
+                    value={'Lined and Bump Interlined'} onChange={handleLinedChange}></input>
+                    Lined and Bump Interlined
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
+                    value={'Self-Lined'} onChange={handleLinedChange}></input>
+                    Self-Lined
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
+                    value={'Self-Lined and Blackout'} onChange={handleLinedChange}></input>
+                    Self-Lined and Blackout
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
+                    value={'Self-Lined and Standard Interlined'} onChange={handleLinedChange}></input>
+                    Self-Lined and standard Interlined
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
+                    value={'Self-Lined and Bump Interlined'} onChange={handleLinedChange}></input>
+                    Self-Lined and Bump Interlined
+                </label>
+                <label className="radio-label">
+                    <input type='radio' name='liningType'
+                    value={'French Blackout'} onChange={handleLinedChange}></input>
+                    French Blackout = Face fabric + 3 layered linings
                 </label>
                 </div>
             </div>
@@ -863,7 +882,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 </div>
             </div>
 
-            <div className="form-section">
+            {/* <div className="form-section">
                 <h4>Are we using contrast fabric?</h4>
                 <div>
                 <label className="radio-label">
@@ -951,16 +970,14 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     </label>
                 </div>
                 </div>}
-            </div>
+            </div> */}
 
             <div className="button-group">
-                <button onClick={() => {calcYardage()}}>Calculate yardage</button>
-                {yardage}<br></br>
                 <button onClick={() => {calcPrice()}}>Calculate price</button>
                 {price}<br></br>
             </div>
             </div>
-
+            </div>
 
     </>)
 }
