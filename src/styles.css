@@ -11,8 +11,6 @@
   --border-color-light: #e0e0e0; /* Light grey for borders */
   --border-color-medium: #cccccc; /* Medium grey for input borders */
   --focus-border-color: #888888; /* Darker grey for input focus */
-  --button-background-color: #333333; /* Dark button background */
-  --button-text-color: #ffffff; /* White button text */
 }
 
 body {
@@ -47,6 +45,7 @@ h3 {
 }
 
 .container {
+  position: relative;
   background-color: var(--background-color-light);
   border: 1px solid var(--border-color-light);
   border-radius: 8px; /* Rounded corners for main containers */
@@ -124,29 +123,6 @@ input[type="checkbox"],
 input[type="radio"] {
   margin-right: 8px;
   transform: scale(1.1); /* Slightly larger checkboxes/radios */
-}
-
-/* Styling for buttons */
-button {
-  background-color: var(--button-background-color);
-  color: var(--button-text-color);
-  border: none;
-  border-radius: 4px;
-  padding: 12px 25px;
-  font-size: 1em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  margin-top: 10px;
-}
-
-button:hover {
-  background-color: #555555; /* Slightly lighter on hover */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-button:active {
-  background-color: #222222;
 }
 
 /* Specific classes for width control */
@@ -247,6 +223,42 @@ input.fixed-width-input {
   width: auto; /* Allow width to be controlled by fixed-width-input class */
 }
 
-.button-group button {
-  margin-right: 15px;
+.button-other{
+  padding: 8px 20px;
+  background-color: #007bff;  /* classic blue */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
+
+.next-button {
+  position: absolute;
+  right: 15px;           /* distance from the right edge */
+  bottom: 15px;          /* optional — if you want it near the bottom */
+  padding: 8px 20px;
+  background-color: #007bff;  /* classic blue */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.back-button {
+  position: absolute;
+  left: 15px;           /* distance from the right edge */
+  bottom: 15px;          /* optional — if you want it near the bottom */
+  padding: 8px 25px;
+  background-color: #007bff;  /* classic blue */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
