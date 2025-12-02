@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
-const Roman = ({pname, name, address, email, room, numWindow, uploads, estName}) => {
+const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, formSection, handleFormSection}) => {
     const[windowImg, setWindowImg] = useState(null);
     const[mount, setMount] = useState('');
     const[stationary,setStationary] = useState('');
-    const[opFunction, setOpFunction] = useState('cordlock');
+    const[opFunction, setOpFunction] = useState('cordless');
     const[motorType, setMotorType] = useState('');
     // const[hardwired, setHardwired] = useState('');
     const[homeAuto, setHomeAuto] = useState('');
@@ -756,503 +756,481 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName})
         setPrice(basePrice + " for yardage + " + addPrice + " for operating function + " + bandingPrice + " for banding = " + (bandingPrice + basePrice + addPrice));
     }
 
+    const checkNum = (e) => {if (!e.target.validity.valid) e.target.value = '';}
+
     return(
-        <div style={{border: 'grey solid 1px', padding:'5px'}}>
-            <h1>Roman Shades</h1>
-            <label>
-                Please load a photo of the window:
-                <input type='file' onChange={handleImageUpload} style={{marginLeft:'15px'}} multiple></input>
-            </label><br></br><br></br>
+        <div className="container">
+            {formSection === 1 && <div className='form-group-indent'>
+                <h1>Roman Shade Dimensions</h1>
+                {/* <label>
+                    Please load a photo of the window:
+                    <input type='file' onChange={handleImageUpload} style={{marginLeft:'15px'}} multiple></input>
+                </label><br></br><br></br> */}
 
-            {/* What units are the measurements in?
-            <label>
-                <input style={{marginLeft:'25px'}} value='cm' type='radio' name='units1' onChange={handleUnits1}></input> Centimeters
-                <input value='in' type='radio' name='units1' onChange={handleUnits1}
-                    style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
-            </label><br></br> */}
-
-            What kind of Roman is this?
-            <div>
+                {/* What units are the measurements in?
                 <label>
-                    <input type='radio' name='type' style={{marginRight:'5px'}}
-                    onChange={handleType} value={'flat'} defaultChecked={true}>
-                    </input>
-                    Flat
-                </label> <br />
-                <label>
-                    <input type='radio' name='type' style={{marginRight:'5px'}}
-                    onChange={handleType} value={'relaxed'} >
-                    </input>
-                    Relaxed
-                </label> <br />
-                <label>
-                    <input type='radio' name='type' style={{marginRight:'5px'}}
-                    onChange={handleType} value={'hobbled'} >
-                    </input>
-                    Hobbled
-                </label> <br />
-                <label>
-                    <input type='radio' name='type' style={{marginRight:'5px'}}
-                    onChange={handleType} value={'london'} >
-                    </input>
-                    London
-                </label> <br />
-                {type === 'london' && <div>
-                    <label style={{marginLeft:'25px'}}>
-                        How many pleats do you want? <br />
-                        <input type="text" name='london-pleats' ></input>
-                    </label> <br />
-                </div>} <br />
-            </div>
+                    <input style={{marginLeft:'25px'}} value='cm' type='radio' name='units1' onChange={handleUnits1}></input> Centimeters
+                    <input value='in' type='radio' name='units1' onChange={handleUnits1}
+                        style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
+                </label><br></br> */}
 
+                    <div className="form-section">
+                        <div className='row dimensions-section'>
+                            <div className='column'>
+                                <h4>What kind of Roman is this?</h4>
+                                <div>
+                                    <label>
+                                        <input type='radio' name='type' style={{marginRight:'5px'}}
+                                        onChange={handleType} value={'flat'} defaultChecked={true}>
+                                        </input>
+                                        Flat
+                                    </label> <br />
+                                    <label>
+                                        <input type='radio' name='type' style={{marginRight:'5px'}}
+                                        onChange={handleType} value={'relaxed'} >
+                                        </input>
+                                        Relaxed
+                                    </label> <br />
+                                    <label>
+                                        <input type='radio' name='type' style={{marginRight:'5px'}}
+                                        onChange={handleType} value={'hobbled'} >
+                                        </input>
+                                        Hobbled
+                                    </label> <br />
+                                    <label>
+                                        <input type='radio' name='type' style={{marginRight:'5px'}}
+                                        onChange={handleType} value={'london'} >
+                                        </input>
+                                        London
+                                    </label> <br />
+                                    {type === 'london' && <div>
+                                        <label style={{marginLeft:'25px'}}>
+                                            How many pleats do you want? <br />
+                                            <input type="text" name='london-pleats' ></input>
+                                        </label> <br />
+                                    </div>} <br />
+                                </div>
+                            </div>
+                            <div className='column'>
+                                <h4>Where are we mounting?</h4>
+                                <div>
+                                    <label className="radio-label"> 
+                                        <input type='radio' name='mount' defaultChecked={true}
+                                        value={'inside'} onChange={handleMount}></input>
+                                        Inside
+                                    </label>
+                                    <label className="radio-label">
+                                        <input type='radio' name='mount'
+                                        value={'outside'} onChange={handleMount}></input>
+                                        Outside
+                                    </label>
+                                </div>
+                            </div>
+                            <div className='column'>
+                                <div>
+                                    <label className='dimension-label'>
+                                        Frame-to-frame width:
+                                    </label><br />
+                                    <input className='fixed-width-input' min="0" onInput={checkNum}id='f2fw'></input>
+                                    {units1 === 'in' && <>
+                                        <Dropdown
+                                            value = {f2fw}
+                                            change = {handlef2fw}
+                                        ></Dropdown>
+                                    </>}<br></br>
+                                    <label className='dimension-label'>
+                                        Frame-to-frame height (to sill): 
+                                    </label> <br />
+                                    <input id='f2fh' className='fixed-width-input' min="0" onInput={checkNum} ></input>
+                                    {units1 === 'in' && <>
+                                        <Dropdown
+                                            value = {f2fh}
+                                            change = {handlef2fh}
+                                        ></Dropdown>
+                                    </>}
+                                </div>
 
+                                {mount === 'outside' && <div >
+                                    {/* <label >
+                                        Above frame to ceiling:
+                                        <input id='abvc' style={{marginLeft:'289px'}}></input>
+                                    </label>
+                                    {units1 === 'in' && <>
+                                        <Dropdown
+                                            value = {abvc}
+                                            change = {handleabvc}
+                                        ></Dropdown>
+                                    </>}<br></br> */}
+                                    <label className='dimension-label'>
+                                        How far above frame:
+                                    </label><br />
+                                    <input id='abvf' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                                    {units1 === 'in' && <>
+                                        <Dropdown
+                                            value = {abvf}
+                                            change = {handleabvf}
+                                        ></Dropdown>
+                                    </>}
+                                    <br></br><br></br>
+                                </div>}
+                            </div>
+                        </div>
+                    </div> 
 
-            Where are we mounting?
-            <div>
-                <label> 
-                    <input type='radio' name='mount' style={{marginRight:'5px'}}
-                    value={'inside'} onChange={handleMount}></input>
-                    Inside
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='mount' style={{marginRight:'5px'}}
-                    value={'outside'} onChange={handleMount}></input>
-                    Outside
-                </label><br></br><br></br>
-                {mount === 'inside' && <div>
-                    What are the approx. following dimensions for inside mounts: 
-                    <br></br><label>
-                        *Frame-to-frame width:
-                        <input id='f2fw' style={{marginLeft:'78px'}}></input>
-                    </label>
-                    {units1 === 'in' && <>
-                        <Dropdown
-                            value = {f2fw}
-                            change = {handlef2fw}
-                        ></Dropdown>
-                    </>}<br></br>
-                    <label >
-                        *Frame-to-frame height (to sill): 
-                        <input id='f2fh' style={{marginLeft:'19px'}}></input>
-                    </label>
-                    {units1 === 'in' && <>
-                        <Dropdown
-                            value = {f2fh}
-                            change = {handlef2fh}
-                        ></Dropdown>
-                    </>}<br></br><br></br>
-                </div>}
-
-                {mount === 'outside' && <div>
-                    What are the approx. following dimensions for outside mounts: 
-                    <br></br><label>
-                        *Frame-to-frame width:
-                        <input id='f2fw' style={{marginLeft:'291px'}}></input>
-                    </label>
-                    {units1 === 'in' && <>
-                        <Dropdown
-                            value = {f2fw}
-                            change = {handlef2fw}
-                        ></Dropdown>
-                    </>}<br></br>
-                    <label >
-                        *Frame-to-frame height (to sill): 
-                        <input id='f2fh' style={{marginLeft:'232px'}}></input>
-                    </label>
-                    {units1 === 'in' && <>
-                        <Dropdown
-                            value = {f2fh}
-                            change = {handlef2fh}
-                        ></Dropdown>
-                    </>}<br></br>
-                    {/* <label >
-                        Above frame to ceiling:
-                        <input id='abvc' style={{marginLeft:'289px'}}></input>
-                    </label>
-                    {units1 === 'in' && <>
-                        <Dropdown
-                            value = {abvc}
-                            change = {handleabvc}
-                        ></Dropdown>
-                    </>}<br></br> */}
-                    <label >
-                        *How far above frame will unit be mounted for outside mounts:
-                        <input id='abvf' style={{marginLeft:'11px'}}></input>
-                    </label>
-                    {units1 === 'in' && <>
-                        <Dropdown
-                            value = {abvf}
-                            change = {handleabvf}
-                        ></Dropdown>
-                    </>}
-                    <br></br><br></br>
-                </div>}
-            </div>
-
-            <>
-            {/* Will this be a stationary Roman?
-            <div>
-                <label> 
-                    <input type='radio' name='stationary' style={{marginRight:'5px'}}
-                    value={'Yes'} onChange={handleStationary}></input>
-                    Yes
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='stationary' style={{marginRight:'5px'}}
-                    value={'No'} onChange={handleStationary}></input>
-                    No
-                </label><br></br><br></br>
-            </div> */}
-            </>
-
-            Please select the operating function (pick 1):
-            <div>
-                <label> 
-                    <input type='radio' name='opFunction' style={{marginRight:'5px'}} defaultChecked={true}
-                    value={'cordlock'} onChange={handleOpFunction}></input>
-                    Cordlock
-                </label> <br></br>
-                <label> 
-                    <input type='radio' name='opFunction' style={{marginRight:'5px'}}
-                    value={'cordless'} onChange={handleOpFunction}></input>
-                    Cordless
-                </label> <br></br>
-                <label> 
-                    <input type='radio' name='opFunction' style={{marginRight:'5px'}}
-                    value={'lift'} onChange={handleOpFunction}></input>
-                    Clutch Lift
-                </label> <br></br>
-                {opFunction === 'lift' && <div>
-                    What color bead chain would you like? <br />
-                    <label style={{marginLeft:'25px'}}>
-                        <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Steel")}}></input>
-                        Stainless Steel (standard)
-                    </label> <br />
-                    <label style={{marginLeft:'25px'}}>
-                        <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Antique")}}></input>
-                        Antique Brass
-                    </label> <br />
-                    <label style={{marginLeft:'25px'}}>
-                        <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Polished")}}></input>
-                        Polished Brass
-                    </label> <br />
-                    <label style={{marginLeft:'25px'}}>
-                        <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Black")}}></input>
-                        Black
-                    </label> <br />
-                    <label style={{marginLeft:'25px'}}>
-                        <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("White")}}></input>
-                        White
-                    </label>
-                </div>}
-                <label> 
-                    <input type='radio' name='opFunction' style={{marginRight:'5px'}}
-                    value={'motorized'} onChange={handleOpFunction}></input>
-                    Motorized (pick 1):
-                </label> <br></br>
-                {opFunction === "motorized" &&  <div>
-                    <label> 
-                        <input type='radio' defaultChecked = {true} name='motorType' style={{marginRight:'5px', marginLeft:"25px"}}
-                        value={'battery'} onChange={handleMotorChange}></input>
-                        Rechargeable battery
-                    </label> <br></br>
-                    <label> 
-                        <input type='radio' name='motorType' style={{marginRight:'5px', marginLeft:"25px"}}
-                        value={'plug in'} onChange={handleMotorChange}></input>
-                        Plug in
-                    </label> <br></br><br></br>
-                    {/* {motorType === 'hardwired' && <div style={{marginLeft:'50px'}}> */}
-                        Is there an existing home-automation system?
-                        <br></br><label> 
-                            <input type='radio' defaultChecked={true} name='homeAuto' style={{marginRight:'5px'}}
-                            value={'no'} onChange={handleHomeAuto}></input>
-                            No
+                    <>
+                    {/* Will this be a stationary Roman?
+                    <div>
+                        <label> 
+                            <input type='radio' name='stationary' style={{marginRight:'5px'}}
+                            value={'Yes'} onChange={handleStationary}></input>
+                            Yes
                         </label> <br></br>
                         <label>
-                            <input type='radio' name='homeAuto' style={{marginRight:'5px'}}
-                            value={'yes'} onChange={handleHomeAuto}></input>
-                            Yes (what is it)?
-                                <input id='homeauto'></input>
-                        </label><br></br>
-                    {/* </div>} */}
-                </div>}
-                {(opFunction === "cordlock" || opFunction === "lift") && <div>
-                    <br />Do you want to add stabilizer bars for structure?
-                    <br /><label><input type="radio" name='stablizer' onChange={() => setStabilizer("yes")}/> Yes</label>
-                    <br /><label><input type="radio" name='stablizer' onChange={() => setStabilizer("no")}/> No</label>
-                </div>}
-                <br></br>
-            </div>
+                            <input type='radio' name='stationary' style={{marginRight:'5px'}}
+                            value={'No'} onChange={handleStationary}></input>
+                            No
+                        </label><br></br><br></br>
+                    </div> */}
+                    </>
 
-            Roman Shade Lining Preference:
-            <div>
-                <label>
-                    <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px'}}
-                    value={'Unlined'} onChange={handleLinedChange}></input>
-                    Unlined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType'  style={{marginRight:'5px'}}
-                    value={'Sheer'} onChange={handleLinedChange}></input>
-                    Sheer Lining
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Lightweight Light Filter'} onChange={handleLinedChange}></input>
-                    Light Weight Light Filtering Lining (Poly Cotton)
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Light Filter'} onChange={handleLinedChange}></input>
-                    Regular Light Filtering Lining (100% Cotton)
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Blackout'} onChange={handleLinedChange}></input>
-                    Blackout Lining
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Napped Sateen'} onChange={handleLinedChange}></input>
-                   Napped Sateen
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Lined and Standard Interlined'} onChange={handleLinedChange}></input>
-                   Lined and Standard Interlined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Lined and Bump Interlined'} onChange={handleLinedChange}></input>
-                   Lined and Bump Interlined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Self-Lined'} onChange={handleLinedChange}></input>
-                   Self-Lined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Self-Lined and Blackout'} onChange={handleLinedChange}></input>
-                   Self-Lined and Blackout
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Self-Lined and Standard Interlined'} onChange={handleLinedChange}></input>
-                   Self-Lined and Standard Interlined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'Self-Lined and Bump Interlined'} onChange={handleLinedChange}></input>
-                   Self-Lined and Bump Interlined
-                </label><br></br>
-                <label> 
-                    <input type='radio' name='liningType' style={{marginRight:'5px'}}
-                    value={'French Blackout'} onChange={handleLinedChange}></input>
-                   French Blackout = Face fabric + 3 layered linings
-                </label><br></br>
-                <br></br>
-            </div>
-
-            Are you using COM material?
-            <div>
-                <label> 
-                    <input type='radio' name='COM' style={{marginRight:'5px'}}
-                    value={true} onChange={handleCom}></input>
-                    Yes
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='COM' style={{marginRight:'5px'}}
-                    value={false} onChange={handleCom}></input>
-                    No (you will purchase your material from Plaza Park Interiors)
-                </label><br></br>
-            </div><br></br>
-
-            Main Fabric specifications:  Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.
-            <br></br>
-            <div>
-                What units are the measurements in?
-                <label>
-                    <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units2' onChange={handleUnits2}></input> Centimeters
-                    <input value='in' type='radio' name='units2' onChange={handleUnits2}
-                        style={{marginLeft:'25px'}} checked={units2 === 'in'}></input> Inches
-                </label>
-                <br></br><label>
-                    Vendor:
-                    <input type='text' id='mainvendor' style={{marginLeft:'135px'}}></input>
-                </label>
-                <br></br><label>
-                    Pattern name & number:
-                    <input type='text' id='mainpattern' style={{marginLeft:'15px'}}></input>
-                </label><br></br><label>
-                    Link to fabric if available:
-                    <input type='href' id='mainlink' placeholder=' ' style={{marginLeft:'13px'}}></input>
-                </label>
-                <br></br><label>
-                    Width:
-                    <input type='number' id='mainwidth' style={{marginLeft:'144px'}}></input>
-                </label>
-                {units2 === 'in' && <>
-                    <Dropdown
-                        value = {mainWidth}
-                        change = {handleMainWidth}
-                    ></Dropdown>
-                </>}
-                <br></br><label>
-                    Vertical repeat:
-                    <input type='number' id='mainvert' style={{marginLeft:'81px'}}></input>
-                </label>
-                {units2 === 'in' && <>
-                    <Dropdown
-                        value = {mainVertical}
-                        change = {handleMainVertical}
-                    ></Dropdown>
-                </>}
-                <br></br><label>
-                    Horizontal repeat:
-                    <input type='number' id='mainhorizontal' style={{marginLeft:'61px'}}></input>
-                </label>
-                {units2 === 'in' && <>
-                    <Dropdown
-                        value = {mainHorizontal}
-                        change = {handleMainHorizontal}
-                    ></Dropdown>
-                </>}
-                <br></br>
-                How are we running the fabric?
-                <br></br><label> 
-                    <input type='radio' name='mainrailroad' style={{marginRight:'5px'}} defaultChecked
-                    value={'up the bolt'} onChange={handleMainRailroad}></input>
-                    Up the bolt
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={'railroad'} onChange={handleMainRailroad}/>
-                    Railroading
-                </label><br/>
-            </div><br />
-
-            Embellishments
-            <div>
-                <label>
-                    <input type="checkbox" style={{marginRight:'5px'}} onChange={() => {setBanding(!banding)}}/>
-                    Ready to use banding/trim
-                </label>
-                {banding && <div>
-                    <label style={{marginLeft:'25px'}}>
-                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding bottom'/>
-                    Bottom</label><br />
-                    <label style={{marginLeft:'25px'}}>
-                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding inside'/>
-                    Inside Edge</label><br />
-                    <label style={{marginLeft:'25px'}}>
-                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding outside'/>
-                    Outside Edge</label><br />
-                    <label style={{marginLeft:'25px'}}>
-                        <input type="checkbox" name="banding-type" style={{marginRight:'5px'}} id='banding top'/>
-                    Top</label><br />
-                </div>}
-            </div> <br />
-
-            Are we using contrast fabric?
-            <div>
-                <label>
-                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContr("yes")}}/>
-                    Yes
-                </label> <br />
-                <label>
-                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContr(null)}}/>
-                    No
-                </label>
-            </div>
-            {contr === "yes" && <div> <br />
-                Contrast Fabric specifications: <br />
-                What units are the measurements in?
-                <label>
-                    <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units3' onChange={handleUnits3}></input> Centimeters
-                    <input value='in' type='radio' name='units3' onChange={handleUnits3}
-                        style={{marginLeft:'25px'}} checked={units2 === 'in'}></input> Inches
-                </label>
-                <br></br><label>
-                    Vendor:
-                    <input type='text' id='contrastvendor' style={{marginLeft:'135px'}}></input>
-                </label>
-                <br></br><label>
-                    Pattern name & number:
-                    <input type='text' id='contrastpattern' style={{marginLeft:'15px'}}></input>
-                </label>
-                <br></br><label>
-                    Link to fabric if available:
-                    <input type='href' id='contrlink' placeholder=' ' style={{marginLeft:'13px'}}></input>
-                </label>
-                <br></br><label>
-                    Width:
-                    <input type='number' id='contrastwidth' style={{marginLeft:'144px'}}></input>
-                </label>
-                {units3 === 'in' && <>
-                    <Dropdown
-                        value = {contrastWidth}
-                        change = {handleContrastWidth}
-                    ></Dropdown>
-                </>}
-                <br></br><label>
-                    Vertical repeat:
-                    <input type='number' id='contrastvert' style={{marginLeft:'81px'}}></input>
-                </label>
-                {units3 === 'in' && <>
-                    <Dropdown
-                        value = {contrastVertical}
-                        change = {handleContrastVertical}
-                    ></Dropdown>
-                </>}
-                <br></br>
-                <label>
-                    Horizontal repeat:
-                    <input type='number' id='contrasthorizontal' style={{marginLeft:'61px'}}></input>
-                </label>
-                {units3 === 'in' && <>
-                    <Dropdown
-                        value = {contrastHorizontal}
-                        change = {handleContrastHorizontal}
-                    ></Dropdown>
-                </>}
-                <br></br>
-                How are we running the fabric?
-                <br></br><label> 
-                    <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
-                    value={false} onChange={handleContrastRailroad}></input>
-                    Up the bolt
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
-                    value={true} onChange={handleContrastRailroad}></input>
-                    Railroading
-                </label><br></br><br></br>
-                Please specify where the contrast fabric will be used:
-                <input id='where'></input>
-            </div>} <br />
-            {/* <div className='row'>
-                <div className='column'>
-                    <button onClick={calcYardage}>Calculate yardage</button> <br />
-                    {yardage}
+                    <div className="form-section">
+                        <h4>Main Fabric specifications: <small>Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.</small></h4>
+                        
+                        {/* <label>What units are the measurements in?</label>
+                        <label className="radio-label">
+                            <input value='cm' type='radio' name='units2' onChange={handleUnits2}></input> Centimeters
+                        </label>
+                        <label className="radio-label">
+                            <input value='in' type='radio' name='units2' onChange={handleUnits2}
+                            checked={units2 === 'in'}></input> Inches
+                        </label> 
+                        <br />
+                        */}
+                        <div className='row dimensions-section'>
+                            <div className='column'>
+                                <label>
+                                    Width:
+                                    <br />
+                                    <input type='number' id='mainwidth' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                                </label>
+                                {units2 === 'in' && <>
+                                    <Dropdown
+                                    value={mainWidth}
+                                    change={handleMainWidth}
+                                    ></Dropdown>
+                                </>}
+                            </div><br />
+                            <div className='column'>
+                                <label>
+                                    Vertical repeat:
+                                    <br />
+                                    <input type='number' id='mainvert' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                                </label>
+                                {units2 === 'in' && <>
+                                    <Dropdown
+                                    value={mainVertical}
+                                    change={handleMainVertical}
+                                    ></Dropdown>
+                                </>}
+                            </div><br />
+                            <div className='column'>
+                                <label>
+                                    Horizontal repeat:
+                                    <br />
+                                    <input type='number' id='mainhorizontal' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                                </label>
+                                {units2 === 'in' && <>
+                                    <Dropdown
+                                    value={mainHorizontal}
+                                    change={handleMainHorizontal}
+                                    ></Dropdown>
+                                </>}
+                            </div>
+                        </div>
+                        <div className='row dimensions-section'>
+                            <div className='column'>
+                                <h4>Embellishments</h4>
+                                <div>
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" onChange={() => {setBanding(!banding)}}/>
+                                        Ready to use banding/trim
+                                    </label>
+                                    {banding && <div className="sub-option-indent">
+                                        <label className="checkbox-label">
+                                            <input type="checkbox" name="banding-type" id='banding bottom'/>
+                                            Bottom
+                                        </label>
+                                        <label className="checkbox-label">
+                                            <input type="checkbox" name="banding-type" id='banding inside'/>
+                                            Inside Edge
+                                        </label>
+                                        <label className="checkbox-label">
+                                            <input type="checkbox" name="banding-type" id='banding outside'/>
+                                            Outside Edge
+                                        </label>
+                                        <label className="checkbox-label">
+                                            <input type="checkbox" name="banding-type" id='banding top'/>
+                                            Top
+                                        </label>
+                                    </div>}
+                                </div>
+                            </div>
+                            <div className='column'>
+                                <h4>How are we running the fabric?</h4>
+                                <label className="radio-label">
+                                    <input type='radio' name='mainrailroad'
+                                    value={'false'} onChange={handleMainRailroad}></input>
+                                    Up the bolt
+                                </label>
+                                <label className="radio-label">
+                                    <input type='radio' name='mainrailroad'
+                                    value={'true'} onChange={handleMainRailroad}></input>
+                                    Railroading
+                                </label><br />
+                            </div>
+                            <div className='column'>
+                                <button className='button-other' onClick={() => {calcYardage()}}>Calculate yardage</button>
+                                {yardage} <br />
+                            </div>
+                        </div>
+                    </div>
+                    <button className="next-button" onClick={() => handleFormSection(prev => prev + 1)}>Next</button>
+                    <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
                 </div>
-                <div className='column'>
-                    <button onClick={calcPrice}>Calculate pricing</button> <br />
-                    {price}
-                </div>
-                <div className='column'>
-                    <button onClick={submitForm}>Submit</button> 
-                </div>
-            </div> */}
+            }
+            
 
-            <div className='column'>
-                <button onClick={calcYardage} style={{marginRight: '5px'}}>Calculate yardage</button> 
-                {yardage} <br />
-            </div>
-            <div className='column'>
-                <button onClick={calcPrice} style={{marginRight: '5px'}}>Calculate pricing</button> 
-                {price} <br />
-            </div>
+
+            {formSection === 2 && <div className="form-group-indent">
+                <h1>Roman Shade Materials</h1>
+                <div className="form-section">
+                    <h4>Are you using COM material?</h4>
+                    <div>
+                        <label className="radio-label">
+                            <input type='radio' name='COM'
+                            value={'yes'} onChange={handleCom}></input>
+                            Yes
+                        </label>
+                        <label className="radio-label">
+                            <input type='radio' name='COM'
+                            value={'no'} onChange={handleCom}></input>
+                            No (you will purchase your material from Plaza Park Interiors)
+                        </label>
+                    </div><br />
+                    <div className='row dimensions-section'>
+                        <div className='column'> 
+                        <label>
+                            Vendor:
+                            <br />
+                            <input type='text' id='mainvendor' className='fixed-width-input'></input>
+                        </label>
+                        <br />
+                        </div>
+                        <div className='column'> 
+                            <label>
+                                Pattern name & number:
+                                <br />
+                                <input type='text' id='mainpattern' className='fixed-width-input'></input>
+                            </label>
+                        </div>
+                        <br />
+                        <div className='column'> 
+                            <label>
+                                Link to fabric if available:
+                                <br />
+                                <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div className='form-section'> 
+                    <div className='row dimensions-section'>
+                        <div className='column'>
+                            <h4>Operating Function</h4>
+                            <div className="form-section">
+                                <label> 
+                                    <input type='radio' name='opFunction' style={{marginRight:'5px'}} defaultChecked={true}
+                                    value={'cordless'} onChange={handleOpFunction}></input>
+                                    Cordless
+                                </label> <br></br>
+                                <label> 
+                                    <input type='radio' name='opFunction' style={{marginRight:'5px'}} 
+                                    value={'cordlock'} onChange={handleOpFunction}></input>
+                                    Cordlock
+                                </label> <br></br>
+                                <label> 
+                                    <input type='radio' name='opFunction' style={{marginRight:'5px'}}
+                                    value={'lift'} onChange={handleOpFunction}></input>
+                                    Clutch Lift
+                                </label> <br></br>
+                                <label> 
+                                    <input type='radio' name='opFunction' style={{marginRight:'5px'}}
+                                    value={'motorized'} onChange={handleOpFunction}></input>
+                                    Motorized (pick 1):
+                                </label> <br></br>
+                                <br></br>
+                            </div>
+                        </div>
+                        <div className='column'>
+                            {opFunction === 'lift' && <div>
+                                <h4>Lift Options</h4>
+                                <label>
+                                    <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Steel")}}></input>
+                                    Stainless Steel (standard)
+                                </label> <br />
+                                <label>
+                                    <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Antique")}}></input>
+                                    Antique Brass
+                                </label> <br />
+                                <label>
+                                    <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Polished")}}></input>
+                                    Polished Brass
+                                </label> <br />
+                                <label>
+                                    <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Black")}}></input>
+                                    Black
+                                </label> <br />
+                                <label>
+                                    <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("White")}}></input>
+                                    White
+                                </label> <br />
+
+                            </div>}
+                            {opFunction === "motorized" &&  <div>
+                                <h4>Motorized Options</h4>
+                                <label> 
+                                    <input type='radio' defaultChecked = {true} name='motorType'
+                                    value={'battery'} onChange={handleMotorChange}></input>
+                                    Rechargeable battery
+                                </label> <br></br>
+                                <label> 
+                                    <input type='radio' name='motorType'
+                                    value={'plug in'} onChange={handleMotorChange}></input>
+                                    Plug in
+                                </label> <br></br><br></br>
+                            </div>}
+                            {(opFunction === "cordlock") && <div>
+                                <h4>Stabilizer Bars</h4>
+                                <label><input type="radio" name='stablizer' onChange={() => setStabilizer("yes")}/> Yes</label>
+                                <br /><label><input type="radio" name='stablizer' onChange={() => setStabilizer("no")}/> No</label>
+                            </div>}
+                        </div>
+                        <div className='column'>
+                            {(opFunction === "lift") && <div>
+                                <h4>Stabilizer Bars</h4>
+                                <label><input type="radio" name='stablizer' onChange={() => setStabilizer("yes")}/> Yes</label>
+                                <br /><label><input type="radio" name='stablizer' onChange={() => setStabilizer("no")}/> No</label>
+                            </div>}
+                            {opFunction === "motorized" && <div>
+                                <h4>Existing Home Automation</h4>
+                                <label>
+                                    <input type='radio' name='homeAuto' 
+                                    value={'yes'} onChange={handleHomeAuto}></input>
+                                    Yes (what is it)?
+                                    {homeAuto === 'yes' && <>
+                                        <input className='fixed-width-input' id='homeauto'></input>
+                                    </>}
+                                </label><br />
+                                <label> 
+                                    <input type='radio' defaultChecked={true} name='homeAuto'
+                                    value={'no'} onChange={handleHomeAuto}></input>
+                                    No
+                                </label> <br />
+                            </div>}
+                        </div>
+                    </div>
+                </div>
+                
+                <div className="form-section">
+                    <div className='row dimensions-section'> 
+                        <div className='column'>
+                            <h4 >What type of lining would you like?</h4>
+                            <label>
+                                <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px'}}
+                                value={'Unlined'} onChange={handleLinedChange}></input>
+                                Unlined
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType'  style={{marginRight:'5px'}}
+                                value={'Sheer'} onChange={handleLinedChange}></input>
+                                Sheer Lining
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Lightweight Light Filter'} onChange={handleLinedChange}></input>
+                                Light Weight Light Filtering Lining (Poly Cotton)
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Light Filter'} onChange={handleLinedChange}></input>
+                                Regular Light Filtering Lining (100% Cotton)
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Blackout'} onChange={handleLinedChange}></input>
+                                Blackout Lining
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Napped Sateen'} onChange={handleLinedChange}></input>
+                            Napped Sateen
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Lined and Standard Interlined'} onChange={handleLinedChange}></input>
+                            Lined and Standard Interlined
+                            </label>
+                        </div>
+                        <div className='column'> <br /> <br />
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Lined and Bump Interlined'} onChange={handleLinedChange}></input>
+                            Lined and Bump Interlined
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Self-Lined'} onChange={handleLinedChange}></input>
+                            Self-Lined
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Self-Lined and Blackout'} onChange={handleLinedChange}></input>
+                            Self-Lined and Blackout
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Self-Lined and Standard Interlined'} onChange={handleLinedChange}></input>
+                            Self-Lined and Standard Interlined
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Self-Lined and Bump Interlined'} onChange={handleLinedChange}></input>
+                            Self-Lined and Bump Interlined
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'French Blackout'} onChange={handleLinedChange}></input>
+                            French Blackout = Face fabric + 3 layered linings
+                            </label>
+                        </div>
+                        <div className='column'></div>
+                    </div>
+                    
+                    
+                    <br></br>
+                </div>
+
+                <div className='form-section'></div>
+                
+                <button className="next-button" onClick={() => handleFormSection(prev => prev + 1)}>Next</button>
+                <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
+            </div>}
+
+            {formSection === 3 && <div className='form-group-indent'>
+                <h1>Review & Submit</h1><br />
+                <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
+            </div> }
+
         </div>
     )
 }

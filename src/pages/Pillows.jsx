@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const Pillows = ({pname, name, address, email, estName}) => {
+const Pillows = ({pname, name, address, email, estName, formSection, handleFormSection}) => {
     const[windowImg, setWindowImg] = useState(null);
     const [pillowType, setPillowType] = useState('');
     const[units1, setUnits1] = useState('in');
@@ -474,7 +474,8 @@ const Pillows = ({pname, name, address, email, estName}) => {
         }
     }
 
-
+    const checkNum = (e) => {if (!e.target.validity.valid) e.target.value = '';}
+    
     return(<>
     <div style={{border: 'grey solid 1px', padding:'5px'}}>
         <h1>Pillows</h1>

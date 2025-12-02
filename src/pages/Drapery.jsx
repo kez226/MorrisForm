@@ -367,7 +367,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         let cutYards = (20.0 + Number(f2fh) + Number(document.getElementById('f2fh').value)) / 36;
                         cutYards += 18 - (cutYards % 18);
                         const widths = (Number(f2fw) + Number(document.getElementById('f2fw').value)) / fabWidth;
-                        setYardage(Number(document.getElementById('wpp').value) * widths / cutYards);
+                        setYardage(Number(document.getElementById('wpp').value) * widths * Number(fullness) / cutYards);
                         return;
                     }
                     //up the bolt, stationary, with vertical repeat
@@ -387,7 +387,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         let fw = (Number(mainWidth) + Number(document.getElementById('mainwidth').value));
                         if (fw == 0){fw = 54;}
                         const widths = (Number(f2fw) + Number(document.getElementById('f2fw').value)) / fw;
-                        setYardage(Number(document.getElementById('wpp').value) * widths / cutYards);
+                        setYardage(Number(document.getElementById('wpp').value) * widths * Number(fullness) / cutYards);
                         return;
                     }
                 }
@@ -437,7 +437,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         alert("Please fill out all relevant fields");
                         return;
                     }
-                    let cw = 14.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * fullness;
+                    let cw = 14.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * Number(fullness);
                     cw += 9 - cw % 9;
                     yardage = cw / 36;
                     let check = Number(document.getElementById('f2fh').value) + Number(f2fh);
@@ -513,6 +513,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         setPrice(basePrice + " for yardage + " + bandingPrice + " for banding = " + (basePrice + bandingPrice));
     }
 
+    const checkNum = (e) => {if (!e.target.validity.valid) e.target.value = '';}
+
     return(<>
         <div className="container">
             {formSection === 1 && <div className="form-group-indent">
@@ -528,7 +530,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     <div className='row dimensions-section'>
                         <div className='column'>
                             <h4>Rod width:</h4>
-                            <input className='fixed-width-input' type='number' id='f2fw'></input>
+                            <input className='fixed-width-input' type='number' id='f2fw' min="0" onInput={checkNum}></input>
                             {units1 ==='in' && <>
                             <Dropdown
                                 value={f2fw}
@@ -538,7 +540,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         </div>
                         <div className='column'>
                             <h4>Drapery height:</h4>
-                            <input className='fixed-width-input' type='number' id='f2fh'></input>
+                            <input className='fixed-width-input' type='number' id='f2fh' min="0" onInput={checkNum}></input>
                             {units1 ==='in' && <>
                             <Dropdown
                                 value={f2fh}
@@ -574,7 +576,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             {stationary === 'true' && <div className="sub-option-indent">
                                 <label>
                                 What is the width per panel?
-                                <input type='number' id='wpp' className='fixed-width-input'></input>
+                                <input type='number' id='wpp' className='fixed-width-input' min="0" onInput={checkNum}></input>
                                 </label>
                             </div>}
                             <label className="radio-label">
@@ -686,7 +688,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             <label>
                                 Width:
                                 <br />
-                                <input type='number' id='mainwidth' className='fixed-width-input'></input>
+                                <input type='number' id='mainwidth' className='fixed-width-input' min="0" onInput={checkNum}></input>
                             </label>
                             {units2 === 'in' && <>
                                 <Dropdown
@@ -699,7 +701,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             <label>
                                 Vertical repeat:
                                 <br />
-                                <input type='number' id='mainvert' className='fixed-width-input'></input>
+                                <input type='number' id='mainvert' className='fixed-width-input' min="0" onInput={checkNum}></input>
                             </label>
                             {units2 === 'in' && <>
                                 <Dropdown
@@ -712,7 +714,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             <label>
                                 Horizontal repeat:
                                 <br />
-                                <input type='number' id='mainhorizontal' className='fixed-width-input'></input>
+                                <input type='number' id='mainhorizontal' className='fixed-width-input' min="0" onInput={checkNum}></input>
                             </label>
                             {units2 === 'in' && <>
                                 <Dropdown
@@ -723,6 +725,34 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         </div>
                     </div>
                     <div className='row dimensions-section'>
+                        <div className='column'>
+                            <h4>Embellishments</h4>
+                            <div>
+                                <label className="checkbox-label">
+                                    <input type="checkbox" onChange={() => {setBanding(!banding)}}/>
+                                    Ready to use banding/trim
+                                </label>
+                                {banding && <div className="sub-option-indent">
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" name="banding-type" id='banding bottom'/>
+                                        Bottom
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" name="banding-type" id='banding inside'/>
+                                        Inside Edge
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" name="banding-type" id='banding outside'/>
+                                        Outside Edge
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" name="banding-type" id='banding top'/>
+                                        Top
+                                    </label>
+                                </div>}
+                            </div>
+                        </div>
+                        
                         <div className='column'>
                             <h4>How are we running the fabric?</h4>
                             <label className="radio-label">
@@ -740,7 +770,6 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             <button className='button-other' onClick={() => {calcYardage()}}>Calculate yardage</button>
                             {yardage} <br />
                         </div>
-                        <div className='column'></div>
                     </div>
                 </div><br />
                 <button className="next-button" onClick={() => handleFormSection(prev => prev + 1)}>Next</button>
@@ -791,103 +820,84 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 </div>
 
                 <div className="form-section">
-                    <h4>Lining preference</h4>
-                    <div>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Unlined'} onChange={handleLinedChange}></input>
-                            Unlined
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Sheer'} onChange={handleLinedChange}></input>
-                            Sheer lining
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Lightweight Light Filter'} onChange={handleLinedChange}></input>
-                            Light weight light filtering lining (Poly cotton)
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Light Filter'} onChange={handleLinedChange}></input>
-                            Regular Light filtering lining (100% cotton)
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Blackout'} onChange={handleLinedChange}></input>
-                            Blackout lining
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Napped Sateen'} onChange={handleLinedChange}></input>
+                    <div className='row dimensions-section'> 
+                        <div className='column'>
+                            <h4 >What type of lining would you like?</h4>
+                            <label>
+                                <input type='radio' name='liningType' defaultChecked={true} style={{marginRight:'5px'}}
+                                value={'Unlined'} onChange={handleLinedChange}></input>
+                                Unlined
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType'  style={{marginRight:'5px'}}
+                                value={'Sheer'} onChange={handleLinedChange}></input>
+                                Sheer Lining
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Lightweight Light Filter'} onChange={handleLinedChange}></input>
+                                Light Weight Light Filtering Lining (Poly Cotton)
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Light Filter'} onChange={handleLinedChange}></input>
+                                Regular Light Filtering Lining (100% Cotton)
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Blackout'} onChange={handleLinedChange}></input>
+                                Blackout Lining
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Napped Sateen'} onChange={handleLinedChange}></input>
                             Napped Sateen
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Lined and Standard Interlined'} onChange={handleLinedChange}></input>
-                            Lined and IStandard interlined
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Lined and Bump Interlined'} onChange={handleLinedChange}></input>
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Lined and Standard Interlined'} onChange={handleLinedChange}></input>
+                            Lined and Standard Interlined
+                            </label>
+                        </div>
+                        <div className='column'> <br /> <br />
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Lined and Bump Interlined'} onChange={handleLinedChange}></input>
                             Lined and Bump Interlined
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Self-Lined'} onChange={handleLinedChange}></input>
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Self-Lined'} onChange={handleLinedChange}></input>
                             Self-Lined
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Self-Lined and Blackout'} onChange={handleLinedChange}></input>
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Self-Lined and Blackout'} onChange={handleLinedChange}></input>
                             Self-Lined and Blackout
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Self-Lined and Standard Interlined'} onChange={handleLinedChange}></input>
-                            Self-Lined and standard Interlined
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'Self-Lined and Bump Interlined'} onChange={handleLinedChange}></input>
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Self-Lined and Standard Interlined'} onChange={handleLinedChange}></input>
+                            Self-Lined and Standard Interlined
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'Self-Lined and Bump Interlined'} onChange={handleLinedChange}></input>
                             Self-Lined and Bump Interlined
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='liningType'
-                            value={'French Blackout'} onChange={handleLinedChange}></input>
+                            </label><br></br>
+                            <label> 
+                                <input type='radio' name='liningType' style={{marginRight:'5px'}}
+                                value={'French Blackout'} onChange={handleLinedChange}></input>
                             French Blackout = Face fabric + 3 layered linings
-                        </label>
+                            </label>
+                        </div>
+                        <div className='column'></div>
                     </div>
+                    
+                    
+                    <br></br>
                 </div>
 
-                <div className="form-section">
-                    <h4>Embellishments</h4>
-                    <div>
-                        <label className="checkbox-label">
-                            <input type="checkbox" onChange={() => {setBanding(!banding)}}/>
-                            Ready to use banding/trim
-                        </label>
-                        {banding && <div className="sub-option-indent">
-                            <label className="checkbox-label">
-                                <input type="checkbox" name="banding-type" id='banding bottom'/>
-                                Bottom
-                            </label>
-                            <label className="checkbox-label">
-                                <input type="checkbox" name="banding-type" id='banding inside'/>
-                                Inside Edge
-                            </label>
-                            <label className="checkbox-label">
-                                <input type="checkbox" name="banding-type" id='banding outside'/>
-                                Outside Edge
-                            </label>
-                            <label className="checkbox-label">
-                                <input type="checkbox" name="banding-type" id='banding top'/>
-                                Top
-                            </label>
-                        </div>}
-                    </div>
-                </div><br />
                 <button className="next-button" onClick={() => handleFormSection(prev => prev + 1)}>Next</button>
                 <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
             </div>}

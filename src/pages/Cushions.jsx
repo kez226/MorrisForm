@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const Cushions = ({pname, name, address, email, estName}) => {
+const Cushions = ({pname, name, address, email, estName, formSection, handleFormSection}) => {
     const[windowImg, setWindowImg] = useState(null);
     const [template, setTemplate] = useState('');
     const[units1, setUnits1] = useState('in');
@@ -342,311 +342,276 @@ const Cushions = ({pname, name, address, email, estName}) => {
         console.log("Calculated Yardage:", calculatedYardage);
     };
 
+    const checkNum = (e) => {if (!e.target.validity.valid) e.target.value = '';}
+
     return(<>
-    <div style={{border: 'grey solid 1px', padding:'5px'}}>
-        <h1>Cushions</h1>
-        <label>
+    <div className='container'>
+        {formSection === 1 && <div className='form-group-indent'>
+            <h1>Cushion Dimensions</h1>
+            <div className='form-section'>
+                {/* Is a template required?
+                <br /><label>
+                    <input type='radio' name='template'
+                    onChange={() => {setTemplate(true)}}></input>
+                    Yes
+                </label>
+                <br /><label>
+                    <input type='radio' name='template'
+                    onChange={() => {setTemplate(false)}}></input>
+                    No
+                </label><br /> <br /> */}
+                <div className='row dimensions-section'>
+                    <h4>Cushion measurements</h4>
+                    <div className='column'>
+                        Length: <br />
+                        <input type='number' id='length'
+                        className='fixed-width-input' min="0" onInput={checkNum}></input>
+                        <Dropdown
+                            value = {length}
+                            change = {handleLength}
+                        ></Dropdown>
+                    </div>
+                    <div className='column'>
+                        <label>
+                            Depth: <br />
+                            <input type='number' id='depth'
+                            className='fixed-width-input' min="0" onInput={checkNum}></input>
+                            <Dropdown
+                                value = {depth}
+                                change = {handleDepth}
+                            ></Dropdown>
+                        </label>
+                    </div>
+                    <div className='column'>
+                        <label>
+                            Thickness: <br />
+                            <input type='number' id='thickness'
+                            className='fixed-width-input' min="0" onInput={checkNum}></input>
+                            <Dropdown
+                                value = {thickness}
+                                change = {handleThickness}
+                            ></Dropdown>
+                        </label>
+                    </div>
+                </div> <br />
+            </div>
+
+            <div className='form-section'>
+                <div className='row dimensions-section'>
+                    <h4>Main Fabric specifications: <small>Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.</small></h4>
+
+                    <div className='row dimensions-section'>
+                        <div className='column'>
+                            <label>
+                                Width:
+                                <br />
+                                <input type='number' id='mainwidth' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                            </label>
+                            {units2 === 'in' && <>
+                                <Dropdown
+                                value={mainWidth}
+                                change={handleMainWidth}
+                                ></Dropdown>
+                            </>}
+                        </div><br />
+                        <div className='column'>
+                            <label>
+                                Vertical repeat:
+                                <br />
+                                <input type='number' id='mainvert' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                            </label>
+                            {units2 === 'in' && <>
+                                <Dropdown
+                                value={mainVertical}
+                                change={handleMainVertical}
+                                ></Dropdown>
+                            </>}
+                        </div><br />
+                        <div className='column'>
+                            <label>
+                                Horizontal repeat:
+                                <br />
+                                <input type='number' id='mainhorizontal' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                            </label>
+                            {units2 === 'in' && <>
+                                <Dropdown
+                                value={mainHorizontal}
+                                change={handleMainHorizontal}
+                                ></Dropdown>
+                            </>}
+                        </div>
+                    </div>
+                    <div className='column'>
+                        Edge detail (please select one):
+                        <br /><label>
+                            <input type='radio' name='edge' value={'Knife'}
+                            style={{marginRight: '5px'}} onChange={handleEdge}></input>
+                            Knife edge (no detail)
+                        </label>
+                        <br /><label>
+                            <input type='radio' name='edge' value={'Welt'}
+                            style={{marginRight: '5px'}} onChange={handleEdge}></input>
+                            Welt
+                        </label>
+                        {edge === 'Welt' && 
+                        <>
+                            <br /><label style={{marginLeft:'25px'}}>
+                                <input type='radio' name='welt' value={'Self-welt'} defaultChecked={true}
+                                style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
+                                Self-welt
+                            </label>
+                            <br /><label style={{marginLeft:'25px'}}>
+                                <input type='radio' name='welt' value={'Contrast Welt'}
+                                style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
+                                Contrast Welt
+                            </label>
+                            <br /><label style={{marginLeft:'25px'}}>
+                                <input type='radio' name='welt' value={'Cord/trim'}
+                                style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
+                                Cord / trim with lip
+                            </label>
+                        </>}
+                    </div>
+                    <div className='column'>
+                        <h4>How are we running the fabric?</h4>
+                        <label className="radio-label">
+                            <input type='radio' name='mainrailroad'
+                            value={'false'} onChange={handleMainRailroad}></input>
+                            Up the bolt
+                        </label>
+                        <label className="radio-label">
+                            <input type='radio' name='mainrailroad'
+                            value={'true'} onChange={handleMainRailroad}></input>
+                            Railroading
+                        </label><br />
+                    </div>
+                    <div className='column'>
+                        <button className='button-other' onClick={() => {calcYardage()}}>Calculate yardage</button>
+                        {yardage} <br />
+                    </div>
+                </div>
+
+            </div>
+            <button className="next-button" onClick={() => handleFormSection(prev => prev + 1)}>Next</button>
+            <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
+        </div>}
+
+        {formSection === 2 && <div className='form-group-indent'>
+            <h1>Cushion Materials</h1>
+            <div className="form-section">
+                <div className='row dimensions-section'>
+                    <div className='column'>
+                        <h4>Are you using COM material?</h4>
+                        <label className="radio-label">
+                            <input type='radio' name='COM'
+                            value={'yes'} onChange={handleCom}></input>
+                            Yes
+                        </label>
+                        <label className="radio-label">
+                            <input type='radio' name='COM'
+                            value={'no'} onChange={handleCom}></input>
+                            No (you will purchase your material from Plaza Park Interiors)
+                        </label>
+                    </div>
+                    <div className='column'>
+                        <div>
+                            Insert (please select one)
+                            <br />
+                            <label>
+                                <input type='radio' style={{marginRight:'5px'}} 
+                                value='Cover only' onClick={handleInsert} name='insert'></input>
+                                Cover only (no insert)
+                            </label>
+                            <br /><label>
+                                <input type='radio' style={{marginRight:'5px'}}
+                                value='Dacron' onClick={handleInsert} name='insert'></input>
+                                Dacron (down alternative)
+                            </label>
+                            <br /><label>
+                                <input type='radio' style={{marginRight:'5px'}}                
+                                value='Outdoor' onClick={handleInsert} name='insert'></input>
+                                Outdoor
+                            </label>
+                            <br /><label>
+                                <input type='radio' style={{marginRight:'5px'}}
+                                value='50/50 Dacron' onClick={handleInsert} name='insert'></input>
+                                50 / 50 Down & Dacron
+                            </label>
+                            <br /><label>
+                                <input type='radio' style={{marginRight:'5px'}}
+                                value='25/75 Down Feather' onClick={handleInsert} name='insert'></input>
+                                Down & Feather Mix (please note prices increase with down count):
+                            </label>
+                            {insert !== '' && insert !== 'Cover only' && insert !== 'Dacron' && insert !== 'Outdoor' && insert !== '50/50 Dacron' &&
+                            <div><label style={{marginLeft:'25px'}}>
+                                    <input type='radio' style={{marginRight:'5px'}}
+                                    value='10/90 Down Feather' onClick={handleInsert} name='mix'></input>
+                                    10 / 90 Down & Feather mix
+                                </label>
+                                <br /><label style={{marginLeft:'25px'}}>
+                                    <input type='radio' style={{marginRight:'5px'}} defaultChecked={true}
+                                    value='25/75 Down Feather' onClick={handleInsert} name='mix'></input>
+                                    25 / 75 (Plaza Park standard)
+                                </label>
+                                <br /><label style={{marginLeft:'25px'}}>
+                                    <input type='radio' style={{marginRight:'5px'}}
+                                    value='50/50 Down Feather' onClick={handleInsert} name='mix'></input>
+                                    50 / 50 Down & Feather mix
+                                </label>
+                                <br /><label style={{marginLeft:'25px'}}>
+                                    <input type='radio' style={{marginRight:'5px'}}
+                                    value='80/20 Down Feather' onClick={handleInsert} name='mix'></input>
+                                    90 / 20 Down & Feather mix
+                                </label>
+                                <br /><label style={{marginLeft:'25px'}}>
+                                    <input type='radio' style={{marginRight:'5px'}}
+                                    value='100% down' onClick={handleInsert} name='mix'></input>
+                                    100% down
+                                </label>
+                            </div>}
+                        </div><br />
+                    </div>
+                </div>
+                
+                <div className='row dimensions-section'>
+                    <div className='column'> 
+                    <label>
+                        Vendor:
+                        <br />
+                        <input type='text' id='mainvendor' className='fixed-width-input'></input>
+                    </label>
+                    <br />
+                    </div>
+                    <div className='column'> 
+                        <label>
+                            Pattern name & number:
+                            <br />
+                            <input type='text' id='mainpattern' className='fixed-width-input'></input>
+                        </label>
+                    </div>
+                    <br />
+                    <div className='column'> 
+                        <label>
+                            Link to fabric if available:
+                            <br />
+                            <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <button className="next-button" onClick={() => handleFormSection(prev => prev + 1)}>Next</button>
+            <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
+        </div>}
+
+        {formSection === 3 && <div className='form-group-indent'>
+            <h1>Review & Submit</h1><br />
+            <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
+        </div> }
+        
+        {/* <label>
             Please load a photo of the window:
             <input type='file' onChange={handleImageUpload} style={{marginLeft:'15px'}} multiple></input>
-        </label><br></br><br></br>
-
-        Is a template required?
-        <br></br><label>
-            <input type='radio' name='template' style={{marginRight:'5px'}}
-            onChange={() => {setTemplate(true)}}></input>
-            Yes
-        </label>
-        <br></br><label>
-            <input type='radio' name='template' style={{marginRight:'5px'}}
-            onChange={() => {setTemplate(false)}}></input>
-            No
-        </label><br></br>
-
-        <br></br>
-        What units are the measurements in?
-        <label>
-            <input style={{marginLeft:'25px'}} value='cm' type='radio' name='units1' onChange={handleUnits1}></input> Centimeters
-            <input value='in' type='radio' name='units1' onChange={handleUnits1}
-                style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
-        </label>
-        <br></br><label>
-            Length:
-            <input type='number' style={{marginLeft: '50px'}} id='length'></input>
-            <Dropdown
-                value = {length}
-                change = {handleLength}
-            ></Dropdown>
-        </label>
-        <br></br><label>
-            Depth:
-            <input type='number' style={{marginLeft: '56px'}} id='depth'></input>
-            <Dropdown
-                value = {depth}
-                change = {handleDepth}
-            ></Dropdown>
-        </label>
-        <br></br><label>
-            Thickness:
-            <input type='number' style={{marginLeft: '27px'}} id='thickness'></input>
-            <Dropdown
-                value = {thickness}
-                change = {handleThickness}
-            ></Dropdown>
-        </label>
-        <br></br><br></br>
-
-        <div>
-            Insert (please select one)
-            <br></br>
-            <label>
-                <input type='radio' style={{marginRight:'5px'}} 
-                value='Cover only' onClick={handleInsert} name='insert'></input>
-                Cover only (no insert)
-            </label>
-            <br></br><label>
-                <input type='radio' style={{marginRight:'5px'}}
-                value='Dacron' onClick={handleInsert} name='insert'></input>
-                Dacron (down alternative)
-            </label>
-            <br></br><label>
-                <input type='radio' style={{marginRight:'5px'}}                
-                value='Outdoor' onClick={handleInsert} name='insert'></input>
-                Outdoor
-            </label>
-            <br></br><label>
-                <input type='radio' style={{marginRight:'5px'}}
-                value='50/50 Dacron' onClick={handleInsert} name='insert'></input>
-                50 / 50 Down & Dacron
-            </label>
-            <br></br><label>
-                <input type='radio' style={{marginRight:'5px'}}
-                value='25/75 Down Feather' onClick={handleInsert} name='insert'></input>
-                Down & Feather Mix (please note prices increase with down count):
-            </label>
-            {insert !== '' && insert !== 'Cover only' && insert !== 'Dacron' && insert !== 'Outdoor' && insert !== '50/50 Dacron' &&
-            <div><label style={{marginLeft:'25px'}}>
-                    <input type='radio' style={{marginRight:'5px'}}
-                    value='10/90 Down Feather' onClick={handleInsert} name='mix'></input>
-                    10 / 90 Down & Feather mix
-                </label>
-                <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' style={{marginRight:'5px'}} defaultChecked={true}
-                    value='25/75 Down Feather' onClick={handleInsert} name='mix'></input>
-                    25 / 75 (Plaza Park standard)
-                </label>
-                <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' style={{marginRight:'5px'}}
-                    value='50/50 Down Feather' onClick={handleInsert} name='mix'></input>
-                    50 / 50 Down & Feather mix
-                </label>
-                <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' style={{marginRight:'5px'}}
-                    value='80/20 Down Feather' onClick={handleInsert} name='mix'></input>
-                    90 / 20 Down & Feather mix
-                </label>
-                <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' style={{marginRight:'5px'}}
-                    value='100% down' onClick={handleInsert} name='mix'></input>
-                    100% down
-                </label>
-            </div>}
-        </div><br></br>
-
-        <div>
-            Edge detail (please select one):
-            <br></br><label>
-                <input type='radio' name='edge' value={'Knife'}
-                style={{marginRight: '5px'}} onChange={handleEdge}></input>
-                Knife edge (no detail)
-            </label>
-            <br></br><label>
-                <input type='radio' name='edge' value={'Welt'}
-                style={{marginRight: '5px'}} onChange={handleEdge}></input>
-                Welt
-            </label>
-            {edge === 'Welt' && 
-            <>
-                <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' name='welt' value={'Self-welt'} defaultChecked={true}
-                    style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
-                    Self-welt
-                </label>
-                <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' name='welt' value={'Contrast Welt'}
-                    style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
-                    Contrast Welt
-                </label>
-                <br></br><label style={{marginLeft:'25px'}}>
-                    <input type='radio' name='welt' value={'Cord/trim'}
-                    style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
-                    Cord / trim with lip
-                </label>
-            </>}
-        </div>
-
-        <br></br>
-        Are you using COM material?
-            <div>
-                <label> 
-                    <input type='radio' name='COM' style={{marginRight:'5px'}}
-                    value={'yes'} onChange={handleCom}></input>
-                    Yes
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='COM' style={{marginRight:'5px'}}
-                    value={'no'} onChange={handleCom}></input>
-                    No (you will purchase your material from Plaza Park Interiors)
-                </label><br></br>
-            </div><br></br>
-
-            Main Fabric specifications:  Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.
-            <br></br>
-            <div>
-                What units are the measurements in?
-                <label>
-                    <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units2' onChange={handleUnits2}></input> Centimeters
-                    <input value='in' type='radio' name='units2' onChange={handleUnits2}
-                        style={{marginLeft:'25px'}} checked={units2 === 'in'}></input> Inches
-                </label>
-                <br></br><label>
-                    Vendor:
-                    <input type='text' id='mainvendor' style={{marginLeft:'135px'}}></input>
-                </label>
-                <br></br><label>
-                    Pattern name & number:
-                    <input type='text' id='mainpattern' style={{marginLeft:'15px'}}></input>
-                </label>
-                <br></br><label>
-                    Link to fabric if available:
-                    <input type='href' id='mainlink' placeholder=' ' style={{marginLeft:'13px'}}></input>
-                </label><br></br><label>
-                    Width:
-                    <input type='number' id='mainwidth' style={{marginLeft:'144px'}}></input>
-                </label>
-                {units2 === 'in' && <>
-                    <Dropdown
-                        value = {mainWidth}
-                        change = {handleMainWidth}
-                    ></Dropdown>
-                </>}
-                <br></br><label>
-                    Vertical repeat:
-                    <input type='number' id='mainvert' style={{marginLeft:'81px'}}></input>
-                </label>
-                {units2 === 'in' && <>
-                    <Dropdown
-                        value = {mainVertical}
-                        change = {handleMainVertical}
-                    ></Dropdown>
-                </>}
-                <br></br><label>
-                    Horizontal repeat:
-                    <input type='number' id='mainhorizontal' style={{marginLeft:'61px'}}></input>
-                </label>
-                {units2 === 'in' && <>
-                    <Dropdown
-                        value = {mainHorizontal}
-                        change = {handleMainHorizontal}
-                    ></Dropdown>
-                </>}
-                <br></br>
-                How are we running the fabric?
-                <br></br><label> 
-                    <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={"utb"} onChange={handleMainRailroad} defaultChecked={true}></input>
-                    Up the bolt
-                </label> <br></br>
-                <label>
-                    <input type='radio' name='mainrailroad' style={{marginRight:'5px'}}
-                    value={"rr"} onChange={handleMainRailroad}></input>
-                    Railroaded
-                </label><br></br>
-            </div><br></br>
-            
-            Are we using contrast fabric?
-            <div>
-                <label>
-                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContrast(true)}}/>
-                    Yes
-                </label> <br />
-                <label>
-                    <input type="radio" name="contrast" style={{marginRight:'5px'}} onClick={() => {setContrast(false)}}/>
-                    No
-                </label>
-            </div>
-            {contrast && <>
-                Contrast Fabric specifications:
-                <div>
-                    What units are the measurements in?
-                    <label>
-                        <input style = {{marginLeft:'25px'}} value='cm' type='radio' name='units3' onChange={handleUnits3}></input> Centimeters
-                        <input value='in' type='radio' name='units3' onChange={handleUnits3}
-                            style={{marginLeft:'25px'}} checked={units3 === 'in'}></input> Inches
-                    </label>
-                    <br></br><label>
-                        Vendor:
-                        <input type='text' id='contrastvendor' style={{marginLeft:'135px'}}></input>
-                    </label>
-                    <br></br><label>
-                        Pattern name & number:
-                        <input type='text' id='contrastpattern' style={{marginLeft:'15px'}}></input>
-                    </label>
-                    <br></br><label>
-                        Link to fabric if available:
-                        <input type='href' id='contrlink' style={{marginLeft:'13px'}}></input>
-                    </label><br></br><label>
-                        Width:
-                        <input type='number' id='contrastwidth' style={{marginLeft:'144px'}}></input>
-                    </label>
-                    {units3 === 'in' && <>
-                        <Dropdown
-                            value = {contrastWidth}
-                            change = {handleContrastWidth}
-                        ></Dropdown>
-                    </>}
-                    <br></br><label>
-                        Vertical repeat:
-                        <input type='number' id='contrastvert' style={{marginLeft:'81px'}}></input>
-                    </label>
-                    {units3 === 'in' && <>
-                        <Dropdown
-                            value = {contrastVertical}
-                            change = {handleContrastVertical}
-                        ></Dropdown>
-                    </>}
-                    <br></br>
-                    <label>
-                        Horizontal repeat:
-                        <input type='number' id='contrasthorizontal' style={{marginLeft:'61px'}}></input>
-                    </label>
-                    {units3 === 'in' && <>
-                        <Dropdown
-                            value = {contrastHorizontal}
-                            change = {handleContrastHorizontal}
-                        ></Dropdown>
-                    </>}
-                    <br></br>
-                    Are we railroaded?
-                    <br></br><label> 
-                        <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
-                        value={true} onChange={handleContrastRailroad}></input>
-                        Yes
-                    </label> <br></br>
-                    <label>
-                        <input type='radio' name='contrastrailroad' style={{marginRight:'5px'}}
-                        value={false} onChange={handleContrastRailroad}></input>
-                        No
-                    </label><br></br><br></br>
-                    Please specify where the contrast fabric will be used:
-                    <input id='where'></input>
-                </div>
-            </>}
-
-
-            <br /><button onClick={calcYardage}>Calculate Yardage</button>
-            {yardage}
-
-            <br /><button onClick={submitForm}>Submit</button>
+        </label><br /><br /> */}
     </div>
     </>)
 }

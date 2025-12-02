@@ -3,7 +3,7 @@ import '../styles.css'
 
 import Drapery from './Drapery';
 import Roman from './Roman';
-import Valance from './Valence';
+import Valance from './Valance';
 import HardTreatments from './HardTreatments';
 import Pillows from './Pillows';
 import Cushions from './Cushions';
@@ -223,25 +223,25 @@ const Window = () => {
               name={name} pname={pname} address={address} email={contact} estName={estName}
               room={room}
               numWindow={windows}
-              uploads={setUploads}
+              uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
             ></Roman>}
             {treatmentType === 'valence' && <Valance 
               name={name} pname={pname} address={address} email={contact} estName={estName}
               room={room}
               numWindow={windows}
-              uploads={setUploads}
+              uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
             ></Valance>}
             {treatmentType === 'pillows' && <Pillows 
               name={name} pname={pname} address={address} email={contact} estName={estName}
               room={room}
               numWindow={windows}
-              uploads={setUploads}
+              uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
             ></Pillows>}
             {treatmentType === 'cushions' && <Cushions 
               name={name} pname={pname} address={address} email={contact} estName={estName}
               room={room}
               numWindow={windows}
-              uploads={setUploads}
+              uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
             ></Cushions>}
             {/* <button className="next-button" onClick={() => handleFormSection("next")}>Next</button>
             <button className="back-button" onClick={() => handleFormSection("back")}>Back</button> */}
