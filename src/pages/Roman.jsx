@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 
 const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, formSection, handleFormSection}) => {
     const[windowImg, setWindowImg] = useState(null);
-    const[mount, setMount] = useState('');
+    const[mount, setMount] = useState('inside');
     const[stationary,setStationary] = useState('');
     const[opFunction, setOpFunction] = useState('cordless');
-    const[motorType, setMotorType] = useState('');
+    const[motorType, setMotorType] = useState('battery');
     // const[hardwired, setHardwired] = useState('');
     const[homeAuto, setHomeAuto] = useState('');
     const[lined, setLined] = useState('Unlined');
@@ -19,8 +19,11 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
 
     const [f2fw, f2fwc] = useState('');
     const [f2fh, f2fhc] = useState('');
+    const [f2fwTotal, setF2fwTotal] = useState(null);
+    const [f2fhTotal, setF2fhTotal] = useState(null);
     const [abvc, abvcc] = useState('');
     const [abvf, abvfc] = useState('');
+    const [abvfTotal, setAbvfTotal] = useState(null);
     const handlef2fw = (e) => {f2fwc(e.target.value);};
     const handlef2fh = (e) => {f2fhc(e.target.value);};
     const handleabvc = (e) => {abvcc(e.target.value);};
@@ -93,7 +96,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
         }
     },[banding])
 
-    const [bead, setBead] = useState(null);
+    const [bead, setBead] = useState("Steel");
 
     useEffect(() => {
         if (opFunction !== "lift"){
@@ -112,21 +115,32 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
         { label: '7/8', value: '.875' }
     ];
 
-    const linings = {
-        "Unlined": 24.0,
-        "Sheer": 26.0,
-        'Lightweight Light Filter': 28.0,
-        'Light Filter': 28.0,
-        'Blackout': 32.0,
-        'Napped Sateen': 28.0,
-        'Lined and IStandard interlined': 35.0,
-        'Lined and Bump Interlined': 38.0,
-        'Self-Lined': 27.0,
-        'Self-Lined and Blackout': 32.0,
-        'Self-Lined and Standard Interlined': 35.0,
-        'Self-Lined and Bump Interlined': 38.0,
-        'French Blackout': 40.0
-    }
+    const [linings, setLinings] = useState();
+        useEffect(() => {
+            fetch('https://script.google.com/macros/s/AKfycbxPB_2UsBjeXSeMmpmraXDAmu5Q1lJ6GX_vB6eoeqjrPflKnsLhN6VxF4wkJlBYUPRL1w/exec', {method: "GET"})
+            .then(response => response.json()).then(
+                data => {
+                    console.log(data);
+                    console.log(typeof data.msg, data.msg);
+                    console.log(typeof data.msg[0], data.msg[0]);
+                    setLinings({
+                        'Unlined': data.msg[0][1],
+                        'Self-Lined': data.msg[0][2],
+                        'Light Filtering': data.msg[0][3],
+                        'Sheer': data.msg[0][4],
+                        'Blackout': data.msg[0][5],
+                        'Lined & Standard Interlined': data.msg[0][6],
+                        'Other': data.msg[0][7], //Lined and bump, and all self-lined with other options
+                        'French Blackout': data.msg[0][8],
+                    })
+                });
+        }, []);
+    
+        const getLiningPrice = (lining) => {
+            if (lining in linings){ return linings[lining]; }
+            else if (lining.includes("Light") || lining ==='Napped Sateen'){ return linings['Light Filtering']; }
+            else {return linings['Other'];}
+        }
 
     const submitForm = (e) => {
         e.preventDefault();
@@ -297,7 +311,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
 
     const [yardage, setYardage] = useState(null);
     const calcYardageOld = () => {
-        if (mainrailroad === "railroad"){
+        if (mainrailroad === "true"){
             if (document.getElementById('f2fw').value == 0 
             || document.getElementById('f2fh').value == 0
             ){
@@ -454,15 +468,23 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
         }
     }
     const calcYardage = () => {
-        if (mainrailroad === "railroad") {
+        if (document.getElementById('f2fh').value && document.getElementById('f2fw').value){
+            setF2fhTotal(Number(document.getElementById('f2fh').value) + Number(f2fh));
+            setF2fwTotal(Number(document.getElementById('f2fw').value) + Number(f2fw));
+            console.log('setTotals')
+        }
+        if (mount === 'outside' && document.getElementById('abvf').value){
+            setAbvfTotal(Number(document.getElementById('abvf').value) + Number(abvf));
+        }
+        if (mainrailroad === "true") {
             if (
-                document.getElementById("f2fw").value == 0 ||
-                document.getElementById("f2fh").value == 0
+                !document.getElementById("f2fw").value ||
+                !document.getElementById("f2fh").value
             ) {
                 alert("Please fill out all relevant fields");
                 return;
             }
-            if (mount === "outside" && document.getElementById("abvf").value == 0) {
+            if (mount === "outside" && !document.getElementById("abvf").value) {
                 alert("Please fill out all relevant fields");
                 return;
             }
@@ -530,7 +552,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
 
         // --- SOLID FABRIC (no vertical repeat) ---
         if (
-            Number(document.getElementById("mainvert").value) === 0 &&
+            !document.getElementById("mainvert").value &&
             Number(mainVertical) === 0
         ) {
             console.log("no vertical repeat");
@@ -539,8 +561,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
             if (mount === "inside") {
                 console.log("inside");
                 if (
-                    document.getElementById("f2fw").value == 0 ||
-                    document.getElementById("f2fh").value == 0
+                    !document.getElementById("f2fw").value||
+                    !document.getElementById("f2fh").value
                 ) {
                     alert("Please fill out all relevant fields");
                     return;
@@ -579,9 +601,9 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
             else {
                 console.log("outside");
                 if (
-                    document.getElementById("f2fw").value == 0 ||
-                    document.getElementById("abvf").value == 0 ||
-                    document.getElementById("f2fh").value == 0
+                    !document.getElementById("f2fw").value ||
+                    !document.getElementById("abvf").value ||
+                    !document.getElementById("f2fh").value
                 ) {
                     alert("Please fill out all relevant fields");
                     return;
@@ -627,9 +649,9 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
         // --- FABRICS WITH REPEAT ---
         else {
             if (
-                document.getElementById("f2fw").value == 0 ||
-                document.getElementById("mainvert").value == 0 ||
-                document.getElementById("f2fh").value == 0
+                !document.getElementById("f2fw").value ||
+                !document.getElementById("mainvert").value ||
+                !document.getElementById("f2fh").value
             ) {
                 alert("Please fill out all relevant fields");
                 return;
@@ -694,27 +716,26 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
 
 
     const [price, setPrice] = useState(null);
-    const [stabilizer, setStabilizer] = useState(null);
+    const [stabilizer, setStabilizer] = useState("yes");
     const calcPrice = () => {
-        if (!document.getElementById('f2fw').value
-        || !document.getElementById('f2fh').value
+        if (!f2fhTotal || !f2fwTotal
         || !opFunction || !lined){
             alert("Please fill out all relevant fields");
             return;
         }
-        const width = Number(document.getElementById('f2fw').value) + Number(f2fw);
-        let height = Number(document.getElementById('f2fh').value) + Number(f2fh);
+        const width = f2fwTotal;
+        let height = f2fhTotal
         if (mount === "outside"){//outside
-            if (!document.getElementById('abvf').value){
+            if (abvfTotal == null){
                 alert("Please fill out all relevant fields");
                 return;
             }
-            height += Number(document.getElementById('abvf').value) + Number(abvf);
+            height += abvfTotal;
         }
         let sqFootage = width * height;
         
         sqFootage = Math.ceil(sqFootage / 144);
-        const basePrice = sqFootage * Number(linings[lined]);
+        const basePrice = sqFootage * getLiningPrice(lined);
         let addPrice = 0;
         if (opFunction === "cordlock" || opFunction === "lift"){
             if (!stabilizer){
@@ -894,6 +915,20 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                     </>
 
                     <div className="form-section">
+                        <h4>Are you using COM material?</h4>
+                        <div>
+                            <label className="radio-label">
+                                <input type='radio' name='COM'
+                                value={'yes'} onChange={handleCom}></input>
+                                Yes
+                            </label>
+                            <label className="radio-label">
+                                <input type='radio' name='COM'
+                                value={'no'} onChange={handleCom}></input>
+                                No (you will purchase your material from Plaza Park Interiors)
+                            </label>
+                        </div><br />
+
                         <h4>Main Fabric specifications: <small>Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.</small></h4>
                         
                         {/* <label>What units are the measurements in?</label>
@@ -907,44 +942,69 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                         <br />
                         */}
                         <div className='row dimensions-section'>
-                            <div className='column'>
+                        <div className='column'>
+                            <label>
+                                Width:
+                                <br />
+                                <input type='number' id='mainwidth' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                            </label>
+                            {units2 === 'in' && <>
+                                <Dropdown
+                                value={mainWidth}
+                                change={handleMainWidth}
+                                ></Dropdown>
+                            </>}
+                        </div><br />
+                        <div className='column'>
+                            <label>
+                                Vertical repeat:
+                                <br />
+                                <input type='number' id='mainvert' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                            </label>
+                            {units2 === 'in' && <>
+                                <Dropdown
+                                value={mainVertical}
+                                change={handleMainVertical}
+                                ></Dropdown>
+                            </>}
+                        </div><br />
+                        <div className='column'>
+                            <label>
+                                Horizontal repeat:
+                                <br />
+                                <input type='number' id='mainhorizontal' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                            </label>
+                            {units2 === 'in' && <>
+                                <Dropdown
+                                value={mainHorizontal}
+                                change={handleMainHorizontal}
+                                ></Dropdown>
+                            </>}
+                        </div>
+                        </div>
+                        <div className='row dimensions-section'>
+                            <div className='column'> 
+                            <label>
+                                Vendor:
+                                <br />
+                                <input type='text' id='mainvendor' className='fixed-width-input'></input>
+                            </label>
+                            <br />
+                            </div>
+                            <div className='column'> 
                                 <label>
-                                    Width:
+                                    Pattern name & number:
                                     <br />
-                                    <input type='number' id='mainwidth' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                                    <input type='text' id='mainpattern' className='fixed-width-input'></input>
                                 </label>
-                                {units2 === 'in' && <>
-                                    <Dropdown
-                                    value={mainWidth}
-                                    change={handleMainWidth}
-                                    ></Dropdown>
-                                </>}
-                            </div><br />
-                            <div className='column'>
+                            </div>
+                            <br />
+                            <div className='column'> 
                                 <label>
-                                    Vertical repeat:
+                                    Link to fabric if available:
                                     <br />
-                                    <input type='number' id='mainvert' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                                    <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
                                 </label>
-                                {units2 === 'in' && <>
-                                    <Dropdown
-                                    value={mainVertical}
-                                    change={handleMainVertical}
-                                    ></Dropdown>
-                                </>}
-                            </div><br />
-                            <div className='column'>
-                                <label>
-                                    Horizontal repeat:
-                                    <br />
-                                    <input type='number' id='mainhorizontal' className='fixed-width-input' min="0" onInput={checkNum}></input>
-                                </label>
-                                {units2 === 'in' && <>
-                                    <Dropdown
-                                    value={mainHorizontal}
-                                    change={handleMainHorizontal}
-                                    ></Dropdown>
-                                </>}
                             </div>
                         </div>
                         <div className='row dimensions-section'>
@@ -1003,46 +1063,6 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
 
             {formSection === 2 && <div className="form-group-indent">
                 <h1>Roman Shade Materials</h1>
-                <div className="form-section">
-                    <h4>Are you using COM material?</h4>
-                    <div>
-                        <label className="radio-label">
-                            <input type='radio' name='COM'
-                            value={'yes'} onChange={handleCom}></input>
-                            Yes
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='COM'
-                            value={'no'} onChange={handleCom}></input>
-                            No (you will purchase your material from Plaza Park Interiors)
-                        </label>
-                    </div><br />
-                    <div className='row dimensions-section'>
-                        <div className='column'> 
-                        <label>
-                            Vendor:
-                            <br />
-                            <input type='text' id='mainvendor' className='fixed-width-input'></input>
-                        </label>
-                        <br />
-                        </div>
-                        <div className='column'> 
-                            <label>
-                                Pattern name & number:
-                                <br />
-                                <input type='text' id='mainpattern' className='fixed-width-input'></input>
-                            </label>
-                        </div>
-                        <br />
-                        <div className='column'> 
-                            <label>
-                                Link to fabric if available:
-                                <br />
-                                <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
-                            </label>
-                        </div>
-                    </div>
-                </div>
                 <div className='form-section'> 
                     <div className='row dimensions-section'>
                         <div className='column'>
@@ -1075,7 +1095,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                             {opFunction === 'lift' && <div>
                                 <h4>Lift Options</h4>
                                 <label>
-                                    <input name='lift-color' type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Steel")}}></input>
+                                    <input name='lift-color' defaultChecked={true} type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Steel")}}></input>
                                     Stainless Steel (standard)
                                 </label> <br />
                                 <label>
@@ -1111,14 +1131,14 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                             </div>}
                             {(opFunction === "cordlock") && <div>
                                 <h4>Stabilizer Bars</h4>
-                                <label><input type="radio" name='stablizer' onChange={() => setStabilizer("yes")}/> Yes</label>
+                                <label><input type="radio" defaultChecked={true} name='stablizer' onChange={() => setStabilizer("yes")}/> Yes</label>
                                 <br /><label><input type="radio" name='stablizer' onChange={() => setStabilizer("no")}/> No</label>
                             </div>}
                         </div>
                         <div className='column'>
                             {(opFunction === "lift") && <div>
                                 <h4>Stabilizer Bars</h4>
-                                <label><input type="radio" name='stablizer' onChange={() => setStabilizer("yes")}/> Yes</label>
+                                <label><input type="radio" defaultChecked={true} name='stablizer' onChange={() => setStabilizer("yes")}/> Yes</label>
                                 <br /><label><input type="radio" name='stablizer' onChange={() => setStabilizer("no")}/> No</label>
                             </div>}
                             {opFunction === "motorized" && <div>
@@ -1213,7 +1233,10 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                             French Blackout = Face fabric + 3 layered linings
                             </label>
                         </div>
-                        <div className='column'></div>
+                        <div className='column'>
+                            <button className='button-other' onClick={() => {calcPrice()}}>Calculate Price</button> 
+                            <br />{price}
+                        </div>
                     </div>
                     
                     
@@ -1228,6 +1251,39 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
 
             {formSection === 3 && <div className='form-group-indent'>
                 <h1>Review & Submit</h1><br />
+
+                <div className="form-section">
+                    <div className='row dimensions-section'>
+                        <div className='column'>
+                            Frame to frame width: {f2fwTotal}  <br />
+                            Frame to frame height: {f2fhTotal}  <br />
+                            {mount === 'outside' && <>
+                                How far above frame: {abvfTotal} <br />
+                            </>}
+                            Mounting type: {mount}<br />
+                            Type of Roman: {type}<br />
+                        </div>
+                        <div className='column'>
+                            COM material: {com ==='yes' ? 'Yes' : 'No'}<br />
+                            Main fabric width: {mainWidth || 54}  <br />
+                            Main fabric vertical repeat: {mainVertical || 0}  <br />
+                            Main fabric horizontal repeat: {mainHorizontal || 0} <br />
+                            Lining type: {lined}<br />
+                            
+                        </div>
+                    </div>
+                </div>
+                <div className='form-section'>
+                    <div className='row dimensions-section'>
+                        <div className='column'>
+                            Yardage required: {yardage} yards<br />
+
+                        </div>
+                        <div className='column'>
+                            Price estimate: {price}<br />
+                        </div>
+                    </div>
+                </div>
                 <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
             </div> }
 

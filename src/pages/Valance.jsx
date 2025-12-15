@@ -368,6 +368,19 @@ const Valance = ({pname, name, address, email, room, numWindow, uploads, estName
                 </div>
         
                 <div className="form-section">
+                    <h4>Are you using COM material?</h4>
+                    <div>
+                        <label className="radio-label">
+                            <input type='radio' name='COM'
+                            value={'yes'} onChange={handleCom}></input>
+                            Yes
+                        </label>
+                        <label className="radio-label">
+                            <input type='radio' name='COM'
+                            value={'no'} onChange={handleCom}></input>
+                            No (you will purchase your material from Plaza Park Interiors)
+                        </label>
+                    </div>
                     <h4>Main Fabric specifications: <small>Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.</small></h4>
                     
                     {/* <label>What units are the measurements in?</label>
@@ -419,6 +432,31 @@ const Valance = ({pname, name, address, email, room, numWindow, uploads, estName
                                 change={handleMainHorizontal}
                                 ></Dropdown>
                             </>}
+                        </div>
+                    </div>
+                    <div className='row dimensions-section'>
+                        <div className='column'> 
+                        <label>
+                            Vendor:
+                            <br />
+                            <input type='text' id='mainvendor' className='fixed-width-input'></input>
+                        </label>
+                        <br />
+                        </div>
+                        <div className='column'> 
+                            <label>
+                                Pattern name & number:
+                                <br />
+                                <input type='text' id='mainpattern' className='fixed-width-input'></input>
+                            </label>
+                        </div>
+                        <br />
+                        <div className='column'> 
+                            <label>
+                                Link to fabric if available:
+                                <br />
+                                <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
+                            </label>
                         </div>
                     </div>
                     <div className='row dimensions-section'>
@@ -507,6 +545,9 @@ const Valance = ({pname, name, address, email, room, numWindow, uploads, estName
                                     No
                             </label><br></br>
                             
+                        </div>
+                        <div className='column'>
+                            <button className='button-other' onClick={() => {alert("Feature not implemented")}}>Calculate Price</button>
                         </div>
                     </div>
                 </div>

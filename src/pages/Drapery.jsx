@@ -4,7 +4,7 @@ import '../styles.css'
 
 const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName, formSection, handleFormSection}) => {
     const[windowImg, setWindowImg] = useState(null);
-    const[stationary, setStationary] = useState(false);
+    const[stationary, setStationary] = useState('false');
     const[lined, setLined] = useState('');
     const[pleat, setPleat] = useState('2top');
     const[ripplePercent, setRipplePercent] = useState('');
@@ -37,21 +37,34 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         { label: '7/8', value: '.875' }
     ];
 
-    const linings = {
-        "Unlined": 145.0,
-        "Sheer": 155.0,
-        'Lightweight Light Filter': 175.0,
-        'Light Filter': 175.0,
-        'Blackout': 210.0,
-        'Napped Sateen': 185.0,
-        'Lined and Standard Interlined': 245.0,
-        'Lined and Bump Interlined': 275.0,
-        'Self-Lined': 165.0,
-        'Self-Lined and Blackout': 255.0,
-        'Self-Lined and Standard Interlined': 225.0,
-        'Self-Lined and Bump Interlined': 265.0,
-        'French Blackout': 285.0
+    const [linings, setLinings] = useState();
+    useEffect(() => {
+        fetch('https://script.google.com/macros/s/AKfycbxPB_2UsBjeXSeMmpmraXDAmu5Q1lJ6GX_vB6eoeqjrPflKnsLhN6VxF4wkJlBYUPRL1w/exec', {method: "GET"})
+        .then(response => response.json()).then(
+            data => {
+                console.log(data);
+                console.log(typeof data.msg, data.msg);
+                console.log(typeof data.msg[0], data.msg[0]);
+                setLinings({
+                    'Unlined': data.msg[0][1],
+                    'Self-Lined': data.msg[0][2],
+                    'Light Filtering': data.msg[0][3],
+                    'Sheer': data.msg[0][4],
+                    'Blackout': data.msg[0][5],
+                    'Lined & Standard Interlined': data.msg[0][6],
+                    'Other': data.msg[0][7], //Lined and bump, and all self-lined with other options
+                    'French Blackout': data.msg[0][8],
+                })
+            });
+    }, []);
+
+    const getLiningPrice = (lining) => {
+        if (lining in linings){ return linings[lining]; }
+        else if (lining.includes("Light") || lining ==='Napped Sateen'){ return linings['Light Filtering']; }
+        else {return linings['Other'];}
     }
+
+    
 
     const handleImageUpload = (event) => {
         if (event.target.files.length > 5){
@@ -97,6 +110,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
 
     const [f2fw, f2fwc] = useState('');
     const [f2fh, f2fhc] = useState('');
+    const [f2fwTotal, setF2fwTotal] = useState(null);
+    const [f2fhTotal, setF2fhTotal] = useState(null);
     const [abvf, abvfc] = useState('');
     const [bsill, bsillc] = useState('');
     const [mountabvf, mountabvfc] = useState('');
@@ -319,10 +334,15 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
 
     const calcYardage = () => {
         let yardage;
+        if (document.getElementById('f2fh').value && document.getElementById('f2fw').value){
+            setF2fhTotal(Number(document.getElementById('f2fh').value) + Number(f2fh));
+            setF2fwTotal(Number(document.getElementById('f2fw').value) + Number(f2fw));
+            console.log('setTotals')
+        }
         if(pleat === 'ripple'){
-            if ( !document.getElementById('f2fh').value
-            || !document.getElementById('f2fw').value ){
-                alert("Please fill out all relevant fields");
+            if ( !document.getElementById('f2fh')
+            || !document.getElementById('f2fw') ){
+                alert("Please fill rod width and height fields");
                 return;
             }
             let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
@@ -356,10 +376,10 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 if (stationary === 'true'){
                     //up the bolt, stationary, no vertical repeat
                     if(Number(document.getElementById('mainvert').value) === 0 && Number(mainVertical) === 0){
-                        if (!document.getElementById('wpp').value
-                        || !document.getElementById('f2fh').value
-                        || !document.getElementById('f2fw').value){
-                            alert("Please fill out all relevant fields");
+                        if (!document.getElementById('wpp')
+                        || !document.getElementById('f2fh')
+                        || !document.getElementById('f2fw')){
+                            alert("Please fill rod width, height, and panel width fields");
                             return;
                         }
                         let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
@@ -372,12 +392,12 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     }
                     //up the bolt, stationary, with vertical repeat
                     else{
-                        if (!document.getElementById('wpp').value
-                        ||!document.getElementById('f2fh').value
-                        || !document.getElementById('f2fw').value
-                        || !document.getElementById('mainvert').value
+                        if (!document.getElementById('wpp')
+                        ||!document.getElementById('f2fh')
+                        || !document.getElementById('f2fw')
+                        || !document.getElementById('mainvert')
                         ){
-                            alert("Please fill out all relevant fields");
+                            alert("Please fill rod width, height, vertical repeat and panel width fields");
                             return;
                         }
                         const repeats = Math.ceil((Number(f2fh) +  Number(document.getElementById('f2fh').value) + 20.0) / (Number(mainVertical) + Number(document.getElementById('mainvert').value)));
@@ -393,11 +413,11 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 }
                 //up the bolt, functional
                 else if (stationary === 'false') {
-                    if (!document.getElementById('f2fh').value
-                    || !document.getElementById('f2fw').value
+                    if (!document.getElementById('f2fh')
+                    || !document.getElementById('f2fw')
                     || !fullness 
                     ){
-                        alert("Please fill out all relevant fields");
+                        alert("Please fill rod width and height fields");
                         return;
                     }
                     const cw = 14.0 + (Number(document.getElementById('f2fw').value)+Number(f2fw)) * Number(fullness);
@@ -430,11 +450,11 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             else{
                 //functional
                 if (stationary === 'false') {
-                    if (!document.getElementById('f2fh').value
-                    || !document.getElementById('f2fw').value
+                    if (!document.getElementById('f2fh')
+                    || !document.getElementById('f2fw')
                     || !fullness
                     ){
-                        alert("Please fill out all relevant fields");
+                        alert("Please fill rod width and height fields");
                         return;
                     }
                     let cw = 14.0 + (Number(document.getElementById('f2fw').value)+ Number(f2fw)) * Number(fullness);
@@ -451,11 +471,11 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 }
                 //stationary
                 else{
-                    if (!document.getElementById('wpp').value
-                    || !document.getElementById('f2fh').value
+                    if (!document.getElementById('wpp')
+                    || !document.getElementById('f2fh')
                     || !panels
                     ){
-                        alert("Please fill out all relevant fields");
+                        alert("Please fill width per panel and height fields");
                         return;
                     }
                     let fabWidth = Number(mainWidth) + Number(document.getElementById('mainwidth').value);
@@ -472,6 +492,49 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         }
     }
 
+    // // Automatically calculate yardage when the relevant inputs are filled.
+    // useEffect(() => {
+    //     // Grab DOM inputs used by calcYardage
+    //     const f2fwEl = document.getElementById('f2fw');
+    //     const f2fhEl = document.getElementById('f2fh');
+    //     const wppEl = document.getElementById('wpp');
+    //     const mainvertEl = document.getElementById('mainvert');
+
+    //     // If required DOM elements are not yet mounted, do nothing
+    //     if (!f2fwEl || !f2fhEl) return;
+
+    //     const f2fwVal = f2fwEl.value;
+    //     const f2fhVal = f2fhEl.value;
+
+    //     // Basic requirement: f2fw and f2fh must have values for most calculations
+    //     if (!f2fwVal || !f2fhVal) return;
+
+    //     if (mainrailroad === '') return;
+
+    //     // Additional required checks for some branches:
+    //     // - stationary up-the-bolt case needs wpp
+    //     if (pleat !== 'ripple' && mainrailroad === 'false' && stationary === 'true') {
+    //         if (!wppEl || !wppEl.value) return;
+    //     }
+
+    //     // - vertical repeat related calculations can require mainvert when specified;
+    //     //   avoid auto-calc until user supplies a value if a repeat is expected
+    //     // if (mainvertEl && mainvertEl.value === '' && mainVertical && Number(mainVertical) > 0) {
+    //     //     return;
+    //     // }
+
+    //     // All minimal checks passed -> calculate
+    //     calcYardage();
+    // }, [
+    //     pleat,
+    //     f2fw, f2fh,          // fraction state
+    //     panels,
+    //     stationary,
+    //     fullness,
+    //     mainWidth, mainVertical, mainHorizontal,
+    //     mainrailroad
+    // ]);
+
     const [banding, setBanding] = useState(false);
     const [bandingType, setBandingType] = useState(null);
 
@@ -483,15 +546,35 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
 
     const [price, setPrice] = useState(null);
     const calcPrice = () => {
-        if (!fullness || !document.getElementById("f2fw").value || !document.getElementById("f2fh").value
+
+        if (!fullness) {
+        console.log("Missing: fullness");
+        }
+
+        if (!f2fwTotal) {
+        console.log("Missing: width (f2fw)");
+        }
+
+        if (!f2fhTotal) {
+        console.log("Missing: height (f2fh)");
+        }
+
+        if (!lined) {
+        console.log("Missing: lining selection");
+        }
+
+        if (!pleat) {
+        console.log("Missing: pleat selection");
+        }
+        if (!fullness || !f2fhTotal || !f2fwTotal
         || !lined || !pleat){
             alert("Please fill out all relevant fields");
             return;
         }
-        const width = Number(document.getElementById('f2fw').value) + Number(f2fw);
-        let height = Number(document.getElementById('f2fh').value) + Number(f2fh);
+        const width = f2fwTotal;
+        let height = f2fhTotal;
         const widths = Math.ceil((width) * fullness / 54.0);
-        let costPerWidth = linings[lined];
+        let costPerWidth = getLiningPrice(lined);
         if (pleat === "ripple") {costPerWidth += 15;}
         const basePrice = widths * costPerWidth;
         let bandingPrice = 0;
@@ -580,7 +663,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                                 </label>
                             </div>}
                             <label className="radio-label">
-                                <input type='radio' name='stationary'
+                                <input type='radio' name='stationary' defaultChecked={true}
                                 value={'false'} onChange={handleStationaryChange}></input>
                                 No (if no, they will be fully functioning)
                             </label>
@@ -671,6 +754,19 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 </div>
 
                 <div className="form-section">
+                    <h4>Are you using COM material?</h4>
+                    <div>
+                        <label className="radio-label">
+                            <input type='radio' name='COM'
+                            value={'yes'} onChange={handleCom}></input>
+                            Yes
+                        </label>
+                        <label className="radio-label">
+                            <input type='radio' name='COM'
+                            value={'no'} onChange={handleCom}></input>
+                            No (you will purchase your material from Plaza Park Interiors)
+                        </label>
+                    </div><br />
                     <h4>Main Fabric specifications: <small>Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.</small></h4>
                     
                     {/* <label>What units are the measurements in?</label>
@@ -725,6 +821,31 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         </div>
                     </div>
                     <div className='row dimensions-section'>
+                        <div className='column'> 
+                        <label>
+                            Vendor:
+                            <br />
+                            <input type='text' id='mainvendor' className='fixed-width-input'></input>
+                        </label>
+                        <br />
+                        </div>
+                        <div className='column'> 
+                            <label>
+                                Pattern name & number:
+                                <br />
+                                <input type='text' id='mainpattern' className='fixed-width-input'></input>
+                            </label>
+                        </div>
+                        <br />
+                        <div className='column'> 
+                            <label>
+                                Link to fabric if available:
+                                <br />
+                                <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
+                            </label>
+                        </div>
+                    </div>
+                    <div className='row dimensions-section'>
                         <div className='column'>
                             <h4>Embellishments</h4>
                             <div>
@@ -768,56 +889,17 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         </div>
                         <div className='column'>
                             <button className='button-other' onClick={() => {calcYardage()}}>Calculate yardage</button>
-                            {yardage} <br />
+                            <br />{yardage}
                         </div>
                     </div>
                 </div><br />
+
                 <button className="next-button" onClick={() => handleFormSection(prev => prev + 1)}>Next</button>
                 <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
             </div> }
             
             {formSection === 2 && <div className='form-group-indent'>
-                <h1>Drapery Material</h1>
-                <div className="form-section">
-                    <h4>Are you using COM material?</h4>
-                    <div>
-                        <label className="radio-label">
-                            <input type='radio' name='COM'
-                            value={'yes'} onChange={handleCom}></input>
-                            Yes
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='COM'
-                            value={'no'} onChange={handleCom}></input>
-                            No (you will purchase your material from Plaza Park Interiors)
-                        </label>
-                    </div><br />
-                    <div className='row dimensions-section'>
-                        <div className='column'> 
-                        <label>
-                            Vendor:
-                            <br />
-                            <input type='text' id='mainvendor' className='fixed-width-input'></input>
-                        </label>
-                        <br />
-                        </div>
-                        <div className='column'> 
-                            <label>
-                                Pattern name & number:
-                                <br />
-                                <input type='text' id='mainpattern' className='fixed-width-input'></input>
-                            </label>
-                        </div>
-                        <br />
-                        <div className='column'> 
-                            <label>
-                                Link to fabric if available:
-                                <br />
-                                <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
-                            </label>
-                        </div>
-                    </div>
-                </div>
+                <h1>Drapery Material</h1> 
 
                 <div className="form-section">
                     <div className='row dimensions-section'> 
@@ -891,7 +973,10 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             French Blackout = Face fabric + 3 layered linings
                             </label>
                         </div>
-                        <div className='column'></div>
+                        <div className='column'>
+                            <button className='button-other' onClick={() => {calcPrice()}}>Calculate Price</button>
+                            <br />{price}
+                        </div>
                     </div>
                     
                     
@@ -904,6 +989,38 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
 
             {formSection === 3 && <div className='form-group-indent'>
                 <h1>Review & Submit</h1><br />
+
+                <div className="form-section">
+                    <div className='row dimensions-section'>
+                        <div className='column'>
+                            Frame to frame width: {f2fwTotal}  <br />
+                            Frame to frame height: {f2fhTotal}  <br />
+                            Number of panels: {panels}<br />
+                            Stationary: {stationary ==='true' ? 'Yes' : 'No'}<br />
+                            Pleat style: {pleat ==='other' ? document.getElementById('pleat_other').value : pleat}<br />
+                            Fullness: {fullness}<br />
+                        </div>
+                        <div className='column'>
+                            COM material: {com ==='yes' ? 'Yes' : 'No'}<br />
+                            Main fabric width: {mainWidth || 54}  <br />
+                            Main fabric vertical repeat: {mainVertical || 0}  <br />
+                            Main fabric horizontal repeat: {mainHorizontal || 0} <br />
+                            Lining type: {lined}<br />
+                            
+                        </div>
+                    </div>
+                </div>
+                <div className='form-section'>
+                    <div className='row dimensions-section'>
+                        <div className='column'>
+                            Yardage required: {yardage} yards<br />
+
+                        </div>
+                        <div className='column'>
+                            Price estimate: {price}<br />
+                        </div>
+                    </div>
+                </div>
                 <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
             </div> 
 

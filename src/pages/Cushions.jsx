@@ -398,79 +398,87 @@ const Cushions = ({pname, name, address, email, estName, formSection, handleForm
 
             <div className='form-section'>
                 <div className='row dimensions-section'>
+                    <h4>Are you using COM material?</h4>
+                    <div>
+                        <label className="radio-label">
+                            <input type='radio' name='COM'
+                            value={'yes'} onChange={handleCom}></input>
+                            Yes
+                        </label>
+                        <label className="radio-label">
+                            <input type='radio' name='COM'
+                            value={'no'} onChange={handleCom}></input>
+                            No (you will purchase your material from Plaza Park Interiors)
+                        </label>
+                    </div><br /> 
+
                     <h4>Main Fabric specifications: <small>Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.</small></h4>
 
                     <div className='row dimensions-section'>
-                        <div className='column'>
-                            <label>
-                                Width:
-                                <br />
-                                <input type='number' id='mainwidth' className='fixed-width-input' min="0" onInput={checkNum}></input>
-                            </label>
-                            {units2 === 'in' && <>
-                                <Dropdown
-                                value={mainWidth}
-                                change={handleMainWidth}
-                                ></Dropdown>
-                            </>}
-                        </div><br />
-                        <div className='column'>
-                            <label>
-                                Vertical repeat:
-                                <br />
-                                <input type='number' id='mainvert' className='fixed-width-input' min="0" onInput={checkNum}></input>
-                            </label>
-                            {units2 === 'in' && <>
-                                <Dropdown
-                                value={mainVertical}
-                                change={handleMainVertical}
-                                ></Dropdown>
-                            </>}
-                        </div><br />
-                        <div className='column'>
-                            <label>
-                                Horizontal repeat:
-                                <br />
-                                <input type='number' id='mainhorizontal' className='fixed-width-input' min="0" onInput={checkNum}></input>
-                            </label>
-                            {units2 === 'in' && <>
-                                <Dropdown
-                                value={mainHorizontal}
-                                change={handleMainHorizontal}
-                                ></Dropdown>
-                            </>}
-                        </div>
-                    </div>
                     <div className='column'>
-                        Edge detail (please select one):
-                        <br /><label>
-                            <input type='radio' name='edge' value={'Knife'}
-                            style={{marginRight: '5px'}} onChange={handleEdge}></input>
-                            Knife edge (no detail)
+                        <label>
+                            Width:
+                            <br />
+                            <input type='number' id='mainwidth' className='fixed-width-input' min="0" onInput={checkNum}></input>
                         </label>
-                        <br /><label>
-                            <input type='radio' name='edge' value={'Welt'}
-                            style={{marginRight: '5px'}} onChange={handleEdge}></input>
-                            Welt
-                        </label>
-                        {edge === 'Welt' && 
-                        <>
-                            <br /><label style={{marginLeft:'25px'}}>
-                                <input type='radio' name='welt' value={'Self-welt'} defaultChecked={true}
-                                style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
-                                Self-welt
-                            </label>
-                            <br /><label style={{marginLeft:'25px'}}>
-                                <input type='radio' name='welt' value={'Contrast Welt'}
-                                style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
-                                Contrast Welt
-                            </label>
-                            <br /><label style={{marginLeft:'25px'}}>
-                                <input type='radio' name='welt' value={'Cord/trim'}
-                                style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
-                                Cord / trim with lip
-                            </label>
+                        {units2 === 'in' && <>
+                            <Dropdown
+                            value={mainWidth}
+                            change={handleMainWidth}
+                            ></Dropdown>
                         </>}
+                    </div><br />
+                    <div className='column'>
+                        <label>
+                            Vertical repeat:
+                            <br />
+                            <input type='number' id='mainvert' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                        </label>
+                        {units2 === 'in' && <>
+                            <Dropdown
+                            value={mainVertical}
+                            change={handleMainVertical}
+                            ></Dropdown>
+                        </>}
+                    </div><br />
+                    <div className='column'>
+                        <label>
+                            Horizontal repeat:
+                            <br />
+                            <input type='number' id='mainhorizontal' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                        </label>
+                        {units2 === 'in' && <>
+                            <Dropdown
+                            value={mainHorizontal}
+                            change={handleMainHorizontal}
+                            ></Dropdown>
+                        </>}
+                    </div>
+                    </div>
+                    <div className='row dimensions-section'>
+                        <div className='column'> 
+                        <label>
+                            Vendor:
+                            <br />
+                            <input type='text' id='mainvendor' className='fixed-width-input'></input>
+                        </label>
+                        <br />
+                        </div>
+                        <div className='column'> 
+                            <label>
+                                Pattern name & number:
+                                <br />
+                                <input type='text' id='mainpattern' className='fixed-width-input'></input>
+                            </label>
+                        </div>
+                        <br />
+                        <div className='column'> 
+                            <label>
+                                Link to fabric if available:
+                                <br />
+                                <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
+                            </label>
+                        </div>
                     </div>
                     <div className='column'>
                         <h4>How are we running the fabric?</h4>
@@ -501,22 +509,8 @@ const Cushions = ({pname, name, address, email, estName, formSection, handleForm
             <div className="form-section">
                 <div className='row dimensions-section'>
                     <div className='column'>
-                        <h4>Are you using COM material?</h4>
-                        <label className="radio-label">
-                            <input type='radio' name='COM'
-                            value={'yes'} onChange={handleCom}></input>
-                            Yes
-                        </label>
-                        <label className="radio-label">
-                            <input type='radio' name='COM'
-                            value={'no'} onChange={handleCom}></input>
-                            No (you will purchase your material from Plaza Park Interiors)
-                        </label>
-                    </div>
-                    <div className='column'>
                         <div>
-                            Insert (please select one)
-                            <br />
+                            <h4>Insert (please select one)</h4>
                             <label>
                                 <input type='radio' style={{marginRight:'5px'}} 
                                 value='Cover only' onClick={handleInsert} name='insert'></input>
@@ -571,31 +565,40 @@ const Cushions = ({pname, name, address, email, estName, formSection, handleForm
                             </div>}
                         </div><br />
                     </div>
-                </div>
-                
-                <div className='row dimensions-section'>
-                    <div className='column'> 
-                    <label>
-                        Vendor:
-                        <br />
-                        <input type='text' id='mainvendor' className='fixed-width-input'></input>
-                    </label>
-                    <br />
-                    </div>
-                    <div className='column'> 
+
+                    <div className='column'>
+                        <h4>Edge detail (please select one):</h4>
                         <label>
-                            Pattern name & number:
-                            <br />
-                            <input type='text' id='mainpattern' className='fixed-width-input'></input>
+                            <input type='radio' name='edge' value={'Knife'}
+                            style={{marginRight: '5px'}} onChange={handleEdge}></input>
+                            Knife edge (no detail)
                         </label>
+                        <br /><label>
+                            <input type='radio' name='edge' value={'Welt'}
+                            style={{marginRight: '5px'}} onChange={handleEdge}></input>
+                            Welt
+                        </label>
+                        {edge === 'Welt' && 
+                        <>
+                            <br /><label style={{marginLeft:'25px'}}>
+                                <input type='radio' name='welt' value={'Self-welt'} defaultChecked={true}
+                                style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
+                                Self-welt
+                            </label>
+                            <br /><label style={{marginLeft:'25px'}}>
+                                <input type='radio' name='welt' value={'Contrast Welt'}
+                                style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
+                                Contrast Welt
+                            </label>
+                            <br /><label style={{marginLeft:'25px'}}>
+                                <input type='radio' name='welt' value={'Cord/trim'}
+                                style={{marginRight: '5px'}} onChange={handleEdgeOther}></input>
+                                Cord / trim with lip
+                            </label>
+                        </>}
                     </div>
-                    <br />
-                    <div className='column'> 
-                        <label>
-                            Link to fabric if available:
-                            <br />
-                            <input type='href' id='mainlink' placeholder=' ' className='fixed-width-input'></input>
-                        </label>
+                    <div className='column'>
+                        <button className='button-other' onClick={() => {alert("Feature not implemented")}}>Calculate Price</button>
                     </div>
                 </div>
             </div>
