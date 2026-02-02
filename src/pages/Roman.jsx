@@ -130,6 +130,12 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
         return Math.ceil(shadeHeight / 8) * 5;
     };
 
+    // Yardage calculation constants
+    const panelHeightAdditionLondon = 24.0; // for London
+    const panelHeightAdditionStandard = 20.0; // for standard
+    const cutWidthAddition = 6.0; // for standard and London
+    const cutWidthAdditionOutside = 4.0;
+
     const [yardage, setYardage] = useState(null);
     const calcYardage = () => {
         if (mainrailroad === "true") {
@@ -145,7 +151,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
             // --- Railroaded Fabrics ---
             if (type === "London") {
                 let panelHeight =
-                    24.0 + Number(f2fhFrac) + Number(f2fh);
+                    panelHeightAdditionLondon + Number(f2fhFrac) + Number(f2fh);
                 if (mount === "Outside") {
                     panelHeight += Number(abvfFrac) + Number(abvf);
                 }
@@ -157,7 +163,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                 }
 
                 // Width + pleats for London
-                let cutWidth = 6.0 + Number(f2fwFrac) + Number(f2fw);
+                let cutWidth = cutWidthAddition + Number(f2fwFrac) + Number(f2fw);
                 let pleats = Number(document.getElementById("London-pleats").value);
                 if (!pleats || pleats <= 0) pleats = 1;
                 cutWidth += 12 * pleats;
@@ -172,7 +178,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
             } else {
                 // Non-London (standard) railroaded
                 let panelHeight =
-                    20.0 + Number(f2fhFrac) + Number(f2fh);
+                    panelHeightAdditionStandard + Number(f2fhFrac) + Number(f2fh);
                 if (mount === "Outside") {
                     panelHeight += Number(abvfFrac) + Number(abvf);
                 }
@@ -188,7 +194,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                     return;
                 }
 
-                let cutWidth = 6.0 + Number(f2fwFrac) + Number(f2fw);
+                let cutWidth = cutWidthAddition + Number(f2fwFrac) + Number(f2fw);
                 if (cutWidth % 18 !== 0) {
                     cutWidth += 18 - (cutWidth % 18);
                 }
@@ -219,7 +225,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                 const widths = Math.ceil(cutWidth / check);
 
                 // --- Height ---
-                const baseAdd = type === "London" ? 24.0 : 20.0;
+                const baseAdd = type === "London" ? panelHeightAdditionLondon : panelHeightAdditionStandard;
                 let cutLength = baseAdd + Number(f2fhFrac) + Number(f2fh);
 
                 const yardDiff = cutLength % 9;
@@ -242,7 +248,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
 
                 // --- Width + Pleats ---
                 let cutWidth =
-                    4.0 + Number(document.getElementById("f2fw").value) + Number(f2fw);
+                    cutWidthAdditionOutside + Number(document.getElementById("f2fw").value) + Number(f2fw);
                 if (type === "London"){
                     let pleats = Number(document.getElementById("London-pleats").value);
                     if (!pleats || pleats <= 0) pleats = 1;
@@ -278,7 +284,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
             }
 
             // --- Repeats calculation ---
-            const baseAdd = type === "London" ? 24.0 : 20.0;
+            const baseAdd = type === "London" ? panelHeightAdditionLondon : panelHeightAdditionStandard;
             let repeats;
             if (mount === "Outside") {
                 repeats = Math.ceil(

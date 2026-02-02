@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../styles.css'
 
 const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName, formSection, handleFormSection}) => {
@@ -123,6 +123,13 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
     const handlef2fwFrac = (e) => {f2fwFracC(e.target.value);};
     const handlef2fhFrac = (e) => {f2fhFracC(e.target.value);};
 
+
+    // Yardage calculation constants
+    const panelAddition = 7.0;
+    const cutLengthAdditionOther= 14.0;
+    const cutLengthAddition = 20.0;
+
+
     const calcYardage = () => {
         let yardage;
         if(pleat === 'Ripplefold'){
@@ -132,13 +139,13 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             }
             let fabWidth = Number(mainWidth) + Number(mainWidth2);
             let rw = Number(f2fw) + Number(f2fwFrac);
-            if (panels == 2){
+            if (panels === 2){
                 rw = rw / 2;
             }
-            let pw = rw * Number(fullness) + 7; //change to be 7 for one panel, 14 for two panel
-            if (panels == 2) pw += 7;
+            let pw = rw * Number(fullness) + panelAddition; //change to be 7 for one panel, 14 for two panel
+            if (panels === 2) pw += panelAddition;
             const widths = Math.ceil(pw / fabWidth);
-            const cl = 14.0 + Number(f2fh) + Number(f2fhFrac);
+            const cl = cutLengthAdditionOther + Number(f2fh) + Number(f2fhFrac);
             if(Number(mainVertical2) === 0 && Number(mainVertical) === 0){
                 let ypp = cl / 36;
                 yardage = ypp * widths;
@@ -150,7 +157,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                 cutYards += 9 - (cutYards % 9);
                 yardage = cutYards * widths;
             }
-            if (panels == 2){
+            if (panels === 2){
                 yardage *= 2;
             }
             setYardage(yardage);
@@ -168,8 +175,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             return;
                         }
                         let fabWidth = Number(mainWidth) + (Number(mainWidth2));
-                        if (fabWidth == 0){fabWidth = 54;}
-                        let cutYards = (20.0 + Number(f2fh) + Number(f2fh)) / 36;
+                        if (fabWidth === 0){fabWidth = 54;}
+                        let cutYards = (cutLengthAddition + Number(f2fh) + Number(f2fh)) / 36;
                         cutYards += 18 - (cutYards % 18);
                         const widths = (Number(f2fw) + Number(f2fwFrac)) / fabWidth;
                         setYardage(Number(wpp) * widths * Number(fullness) / cutYards);
@@ -185,12 +192,12 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             alert("Please fill rod width, height, vertical repeat and panel width fields");
                             return;
                         }
-                        const repeats = Math.ceil((Number(f2fh) + Number(f2fhFrac) + 20.0) / (Number(mainVertical) + Number(mainVertical2)));
+                        const repeats = Math.ceil((Number(f2fh) + Number(f2fhFrac) + cutLengthAddition) / (Number(mainVertical) + Number(mainVertical2)));
                         const cl = repeats * (Number(mainVertical) + Number(mainVertical2));
                         let cutYards = cl / 36;
                         cutYards += 9 - cutYards % 9;
                         let fw = (Number(mainWidth) + Number(mainWidth2));
-                        if (fw == 0){fw = 54;}
+                        if (fw === 0){fw = 54;}
                         const widths = (Number(f2fw) + Number(f2fwFrac)) / fw;
                         setYardage(Number(wpp) * widths * Number(fullness) / cutYards);
                         return;
@@ -205,7 +212,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         alert("Please fill rod width and height fields");
                         return;
                     }
-                    const cw = 14.0 + (Number(f2fw) + Number(f2fwFrac)) * Number(fullness);
+                    const cw = cutLengthAdditionOther + (Number(f2fw) + Number(f2fwFrac)) * Number(fullness);
                     let width = Number(mainWidth) + Number(mainWidth2)
                     let widths = cw / width;
                     widths = widths.toFixed(3);
@@ -218,10 +225,10 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     let cutYards;
                     //no vertical repeat
                     if(Number(mainVertical2) === 0 && Number(mainVertical) === 0){
-                        cutYards = (Number(f2fh) + Number(f2fhFrac) + 20.0) / 36;
+                        cutYards = (Number(f2fh) + Number(f2fhFrac) + cutLengthAddition) / 36;
                     }
                     else{
-                        const repeats = Math.ceil((Number(f2fh) + Number(f2fhFrac) + 20.0) / (Number(mainVertical) + Number(mainVertical2)));
+                        const repeats = Math.ceil((Number(f2fh) + Number(f2fhFrac) + cutLengthAddition) / (Number(mainVertical) + Number(mainVertical2)));
                         const cl = repeats * (Number(mainVertical) + Number(mainVertical2));
                         cutYards += 9 - cutYards % 9;
                         cutYards = cl / 36;
@@ -241,12 +248,12 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         alert("Please fill rod width and height fields");
                         return;
                     }
-                    let cw = 14.0 + (Number(f2fw) + Number(f2fwFrac)) * Number(fullness);
+                    let cw = cutLengthAdditionOther + (Number(f2fw) + Number(f2fwFrac)) * Number(fullness);
                     cw += 9 - cw % 9;
                     yardage = cw / 36;
                     let check = Number(f2fh) + Number(f2fhFrac);
-                    if (pleat === "Ripplefold"){check += 14}
-                    else{check += 20}
+                    if (pleat === "Ripplefold"){check += cutLengthAdditionOther}
+                    else{check += cutLengthAddition}
                     let fabWidth = Number(mainWidth) + Number(mainWidth2);
                     if (fabWidth === 0) {fabWidth = 54}
                     if (check > fabWidth){alert("Height is too much by " + (check-fabWidth)); 
@@ -269,8 +276,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     const widths = Number(wpp) / fabWidth;
                     const ypp = widths * 54 / 36;
                     let check = Number(f2fh) + Number(f2fhFrac);
-                    if (pleat === "Ripplefold"){check += 14}
-                    else{check += 20}
+                    if (pleat === "Ripplefold"){check += cutLengthAdditionOther}
+                    else{check += cutLengthAddition}
                     if (check > fabWidth){alert("Height is too much by " + (check-fabWidth)); return;}
                     setYardage(ypp * panels);
                 }
