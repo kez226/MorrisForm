@@ -1,35 +1,64 @@
 import React, { use, useEffect, useState } from 'react';
 import '../styles.css'
-//import .env;
 
 const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName, formSection, handleFormSection}) => {
-    const[windowImg, setWindowImg] = useState(null);
     const[stationary, setStationary] = useState('false');
-    const[lined, setLined] = useState('Unlined');
-    const[pleat, setPleat] = useState('2 Finger Top Tack');
     const[ripplePercent, setRipplePercent] = useState('60%');
+    const handleRipple = (event) => {setRipplePercent(event.target.value);}
+    const handleStationaryChange = (event) => {setStationary(event.target.value);}
+
+    // No handle function, the set functions are called directly
     const[fullness, setFullness] = useState(2);
-    const[hardware, setHardware] = useState('');
-    const[hardwareType, setHardwareType] = useState('');
-    const[hardwareDecorativeType, setHardwareDecorativeType] = useState('');
-    let ringType = '';
-    const[hardwired, setHardwired] = useState('');
-    const[homeAuto, setHomeAuto] = useState('');
-    const[com, setCom] = useState('yes');
-    const[mainrailroad, setMainRailroad] = useState('false');
-    const[contrastrailroad, setContrastRailroad] = useState('');
-    const[units1, setUnits1] = useState('in');
-    const[units2, setUnits2] = useState('in');
-    const[units3, setUnits3] = useState('in');
-    const[folderID, setFolderID] = useState(null);
     const[yardage, setYardage] = useState(0);
     const[panels, setPanels] = useState(1);
 
-    const [otherPleat, setOtherPleat] = useState('Other');
-    const handleOtherPleatChange = (event) => {
-        setOtherPleat(event.target.value);
+    const[pleat, setPleat] = useState('2 Finger Top Tack');
+    const handlePleatChange = (event) => {
+        // If we switch from ripplefold to another option, reset the fullness back to the default of 2
+        if(pleat === 'Ripplefold' && event.target.value !== 'Ripplefold'){
+            setFullness(2);
+        }
+        // If we switch to ripplefold, set the fullness to ripple default of 1.6 and ripple percent to 60%
+        else if (pleat !== 'Ripplefold' && event.target.value === 'Ripplefold'){
+            setFullness(1.6);
+            setRipplePercent('60%');
+        }
+        setPleat(event.target.value);
     }
-    
+
+    const[lined, setLined] = useState('Unlined');
+    const handleLinedChange = (event) => {setLined(event.target.value);}
+
+    const[com, setCom] = useState('yes');
+    const[mainrailroad, setMainRailroad] = useState('false');
+    const handleCom = (event) => {setCom(event.target.value);}
+    const handleMainRailroad = (event) => {setMainRailroad(event.target.value);}
+
+    // These are actually the fractional states but the names were not updated to reflect that
+    const [mainWidth, mainWidthChange] = useState(0);
+    const [mainVertical, mainVerticalChange] = useState(0);
+    const [mainHorizontal, mainHorizontalChange] = useState(0);
+
+    // This is the actual input for the main values
+    const [mainWidth2, mainWidthChange2] = useState(54);
+    const [mainVertical2, mainVerticalChange2] = useState(0);
+    const [mainHorizontal2, mainHorizontalChange2] = useState(0);
+
+    const handleMainWidth = (e) => {mainWidthChange(e.target.value);};
+    const handleMainVertical = (e) => {mainVerticalChange(e.target.value);};
+    const handleMainHorizontal = (e) => {mainHorizontalChange(e.target.value);};
+    // Defaults to 54 if empty as to not mess up yardage calculations
+    const handleMainWidth2 = (e) => {if(e.target.value !== '')mainWidthChange2(e.target.value); else mainWidthChange2(54);};
+    const handleMainVertical2 = (e) => {mainVerticalChange2(e.target.value);};
+    const handleMainHorizontal2 = (e) => {mainHorizontalChange2(e.target.value);};
+
+    // Widths per panel
+    const [wpp, setWpp] = useState(0);
+    const handleWppChange = (event) => {setWpp(event.target.value);}
+
+
+    // These are the fractions used for fractional inputs for different values
+    // They are passed to the below dropdown component to render and update the fraction states
     const fractions = [
         { label: '0', value: 0},
         { label: '1/8', value: .125 },
@@ -41,8 +70,20 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         { label: '7/8', value: .875 }
     ];
 
-    const [linings, setLinings] = useState(null);
+    const Dropdown =({ value, change}) => {
+        return(<>
+            <select value={value} onChange={(e) => change(e)} className="select-input fixed-width-input">
+                {fractions.map((fraction) => (
+                <option key={fraction.value} value={fraction.value}>
+                    {fraction.label}
+                </option>
+                ))}
+            </select>
+        </>)
+    }
 
+    // Linings represents the linings and their prices fetched from the Google Sheets script
+    const [linings, setLinings] = useState(null);
     useEffect(() => {
         fetch('https://script.google.com/macros/s/AKfycbxPB_2UsBjeXSeMmpmraXDAmu5Q1lJ6GX_vB6eoeqjrPflKnsLhN6VxF4wkJlBYUPRL1w/exec', {method: "GET"})
         .then(response => response.json()).then(
@@ -60,298 +101,27 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             });
     }, []);
 
+    // This function gets the pricing for the selected lining
     const getLiningPrice = (lining) => {
+        // Check if the exact lining name exists in the fetched linings
         if (lining in linings){ return linings[lining]; }
+        // If it's a light lining or Napped Sateen, return Light Filtering price
         else if (lining.includes("Light") || lining ==='Napped Sateen'){ return linings['Light Filtering']; }
+        // Anything else, return Other price
+        // This price represents Lined and bump, interlined, and all self-lined with other options
         else {return linings['Other'];}
     }
 
     
-
-    // const handleImageUpload = (event) => {
-    //     if (event.target.files.length > 5){
-    //         setWindowImg(null);
-    //         alert("Please select no more than five files");
-    //         return;
-    //     }
-    //     else{
-    //         for (const file of event.target.files){
-    //             if (file.size > 10 * 1024 * 1024){
-    //                 alert(file.name + " is too big to upload");
-    //                 return;
-    //             }
-    //         }
-    //         setWindowImg(event.target.files);
-    //     }
-    // }
-    const handleRipple = (event) => {setRipplePercent(event.target.value);}
-    const handleStationaryChange = (event) => {setStationary(event.target.value);}
-    const [wpp, setWpp] = useState(0);
-    const handleWppChange = (event) => {setWpp(event.target.value);}
-    const handleLinedChange = (event) => {setLined(event.target.value);}
-    const handlePleatChange = (event) => {
-        if(pleat === 'Ripplefold' && event.target.value !== 'Ripplefold'){
-            setFullness(2);
-        }
-        else if (pleat !== 'Ripplefold' && event.target.value === 'Ripplefold'){
-            setFullness(1.6);
-            setRipplePercent('60%');
-        }
-        setPleat(event.target.value);
-    }
-    // const handleHardwareChange = (event) => {setHardware(event.target.value);
-    //     if(event.target.value === 'true'){setHardwareType('non-decorative');}
-    // }
-    // const handleHardwareTypeChange = (event) => {setHardwareType(event.target.value);
-    //     if(event.target.value === 'decorative'){setHardwareDecorativeType('track');}
-    // }
-    // const handleHardwareDecorativeTypeChange = (event) => {setHardwareDecorativeType(event.target.value);
-    //     if(event.target.value === 'motorized'){setHardwired('false');}
-    // }
-    // const handleHardwiredChange = (event) => {setHardwired(event.target.value);
-    //     if(event.target.value === 'motorized'){setHomeAuto('false');}
-    // }
-    // const handleHomeAuto = (event) => {setHomeAuto(event.target.value);}
-    const handleCom = (event) => {setCom(event.target.value);}
-    const handleMainRailroad = (event) => {setMainRailroad(event.target.value);}
-    // const handleContrastRailroad = (event) => {setContrastRailroad(event.target.value);}
-
-    // //Window units
-    // const handleUnits1 = (event) => {setUnits1(event.target.value);}
-
+    // These are named and used properly in the calculation functions (Frac means fraction, represents fractional states)
     const [f2fw, f2fwc] = useState(0);
     const [f2fh, f2fhc] = useState(0);
     const [f2fwFrac, f2fwFracC] = useState(0);
     const [f2fhFrac, f2fhFracC] = useState(0);
-    // const [f2fwTotal, setF2fwTotal] = useState(null);
-    // const [f2fhTotal, setF2fhTotal] = useState(null);
-
     const handlef2fw = (e) => {f2fwc(e.target.value);};
     const handlef2fh = (e) => {f2fhc(e.target.value);};
     const handlef2fwFrac = (e) => {f2fwFracC(e.target.value);};
     const handlef2fhFrac = (e) => {f2fhFracC(e.target.value);};
-
-    // const [abvf, abvfc] = useState('');
-    // const [bsill, bsillc] = useState('');
-    // const [mountabvf, mountabvfc] = useState('');
-
-    // const handleabvf = (e) => {abvfc(e.target.value);};
-    // const handlebsill = (e) => {bsillc(e.target.value);};
-    // const handlemountabvf = (e) => {mountabvfc(e.target.value);};
-
-    // //Main fabric units
-    // const handleUnits2 = (event) => {setUnits2(event.target.value);}
-
-    const [mainWidth, mainWidthChange] = useState(0);
-    const [mainVertical, mainVerticalChange] = useState(0);
-    const [mainHorizontal, mainHorizontalChange] = useState(0);
-
-    const handleMainWidth = (e) => {mainWidthChange(e.target.value);};
-    const handleMainVertical = (e) => {mainVerticalChange(e.target.value);};
-    const handleMainHorizontal = (e) => {mainHorizontalChange(e.target.value);};
-
-    const [mainWidth2, mainWidthChange2] = useState(54);
-    const [mainVertical2, mainVerticalChange2] = useState(0);
-    const [mainHorizontal2, mainHorizontalChange2] = useState(0);
-
-    const handleMainWidth2 = (e) => {mainWidthChange2(e.target.value);};
-    const handleMainVertical2 = (e) => {mainVerticalChange2(e.target.value);};
-    const handleMainHorizontal2 = (e) => {mainHorizontalChange2(e.target.value);};
-
-
-
-    // //Contrast fabric units
-    // const [contr, setContr] = useState(null);
-    // const handleUnits3 = (event) => {setUnits3(event.target.value);}
-
-    // const [contrastWidth, contrastWidthChange] = useState('');
-    // const [contrastVertical, contrastVerticalChange] = useState('');
-    // const [contrastHorizontal, contrastHorizontalChange] = useState('');
-
-    // const handleContrastWidth = (e) => {contrastWidthChange(e.target.value);};
-    // const handleContrastVertical = (e) => {contrastVerticalChange(e.target.value);};
-    // const handleContrastHorizontal = (e) => {contrastHorizontalChange(e.target.value);};
-
-    // const submitForm = (e) => {
-    //     e.preventDefault();
-
-    //     let formData = new FormData();
-    //     formData.append('Sheet', 'Drapery');
-    //     let date = new Date(Date.now());
-    //     formData.append('Date', date.toLocaleString());
-    //     formData.append('PName', pname);
-    //     formData.append('EstName', estName);
-    //     formData.append('Name', name);
-    //     formData.append('Address', address);
-    //     formData.append('Email', email);
-    //     formData.append('Room', room);
-    //     formData.append('Windows', numWindow);
-    //     formData.append('Units1', units1);
-    //     if (units1 !== 'in'){
-    //         formData.append('F2fw', document.getElementById('f2fw').value);
-    //         formData.append('F2fh', document.getElementById('f2fh').value);
-    //         formData.append('Abvf', document.getElementById('abvf').value);
-    //         formData.append('Bsill', document.getElementById('bsill').value);
-    //         formData.append('Mountabvf', document.getElementById('mountabvf').value);
-    //     }
-    //     else{
-    //         formData.append('F2fw', document.getElementById('f2fw').value + f2fw);
-    //         formData.append('F2fh', document.getElementById('f2fh').value + f2fh);
-    //         formData.append('Abvf', document.getElementById('abvf').value + abvf);
-    //         formData.append('Bsill', document.getElementById('bsill').value + bsill);
-    //         formData.append('Mountabvf', document.getElementById('mountabvf').value + mountabvf);
-    //     }
-    //     formData.append('Stationary', stationary);
-
-    //     if (lined === ''){formData.append('Lining', 'no');}
-    //     else{formData.append('Lining', lined);}
-
-    //     if (pleat === 'ripple'){formData.append('Pleat', ripplePercent + ' ripple');}
-    //     else if (pleat === 'other'){formData.append('Pleat', document.getElementById('pleat_other').value);}
-    //     else{formData.append('Pleat', pleat);}
-
-    //     if (hardware === 'false'){formData.append('Hardware', 'no');}
-    //     else if(hardwareType === 'non-decorative'){formData.append('Hardware', 'non-decorative');}
-    //     else if(hardwareDecorativeType === 'track'){formData.append('Hardware', 'track');}
-    //     else if(hardwareDecorativeType === 'rings'){formData.append('Hardware', 'rings: ' + document.getElementById('rings').value);}
-    //     else if(hardwired === 'false'){formData.append('Hardware', 'motorized');}
-    //     else if(homeAuto === 'false'){formData.append('Hardware', 'hardwired, no home-auto');}
-    //     else{formData.append('Hardware', 'hardwired with home-auto system: ' + document.getElementById('homeauto').value);}
-        
-    //     formData.append('Com', com);
-
-
-    //     formData.append('Units2', units2);
-    //     formData.append('Mainvendor', document.getElementById('mainvendor').value);
-    //     formData.append('Mainpattern', document.getElementById('mainpattern').value);
-
-    //     let mainlink = document.getElementById('mainlink').value;
-    //     if (mainlink == null || mainlink === ""){
-    //         mainlink = document.getElementById('mainvendor').value + "+" + document.getElementById('mainpattern').value;
-    //         mainlink = "https://www.google.com/search?q=" + mainlink.replace(/[^a-zA-Z0-9]+/g, '+')  // Replace non-alphanumeric characters with "+"
-    //                 .replace(/^\+|(\++)/g, '+');
-    //     }
-    //     formData.append('Mainlink', mainlink);
-    //     formData.append('Mainwidth', document.getElementById('mainwidth').value + mainWidth);
-    //     formData.append('Mainvert', document.getElementById('mainvert').value + mainVertical);
-    //     formData.append('Mainhorizontal', document.getElementById('mainhorizontal').value + mainHorizontal);
-    //     formData.append('Mainrailroad', mainrailroad);
-
-    //     if (!yardage || ! price){
-    //         alert("Please calculate yardage and price first");
-    //         return;
-    //     }
-    //     formData.append("Yardage", yardage);
-    //     formData.append("Price", price);
-    //     formData.append("Embellishments", bandingType);
-
-    //     formData.append('Units3', units3);
-    //     formData.append('Contrastvendor', document.getElementById('contrastvendor').value);
-    //     formData.append('Contrastpattern', document.getElementById('contrastpattern').value);
-    //     let contrlink = document.getElementById('contrlink').value;
-    //     if (contrlink == null || contrlink === ""){
-    //         contrlink = document.getElementById('contrastvendor').value + '+' + document.getElementById('contrastpattern').value;
-    //         contrlink = "https://www.google.com/search?q=" + contrlink.replace(/[^a-zA-Z0-9]+/g, '+')  // Replace non-alphanumeric characters with "+"
-    //         .replace(/^\+|(\++)/g, '+');
-    //     }
-    //     formData.append('Contrastlink', contrlink);
-    //     formData.append('Contrastwidth', document.getElementById('contrastwidth').value + contrastHorizontal);
-    //     formData.append('Contrastvert', document.getElementById('contrastvert').value + contrastVertical);
-    //     formData.append('Contrasthorizontal', document.getElementById('contrasthorizontal').value + contrastHorizontal);
-    //     formData.append('Contrastrailroad', contrastrailroad);
-    //     formData.append('Where', document.getElementById('where').value);
-
-    //     // formData.forEach((value, key) => {
-    //     //     console.log(key, value); // Logs each key-value pair
-    //     //   });
-
-    //     fetch("https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec", {
-    //         method: 'POST',
-    //         body: formData,
-    //     }).then(res => res.json())
-    //     .then(data => {
-    //         console.log(data);
-    //         setFolderID(data.folderID);
-    //         uploads(prev => prev + 1);
-    //         alert(data.msg);
-    //     })
-    //     .catch(err => console.log(err));
-
-    //     uploadAllFiles();
-    // }
-
-    const uploadFile = () => {
-        for (const file of windowImg){
-            const fr = new FileReader();
-            fr.readAsArrayBuffer(file);
-            fr.onload = f => {
-                
-                const url = "https://script.google.com/macros/s/AKfycbwlwY47vpYlfYv8YA43q9TFm0VYSJiVuKlPV4m5OGt15_SBQsKkWBVJ-B5vAi1yiTdizg/exec";
-                
-                const qs = new URLSearchParams({filename: file.name, mimeType: file.type});
-                fetch(`${url}?${qs}`, {method: "POST", body: JSON.stringify([...new Int8Array(f.target.result)])})
-                .then(res => res.json())
-                .then(e => console.log(e))
-                .catch(err => console.log(err));
-            }
-        }
-        alert("Images uploaded");
-    };
-
-    async function uploadAllFiles() {
-        if (windowImg == null){
-            console.log("no images to upload");
-            return;
-        }
-        const url = "https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec";
-      
-        const uploadPromises = Array.from(windowImg).map(file => {
-          return new Promise((resolve, reject) => {
-            const fr = new FileReader();
-            fr.readAsArrayBuffer(file);
-      
-            fr.onload = f => {
-                const body = JSON.stringify([...new Int8Array(f.target.result)]);
-                // const body = f.target.result;
-                const qs = new URLSearchParams({FolderID: folderID, FolderName: pname + '_' + name + '_' + address, filename: file.name, mimeType: file.type});
-                // const qs = new URLSearchParams({ filename: file.name, mimeType: file.type, FolderID: FolderID });
-      
-              fetch(`${url}?${qs}`, {
-                method: "POST",
-                body: body
-              })
-                .then(res => res.json())
-                .then(data => resolve(data))
-                .catch(err => reject(err));
-            };
-      
-            fr.onerror = err => reject(err);
-          });
-        });
-      
-        try {
-          const results = await Promise.all(uploadPromises);
-          console.log("All uploads complete", results);
-          alert("All files uploaded successfully!");
-        } catch (error) {
-          console.error("One or more uploads failed", error);
-          alert("There was an error uploading the files.");
-        }
-      }
-    
-    const Dropdown =({ value, change}) => {
-        return(
-            <>
-                <select value={value} onChange={(e) => change(e)} className="select-input fixed-width-input">
-                    {fractions.map((fraction) => (
-                    <option key={fraction.value} value={fraction.value}>
-                        {fraction.label}
-                    </option>
-                    ))}
-                </select>
-            </>
-        )
-    }
 
     const calcYardage = () => {
         let yardage;
@@ -507,27 +277,20 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             }
         }
     }
-    const getTotal = (num1, frac1) => { 
-        return Number(num1) + Number(frac1);
-    }
-    const round = (value) => {
-        return value - (value % 0.25) + 0.25
-    }
-    const short = (value) => {
-        return Number(value).toFixed(2);
-    }
+
+    // Helper function to display total
+    const getTotal = (num1, frac1) => { return Number(num1) + Number(frac1);}
+    // Unused helper function to round a value up to the nearest quarter yard
+    const round = (value) => {return value - (value % 0.25) + 0.25}
+    // Helper function to shorten a number to two decimal places
+    const short = (value) => {return Number(value).toFixed(2);}
 
     // Automatically calculate yardage when the relevant inputs are filled.
     useEffect(() => {
         let doCalc = true;
-        // Grab DOM inputs used by calcYardage
 
         // Basic requirement: f2fw and f2fh must have values for most calculations
         if (!f2fw || !f2fh || f2fw === 0 || f2fh === 0){
-            doCalc = false;
-        }
-
-        if (mainrailroad === '') {
             doCalc = false;
         }
 
@@ -539,7 +302,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             }
         }
 
-        // All minimal checks passed -> calculate
+        // All minimal checks passed -> calculate yardage and pricing after a delay. This delay helps ensure yardage is set before price calculation
+        // Else, reset yardage and price to 0
         if (doCalc) {
             calcYardage();
             setTimeout(calcPrice, 100);
@@ -548,19 +312,19 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             setPrice(0);
         }
     }, [
-        pleat,
+        pleat,mainrailroad, panels,stationary,fullness,
         f2fw, f2fh,
         f2fwFrac, f2fhFrac,          // fraction state
-        panels,
-        stationary,
-        fullness,
         mainWidth, mainVertical, mainHorizontal, //Fraction state
-        mainHorizontal2, mainWidth2, mainVertical2,
-        mainrailroad
+        mainHorizontal2, mainWidth2, mainVertical2
     ]);
 
+    // This is embellishment option, no handle function
     const [banding, setBanding] = useState(false);
+
+    // This represents the types of trim selected
     const [trim, setTrim] = useState([]);
+    // This function adds or removes the value of each trim checkbox to the trim array
     const handleTrim = (event) => {
         if (event.target.checked){
             setTrim([...trim, event.target.value]);
@@ -569,8 +333,14 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         }
     }
 
+    // Pricing constants
+    const addCostPerWidth = 15; // Additional cost per width for ripplefold pleat
+    const bandingCostPerYard = 13; // Cost per yard of banding
+    const bandingHeightAllowance = 10; // Extra height added to inside/outside banding for hems
+
     const [price, setPrice] = useState(0);
     const calcPrice = () => {
+        // If the fetch for lining prices hasn't completed yet, alert and return because we dont have pricing info
         if (!linings){alert("No pricing info fetched, cannot calculate price. Please wait a moment and try again."); return;}
         if (!fullness || !f2fh || !f2fw
         || !lined || !pleat){
@@ -581,43 +351,291 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         let height = f2fhFrac + f2fh;
         const widths = Math.ceil((width) * fullness / 54.0);
         let costPerWidth = getLiningPrice(lined);
-        if (pleat === "Ripplefold") {costPerWidth += 15;}
+        if (pleat === "Ripplefold") {costPerWidth += addCostPerWidth;}
         const basePrice = widths * costPerWidth;
         let bandingPrice = 0;
         if (banding){
-            if (trim.includes("banding bottom")){
+            if (trim.includes("bottom")){
                 bandingPrice += Math.ceil(width * fullness / 12);
             }
-            if (trim.includes("banding top")){
+            if (trim.includes("top")){
                 bandingPrice += Math.ceil(width * fullness / 12);
             }
-            if (trim.includes("banding inside")){
-                bandingPrice += 2 * Math.ceil((Number(height) + 10) / 12);
+            if (trim.includes("inside")){
+                bandingPrice += 2 * Math.ceil((Number(height) + bandingHeightAllowance) / 12);
             }
-            if (trim.includes("banding outside")){
-                bandingPrice += 2 * Math.ceil((Number(height) + 10) / 12);
+            if (trim.includes("outside")){
+                bandingPrice += 2 * Math.ceil((Number(height) + bandingHeightAllowance) / 12);
             }
-            bandingPrice *= 13;
+            bandingPrice *= bandingCostPerYard;
         }
         setPrice("$" + basePrice + " for yardage + $" + bandingPrice + " for banding = $" + (basePrice + bandingPrice));
     }
 
+    // This is triggered when items that affect price but not yardage are changed -> recalculate price only
     useEffect(() => {
         let doCalc = true;
+        // If yardage hasn't been calculated yet, skip price calculation
         if (yardage === 0 || !yardage){
             doCalc = false;
         }
         if (doCalc) calcPrice();
     }, [trim, lined, banding]);
 
+    // Helper function to make sure only valid numbers are input
     const checkNum = (e) => {if (!e.target.validity.valid) e.target.value = "";}
 
-    return(<>
+    // 
+    // None of these are currently being used but were part of the original Drapery form
+    // 
+
+    /*const[windowImg, setWindowImg] = useState(null);
+    const[folderID, setFolderID] = useState(null);
+    const[hardware, setHardware] = useState('');
+    const[hardwareType, setHardwareType] = useState('');
+    const[hardwareDecorativeType, setHardwareDecorativeType] = useState('');
+    let ringType = '';
+    const[hardwired, setHardwired] = useState('');
+    const[homeAuto, setHomeAuto] = useState('');
+    const[contrastrailroad, setContrastRailroad] = useState('');
+    const[units1, setUnits1] = useState('in');
+    const[units2, setUnits2] = useState('in');
+    const[units3, setUnits3] = useState('in');
+    const [otherPleat, setOtherPleat] = useState('Other');
+    const handleOtherPleatChange = (event) => {setOtherPleat(event.target.value);} */
+    
+    /*const handleImageUpload = (event) => {
+        if (event.target.files.length > 5){
+            setWindowImg(null);
+            alert("Please select no more than five files");
+            return;
+        }
+        else{
+            for (const file of event.target.files){
+                if (file.size > 10 * 1024 * 1024){
+                    alert(file.name + " is too big to upload");
+                    return;
+                }
+            }
+            setWindowImg(event.target.files);
+        }
+    } */
+    
+    /*const handleHardwareChange = (event) => {setHardware(event.target.value);
+        if(event.target.value === 'true'){setHardwareType('non-decorative');}
+    }
+    const handleHardwareTypeChange = (event) => {setHardwareType(event.target.value);
+        if(event.target.value === 'decorative'){setHardwareDecorativeType('track');}
+    }
+    const handleHardwareDecorativeTypeChange = (event) => {setHardwareDecorativeType(event.target.value);
+        if(event.target.value === 'motorized'){setHardwired('false');}
+    }
+    const handleHardwiredChange = (event) => {setHardwired(event.target.value);
+        if(event.target.value === 'motorized'){setHomeAuto('false');}
+    }
+    const handleHomeAuto = (event) => {setHomeAuto(event.target.value);}
+    const handleContrastRailroad = (event) => {setContrastRailroad(event.target.value);}
+
+    //Window units
+    const handleUnits1 = (event) => {setUnits1(event.target.value);}
+
+    const [abvf, abvfc] = useState('');
+    const [bsill, bsillc] = useState('');
+    const [mountabvf, mountabvfc] = useState('');
+
+    const handleabvf = (e) => {abvfc(e.target.value);};
+    const handlebsill = (e) => {bsillc(e.target.value);};
+    const handlemountabvf = (e) => {mountabvfc(e.target.value);};
+
+    //Main fabric units
+    const handleUnits2 = (event) => {setUnits2(event.target.value);}
+
+    //Contrast fabric units
+    const [contr, setContr] = useState(null);
+    const handleUnits3 = (event) => {setUnits3(event.target.value);}
+
+    const [contrastWidth, contrastWidthChange] = useState('');
+    const [contrastVertical, contrastVerticalChange] = useState('');
+    const [contrastHorizontal, contrastHorizontalChange] = useState('');
+
+    const handleContrastWidth = (e) => {contrastWidthChange(e.target.value);};
+    const handleContrastVertical = (e) => {contrastVerticalChange(e.target.value);};
+    const handleContrastHorizontal = (e) => {contrastHorizontalChange(e.target.value);}; */
+
+    /*const submitForm = (e) => {
+        e.preventDefault();
+
+        let formData = new FormData();
+        formData.append('Sheet', 'Drapery');
+        let date = new Date(Date.now());
+        formData.append('Date', date.toLocaleString());
+        formData.append('PName', pname);
+        formData.append('EstName', estName);
+        formData.append('Name', name);
+        formData.append('Address', address);
+        formData.append('Email', email);
+        formData.append('Room', room);
+        formData.append('Windows', numWindow);
+        formData.append('Units1', units1);
+        if (units1 !== 'in'){
+            formData.append('F2fw', document.getElementById('f2fw').value);
+            formData.append('F2fh', document.getElementById('f2fh').value);
+            formData.append('Abvf', document.getElementById('abvf').value);
+            formData.append('Bsill', document.getElementById('bsill').value);
+            formData.append('Mountabvf', document.getElementById('mountabvf').value);
+        }
+        else{
+            formData.append('F2fw', document.getElementById('f2fw').value + f2fw);
+            formData.append('F2fh', document.getElementById('f2fh').value + f2fh);
+            formData.append('Abvf', document.getElementById('abvf').value + abvf);
+            formData.append('Bsill', document.getElementById('bsill').value + bsill);
+            formData.append('Mountabvf', document.getElementById('mountabvf').value + mountabvf);
+        }
+        formData.append('Stationary', stationary);
+
+        if (lined === ''){formData.append('Lining', 'no');}
+        else{formData.append('Lining', lined);}
+
+        if (pleat === 'ripple'){formData.append('Pleat', ripplePercent + ' ripple');}
+        else if (pleat === 'other'){formData.append('Pleat', document.getElementById('pleat_other').value);}
+        else{formData.append('Pleat', pleat);}
+
+        if (hardware === 'false'){formData.append('Hardware', 'no');}
+        else if(hardwareType === 'non-decorative'){formData.append('Hardware', 'non-decorative');}
+        else if(hardwareDecorativeType === 'track'){formData.append('Hardware', 'track');}
+        else if(hardwareDecorativeType === 'rings'){formData.append('Hardware', 'rings: ' + document.getElementById('rings').value);}
+        else if(hardwired === 'false'){formData.append('Hardware', 'motorized');}
+        else if(homeAuto === 'false'){formData.append('Hardware', 'hardwired, no home-auto');}
+        else{formData.append('Hardware', 'hardwired with home-auto system: ' + document.getElementById('homeauto').value);}
         
+        formData.append('Com', com);
+
+
+        formData.append('Units2', units2);
+        formData.append('Mainvendor', document.getElementById('mainvendor').value);
+        formData.append('Mainpattern', document.getElementById('mainpattern').value);
+
+        let mainlink = document.getElementById('mainlink').value;
+        if (mainlink == null || mainlink === ""){
+            mainlink = document.getElementById('mainvendor').value + "+" + document.getElementById('mainpattern').value;
+            mainlink = "https://www.google.com/search?q=" + mainlink.replace(/[^a-zA-Z0-9]+/g, '+')  // Replace non-alphanumeric characters with "+"
+                    .replace(/^\+|(\++)/g, '+');
+        }
+        formData.append('Mainlink', mainlink);
+        formData.append('Mainwidth', document.getElementById('mainwidth').value + mainWidth);
+        formData.append('Mainvert', document.getElementById('mainvert').value + mainVertical);
+        formData.append('Mainhorizontal', document.getElementById('mainhorizontal').value + mainHorizontal);
+        formData.append('Mainrailroad', mainrailroad);
+
+        if (!yardage || ! price){
+            alert("Please calculate yardage and price first");
+            return;
+        }
+        formData.append("Yardage", yardage);
+        formData.append("Price", price);
+        formData.append("Embellishments", bandingType);
+
+        formData.append('Units3', units3);
+        formData.append('Contrastvendor', document.getElementById('contrastvendor').value);
+        formData.append('Contrastpattern', document.getElementById('contrastpattern').value);
+        let contrlink = document.getElementById('contrlink').value;
+        if (contrlink == null || contrlink === ""){
+            contrlink = document.getElementById('contrastvendor').value + '+' + document.getElementById('contrastpattern').value;
+            contrlink = "https://www.google.com/search?q=" + contrlink.replace(/[^a-zA-Z0-9]+/g, '+')  // Replace non-alphanumeric characters with "+"
+            .replace(/^\+|(\++)/g, '+');
+        }
+        formData.append('Contrastlink', contrlink);
+        formData.append('Contrastwidth', document.getElementById('contrastwidth').value + contrastHorizontal);
+        formData.append('Contrastvert', document.getElementById('contrastvert').value + contrastVertical);
+        formData.append('Contrasthorizontal', document.getElementById('contrasthorizontal').value + contrastHorizontal);
+        formData.append('Contrastrailroad', contrastrailroad);
+        formData.append('Where', document.getElementById('where').value);
+
+        // formData.forEach((value, key) => {
+        //     console.log(key, value); // Logs each key-value pair
+        //   });
+
+        fetch("https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec", {
+            method: 'POST',
+            body: formData,
+        }).then(res => res.json())
+        .then(data => {
+            console.log(data);
+            setFolderID(data.folderID);
+            uploads(prev => prev + 1);
+            alert(data.msg);
+        })
+        .catch(err => console.log(err));
+
+        uploadAllFiles();
+    }*/
+
+    /*const uploadFile = () => {
+        for (const file of windowImg){
+            const fr = new FileReader();
+            fr.readAsArrayBuffer(file);
+            fr.onload = f => {
+                
+                const url = "https://script.google.com/macros/s/AKfycbwlwY47vpYlfYv8YA43q9TFm0VYSJiVuKlPV4m5OGt15_SBQsKkWBVJ-B5vAi1yiTdizg/exec";
+                
+                const qs = new URLSearchParams({filename: file.name, mimeType: file.type});
+                fetch(`${url}?${qs}`, {method: "POST", body: JSON.stringify([...new Int8Array(f.target.result)])})
+                .then(res => res.json())
+                .then(e => console.log(e))
+                .catch(err => console.log(err));
+            }
+        }
+        alert("Images uploaded");
+    }; */
+
+    /*async function uploadAllFiles() {
+        if (windowImg == null){
+            console.log("no images to upload");
+            return;
+        }
+        const url = "https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec";
+      
+        const uploadPromises = Array.from(windowImg).map(file => {
+          return new Promise((resolve, reject) => {
+            const fr = new FileReader();
+            fr.readAsArrayBuffer(file);
+      
+            fr.onload = f => {
+                const body = JSON.stringify([...new Int8Array(f.target.result)]);
+                // const body = f.target.result;
+                const qs = new URLSearchParams({FolderID: folderID, FolderName: pname + '_' + name + '_' + address, filename: file.name, mimeType: file.type});
+                // const qs = new URLSearchParams({ filename: file.name, mimeType: file.type, FolderID: FolderID });
+      
+              fetch(`${url}?${qs}`, {
+                method: "POST",
+                body: body
+              })
+                .then(res => res.json())
+                .then(data => resolve(data))
+                .catch(err => reject(err));
+            };
+      
+            fr.onerror = err => reject(err);
+          });
+        });
+      
+        try {
+          const results = await Promise.all(uploadPromises);
+          console.log("All uploads complete", results);
+          alert("All files uploaded successfully!");
+        } catch (error) {
+          console.error("One or more uploads failed", error);
+          alert("There was an error uploading the files.");
+        }
+      }*/
+
+    return(<>
         <div className="container container-row">
             <div className="container left">
                 
                 {formSection === 1 && <div className="form-group-indent">
+                    {/* Unused image upload functionality */}
+
                     {/* <label className="file-upload-label">
                         Please load a photo of the window:
                         <input type='file' onChange={handleImageUpload} multiple></input>
@@ -632,24 +650,21 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                                 <input className='fixed-width-input' type='number' id='f2fw' min="0" onInput={checkNum} 
                                 placeholder={f2fw || 0}
                                 onChange={(handlef2fw)}></input>
-                                {units1 ==='in' && <>
                                 <Dropdown
                                     value={f2fwFrac}
                                     change={handlef2fwFrac}
                                 ></Dropdown>
-                                </>}<br></br>
+                                <br></br>
                             </div>
                             <div className='column'>
                                 <h4>Drapery height:</h4>
                                 <input className='fixed-width-input' type='number' id='f2fh' min="0" onInput={checkNum}
                                 placeholder={f2fh || 0}
                                 onChange={(handlef2fh)}></input>
-                                {units1 ==='in' && <>
                                 <Dropdown
                                     value={f2fhFrac}
                                     change={handlef2fhFrac}
                                 ></Dropdown>
-                                </>}
                             </div>
                         </div>
                     </div>
@@ -791,6 +806,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         </div><br />
                         <h4>Main Fabric specifications: <small>Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.</small></h4>
                         
+                        {/* Unused unit selection */}
+
                         {/* <label>What units are the measurements in?</label>
                         <label className="radio-label">
                             <input value='cm' type='radio' name='units2' onChange={handleUnits2}></input> Centimeters
@@ -809,12 +826,10 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                                     <input type='number' id='mainwidth' className='fixed-width-input' min="0" onInput={checkNum}
                                     placeholder={mainWidth2 || 0} onChange={handleMainWidth2}></input>
                                 </label>
-                                {units2 === 'in' && <>
                                     <Dropdown
                                     value={mainWidth}
                                     change={handleMainWidth}
                                     ></Dropdown>
-                                </>}
                             </div><br />
                             <div className='column'>
                                 <label>
@@ -823,12 +838,10 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                                     <input type='number' id='mainvert' className='fixed-width-input' min="0" onInput={checkNum}
                                     placeholder={mainVertical2 || 0} onChange={handleMainVertical2}></input>
                                 </label>
-                                {units2 === 'in' && <>
                                     <Dropdown
                                     value={mainVertical}
                                     change={handleMainVertical}
                                     ></Dropdown>
-                                </>}
                             </div><br />
                             <div className='column'>
                                 <label>
@@ -837,12 +850,10 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                                     <input type='number' id='mainhorizontal' className='fixed-width-input' min="0" onInput={checkNum}
                                     placeholder={mainHorizontal2 || 0} onChange={handleMainHorizontal2}></input>
                                 </label>
-                                {units2 === 'in' && <>
                                     <Dropdown
                                     value={mainHorizontal}
                                     change={handleMainHorizontal}
                                     ></Dropdown>
-                                </>}
                             </div>
                         </div>
                         <div className='row dimensions-section'>
@@ -881,26 +892,26 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                                     {banding && <div className="sub-option-indent">
                                         <label className="checkbox-label">
                                             <input type="checkbox" name="banding-type" 
-                                            onChange={handleTrim} defaultChecked={trim.includes('banding bottom')}
-                                            id='banding bottom' value='banding bottom'/>
+                                            onChange={handleTrim} defaultChecked={trim.includes('bottom')}
+                                            id='banding bottom' value='bottom'/>
                                             Bottom
                                         </label>
                                         <label className="checkbox-label">
                                             <input type="checkbox" name="banding-type" 
-                                            onChange={handleTrim} defaultChecked={trim.includes('banding inside')}
-                                            id='banding inside' value='banding inside'/>
+                                            onChange={handleTrim} defaultChecked={trim.includes('inside')}
+                                            id='banding inside' value='inside'/>
                                             Inside Edge
                                         </label>
                                         <label className="checkbox-label">
                                             <input type="checkbox" name="banding-type" 
-                                            onChange={handleTrim} defaultChecked={trim.includes('banding outside')}
-                                            id='banding outside' value='banding outside'/>
+                                            onChange={handleTrim} defaultChecked={trim.includes('outside')}
+                                            id='banding outside' value='outside'/>
                                             Outside Edge
                                         </label>
                                         <label className="checkbox-label">
                                             <input type="checkbox" name="banding-type" 
-                                            onChange={handleTrim} defaultChecked={trim.includes('banding top')}
-                                            id='banding top' value='banding top'/>
+                                            onChange={handleTrim} defaultChecked={trim.includes('top')}
+                                            id='banding top' value='top'/>
                                             Top
                                         </label>
                                     </div>}
@@ -1024,6 +1035,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             {stationary ==='true' && <>Width per panel: {wpp || 0}<br /></>}
                             Pleat style: {pleat}<br />
                             Fullness: {fullness}<br />
+                            Fabric running: {mainrailroad ==='true' ? 'Railroaded' : 'Up the bolt'}<br />
                         </div>
                         <div className='column'>
                             COM material: {com ==='yes' ? 'Yes' : 'No'}<br />
@@ -1031,6 +1043,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             Main fabric vertical repeat: {getTotal(mainVertical2, mainVertical)}  <br />
                             Main fabric horizontal repeat: {getTotal(mainHorizontal2, mainHorizontal)} <br />
                             Lining type: {lined}<br />
+                            Embellishments: {banding ? trim.length > 0 ? trim.join(', ') : 'None' : 'None'}<br />
                         </div>
                         <div className='column'>
                             Yardage required: {short(yardage) || 0} yards<br />

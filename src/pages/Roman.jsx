@@ -1,34 +1,442 @@
 import React, { useState, useEffect } from 'react';
 
 const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, formSection, handleFormSection}) => {
-    const[windowImg, setWindowImg] = useState(null);
-    const[mount, setMount] = useState('inside');
-    const[stationary,setStationary] = useState('');
-    const[opFunction, setOpFunction] = useState('cordless');
-    const[motorType, setMotorType] = useState('battery');
-    // const[hardwired, setHardwired] = useState('');
+    const[mount, setMount] = useState('Inside');
+    const[opFunction, setOpFunction] = useState('Cordless');
+    const[motorType, setMotorType] = useState('battery'); // Value isn't used but included for completeness
     const[homeAuto, setHomeAuto] = useState('');
     const[lined, setLined] = useState('Unlined');
-    const[com, setCom] = useState('');
-    const[mainrailroad, setMainRailroad] = useState('');
-    const[contrastrailroad, setContrastRailroad] = useState('');
-
-    const[units1, setUnits1] = useState('in');
-    const[units2, setUnits2] = useState('in');
-    const[units3, setUnits3] = useState('in');
-
-    const [f2fw, f2fwc] = useState('');
-    const [f2fh, f2fhc] = useState('');
-    const [f2fwTotal, setF2fwTotal] = useState(null);
-    const [f2fhTotal, setF2fhTotal] = useState(null);
-    const [abvc, abvcc] = useState('');
-    const [abvf, abvfc] = useState('');
-    const [abvfTotal, setAbvfTotal] = useState(null);
+    const[com, setCom] = useState('yes');
+    const[mainrailroad, setMainRailroad] = useState('false');
+    
+    const [f2fw, f2fwc] = useState(0);
+    const [f2fh, f2fhc] = useState(0);
+    const [f2fwFrac, f2fwC] = useState(0);
+    const [f2fhFrac, f2fhC] = useState(0);
     const handlef2fw = (e) => {f2fwc(e.target.value);};
     const handlef2fh = (e) => {f2fhc(e.target.value);};
-    const handleabvc = (e) => {abvcc(e.target.value);};
-    const handleabvf = (e) => {abvfc(e.target.value);};
+    const handlef2fwFrac = (e) => {f2fwC(e.target.value);};
+    const handlef2fhFrac = (e) => {f2fhC(e.target.value);};
 
+    const [abvf, abvfc] = useState(0);
+    const [abvfFrac, abvfC] = useState(0);
+    const handleabvf = (e) => {abvfc(e.target.value);};
+    const handleabvfFrac = (e) => {abvfC(e.target.value);};
+
+    const handleMount = (event) => {setMount(event.target.value);}
+    const [type, setType] = useState('Flat');
+    const handleType = (event) => {setType(event.target.value);}
+    const handleOpFunction = (event) => {
+        setOpFunction(event.target.value);
+        if (event.target.value === 'Motorized'){setMotorType('battery')}
+    }
+    const handleMotorChange = (event) => {
+        setMotorType(event.target.value);
+        if (event.target.value === 'hardwired'){setHomeAuto('no')}
+    }
+    const handleHomeAuto = (event) => {setHomeAuto(event.target.value);}
+    const handleLinedChange = (event) => {setLined(event.target.value);}
+    const handleCom = (event) => {setCom(event.target.value);}
+    const handleMainRailroad = (event) => {setMainRailroad(event.target.value);}
+    
+    const [mainWidth, mainWidthChange] = useState(54);
+    const [mainVertical, mainVerticalChange] = useState(0);
+    const [mainHorizontal, mainHorizontalChange] = useState(0);
+    const [mainWidthFrac, mainWidthFracChange] = useState(0);
+    const [mainVerticalFrac, mainVerticalFracChange] = useState(0);
+    const [mainHorizontalFrac, mainHorizontalFracChange] = useState(0);
+
+    const handleMainWidth = (e) => {
+        if (e.target.value === 0) mainWidthChange(54);
+        else mainWidthChange(e.target.value);
+    };
+    const handleMainVertical = (e) => {mainVerticalChange(e.target.value);};
+    const handleMainHorizontal = (e) => {mainHorizontalChange(e.target.value);};
+    const handleMainWidthFrac = (e) => {mainWidthFracChange(e.target.value);};
+    const handleMainVerticalFrac = (e) => {mainVerticalFracChange(e.target.value);};
+    const handleMainHorizontalFrac = (e) => {mainHorizontalFracChange(e.target.value);};
+
+    const [banding, setBanding] = useState(false);
+    // This represents the types of trim selected
+    const [trim, setTrim] = useState([]);
+    // This function adds or removes the value of each trim checkbox to the trim array
+    const handleTrim = (event) => {
+        if (event.target.checked){
+            setTrim([...trim, event.target.value]);
+        } else {
+            setTrim(trim.filter(item => item !== event.target.value));
+        }
+    }
+
+    // Bead option only for Lift, doesn't affect price or yardage but included for completeness
+    const [bead, setBead] = useState("Steel");
+    useEffect(() => {if (opFunction !== "Lift") setBead(null);},[opFunction])
+
+    const fractions = [
+        { label: '0', value: 0},
+        { label: '1/8', value: .125 },
+        { label: '1/4', value: .25 },
+        { label: '3/8', value: .375 },
+        { label: '1/2', value: .5 },
+        { label: '5/8', value: .625 },
+        { label: '3/4', value: .75 },
+        { label: '7/8', value: .875 }
+    ];
+
+    const Dropdown =({ value, change}) => { 
+        return( 
+            <>
+                <select value={value} onChange={(e) => change(e)} style={{width: '50px'}}>
+                    {fractions.map((fraction) => (
+                    <option key={fraction.value} value={fraction.value}
+                    >
+                        {fraction.label}
+                    </option>
+                    ))}
+                </select>
+            </> 
+    )}
+
+    const [linings, setLinings] = useState();
+    useEffect(() => {
+        fetch('https://script.google.com/macros/s/AKfycbxPB_2UsBjeXSeMmpmraXDAmu5Q1lJ6GX_vB6eoeqjrPflKnsLhN6VxF4wkJlBYUPRL1w/exec', {method: "GET"})
+        .then(response => response.json()).then(
+            data => {
+                setLinings({
+                    'Unlined': data.msg[0][1],
+                    'Self-Lined': data.msg[0][2],
+                    'Light Filtering': data.msg[0][3],
+                    'Sheer': data.msg[0][4],
+                    'Blackout': data.msg[0][5],
+                    'Lined & Standard Interlined': data.msg[0][6],
+                    'Other': data.msg[0][7], //Lined and bump, and all self-lined with other options
+                    'French Blackout': data.msg[0][8],
+                })
+            });
+    }, []);
+
+    const getLiningPrice = (lining) => {
+        if (lining in linings){ return linings[lining]; }
+        else if (lining.includes("Light") || lining ==='Napped Sateen'){ return linings['Light Filtering']; }
+        else {return linings['Other'];}
+    }
+
+    // Helper function to calculate the hobbled fabric addition
+    const calculateHobbledAddition = (shadeHeight) => {
+        if (type !== "Hobbled") {
+            return shadeHeight;
+        }
+        // Add 5 inches for every 8 inches of height (shade height only)
+        return Math.ceil(shadeHeight / 8) * 5;
+    };
+
+    const [yardage, setYardage] = useState(null);
+    const calcYardage = () => {
+        if (mainrailroad === "true") {
+            if (!f2fw ||!f2fh) {
+                alert("Please fill out all relevant fields");
+                return;
+            }
+            if (mount === "Outside" && !abvf) {
+                alert("Please fill out all relevant fields");
+                return;
+            }
+
+            // --- Railroaded Fabrics ---
+            if (type === "London") {
+                let panelHeight =
+                    24.0 + Number(f2fhFrac) + Number(f2fh);
+                if (mount === "Outside") {
+                    panelHeight += Number(abvfFrac) + Number(abvf);
+                }
+
+                let check = Number(mainWidth) + Number(mainWidthFrac);
+                if (panelHeight > check) {
+                    alert("Height is too much by " + (panelHeight - check));
+                    return;
+                }
+
+                // Width + pleats for London
+                let cutWidth = 6.0 + Number(f2fwFrac) + Number(f2fw);
+                let pleats = Number(document.getElementById("London-pleats").value);
+                if (!pleats || pleats <= 0) pleats = 1;
+                cutWidth += 12 * pleats;
+
+                if (cutWidth % 18 !== 0) {
+                    cutWidth += 18 - (cutWidth % 18);
+                }
+
+                cutWidth = cutWidth / 36;
+                setYardage(cutWidth);
+                return;
+            } else {
+                // Non-London (standard) railroaded
+                let panelHeight =
+                    20.0 + Number(f2fhFrac) + Number(f2fh);
+                if (mount === "Outside") {
+                    panelHeight += Number(abvfFrac) + Number(abvf);
+                }
+
+                let check;
+                if (mainWidth === "") {
+                    check = 54;
+                } else {
+                    check = Number(mainWidthFrac) + Number(mainWidth);
+                }
+                if (panelHeight > check) {
+                    alert("Height is too much by " + (panelHeight - check));
+                    return;
+                }
+
+                let cutWidth = 6.0 + Number(f2fwFrac) + Number(f2fw);
+                if (cutWidth % 18 !== 0) {
+                    cutWidth += 18 - (cutWidth % 18);
+                }
+                cutWidth = cutWidth / 36;
+                setYardage(cutWidth);
+                return;
+            }
+        }
+
+        // --- SOLID FABRIC (no vertical repeat) ---
+        if (Number(mainVertical) === 0) {
+            // Inside mount
+            if (mount === "Inside") {
+                if (!f2fw || !f2fh) {
+                    alert("Please fill out all relevant fields");
+                    return;
+                }
+
+                // --- Width + Pleats ---
+                let cutWidth = (Number(f2fwFrac) + Number(f2fw)) * 0.75 + 3;
+                if (type === "London"){
+                    let pleats = Number(document.getElementById("London-pleats").value);
+                    if (!pleats || pleats <= 0) pleats = 1;
+                    cutWidth += 12 * pleats;
+                }
+
+                let check = Number(mainWidthFrac) + Number(mainWidth);
+                const widths = Math.ceil(cutWidth / check);
+
+                // --- Height ---
+                const baseAdd = type === "London" ? 24.0 : 20.0;
+                let cutLength = baseAdd + Number(f2fhFrac) + Number(f2fh);
+
+                const yardDiff = cutLength % 9;
+                if (yardDiff !== 0) cutLength += 9 - yardDiff;
+
+                calculateHobbledAddition(cutLength);
+                cutLength = (cutLength / 36).toFixed(2);
+                setYardage(widths * cutLength);
+                return;
+            }
+
+            // Outside mount
+            else {
+                if (!f2fw || !abvf || !f2fh) {
+                    alert("Please fill out all relevant fields");
+                    return;
+                }
+
+                let check = Number(mainWidthFrac) + Number(mainWidth);
+
+                // --- Width + Pleats ---
+                let cutWidth =
+                    4.0 + Number(document.getElementById("f2fw").value) + Number(f2fw);
+                if (type === "London"){
+                    let pleats = Number(document.getElementById("London-pleats").value);
+                    if (!pleats || pleats <= 0) pleats = 1;
+                    cutWidth += 12 * pleats;
+                }
+
+                const widths = Math.ceil(cutWidth / check);
+
+                // --- Height ---
+                const baseAdd = type === "London" ? 24.0 : 20.0;
+                const obHeight = Number(abvfFrac) + Number(abvf) + Number(f2fhFrac) + Number(f2fh);
+                let cutYards = baseAdd + obHeight;
+
+                const yardDiff = cutYards % 9;
+                if (yardDiff !== 0) cutYards += 9 - yardDiff;
+
+                calculateHobbledAddition(cutYards);
+                cutYards = (cutYards / 36).toFixed(2);
+                setYardage(widths * cutYards);
+                return;
+            }
+        }
+
+        // --- FABRICS WITH REPEAT ---
+        else {
+            if ( !f2fh || !f2fw || !mainVertical) {
+                alert("Please fill out all relevant fields");
+                return;
+            }
+            if (mount === "Outside" && abvf === 0) {
+                alert("Please fill out all relevant fields");
+                return;
+            }
+
+            // --- Repeats calculation ---
+            const baseAdd = type === "London" ? 24.0 : 20.0;
+            let repeats;
+            if (mount === "Outside") {
+                repeats = Math.ceil(
+                    (baseAdd + Number(f2fhFrac) + Number(f2fh) 
+                    + Number(abvfFrac) + Number(abvf))
+                    / (Number(mainVerticalFrac) + Number(mainVertical))
+                );
+            } else {
+                repeats = Math.ceil(
+                    (baseAdd + Number(f2fhFrac) + Number(f2fh)) 
+                    / (Number(mainVerticalFrac) + Number(mainVertical))
+                );
+            }
+
+            const cutLength =
+                repeats *
+                (Number(mainVerticalFrac) + Number(mainVertical));
+
+            const yardDiff = cutLength % 9;
+            let cutYards = cutLength;
+            if (yardDiff !== 0) cutYards += 9 - yardDiff;
+
+            calculateHobbledAddition(cutYards);
+            cutYards = (cutYards / 36).toFixed(2);
+
+            // --- Width + Pleats ---
+            let cutWidth = Number(f2fwFrac) + Number(f2fw);
+            if (type === "London"){
+                let pleats = Number(document.getElementById("London-pleats").value);
+                if (!pleats || pleats <= 0) pleats = 1;
+                cutWidth += 12 * pleats;
+            }
+
+            let check = Number(mainWidthFrac) + Number(mainWidth);
+            const widths = Math.ceil(cutWidth / check);
+
+            setYardage(widths * cutYards);
+            return;
+        }
+    };
+
+    // Automatically calculate yardage when the relevant inputs are filled.
+    useEffect(() => {
+        let doCalc = true;
+
+        // Basic requirement: f2fw and f2fh must have values for most calculations
+        if (!f2fw || !f2fh || f2fw === 0 || f2fh === 0){
+            doCalc = false;
+        }
+
+        // All minimal checks passed -> calculate yardage and pricing after a delay. This delay helps ensure yardage is set before price calculation
+        // Else, reset yardage and price to 0
+        if (doCalc) {
+            calcYardage();
+            setTimeout(calcPrice, 100);
+        }else{
+            setYardage(0);
+            setPrice(0);
+        }
+    }, [
+        mainrailroad, type, mount,
+        f2fw, f2fh, abvf,
+        f2fwFrac, f2fhFrac, abvfFrac,
+        mainWidth, mainVertical, mainHorizontal,
+        mainHorizontalFrac, mainWidthFrac, mainVerticalFrac
+    ]);
+
+    // Pricing constants
+    const stabilizerAddon = 4.0; // per sq ft
+    const cordlessAddon = 30.0; // per ft
+    const motorizedBase = 650.0; // base price
+    const motorizedExtra = 45.0; // per ft over 72"
+    const bandingCostPerYard = 13; // Cost per yard of banding
+    const bandingHeightAllowance = 10; // Extra height added to inside/outside banding for hems
+
+    const [price, setPrice] = useState(null);
+    const [stabilizer, setStabilizer] = useState("yes");
+    const calcPrice = () => {
+        if (!f2fh || !f2fw
+        || !opFunction || !lined){
+            alert("Please fill out all relevant fields");
+            return;
+        }
+        const width = getTotal(f2fw, f2fwFrac);
+        let height = getTotal(f2fh, f2fhFrac);
+        if (mount === "Outside"){//Outside
+            if (!abvf || !abvfFrac){
+                alert("Please fill out all relevant fields");
+                return;
+            }
+            height += getTotal(abvf, abvfFrac);
+        }
+        let sqFootage = width * height;
+        sqFootage = Math.ceil(sqFootage / 144);
+        const basePrice = sqFootage * getLiningPrice(lined);
+
+        let addPrice = 0;
+        if (opFunction === "Cordlock" || opFunction === "Lift"){
+            if (!stabilizer){
+                alert("Please fill out all relevant fields");
+                return;
+            }
+            if (stabilizer === "yes"){
+                addPrice = stabilizerAddon * sqFootage;
+            }
+        }
+        else if (opFunction === "Cordless"){
+            addPrice = cordlessAddon * (width) / 12;
+        }
+        else{//this is for Motorized
+            addPrice = motorizedBase;
+            const extraFeet = Math.ceil(((width) - 72) / 12);
+            if (extraFeet > 2)
+                addPrice += (extraFeet - 2) * motorizedExtra;
+        }
+        let bandingPrice = 0;
+        if (banding){
+            if (trim.includes("Bottom")){
+                bandingPrice += Math.ceil(width / 12);
+            }
+            if (trim.includes("Top")){
+                bandingPrice += Math.ceil(width / 12);
+            }
+            if (trim.includes("Inside")){
+                bandingPrice += 2 * Math.ceil((height + bandingHeightAllowance) / 12);
+            }
+            if (trim.includes("Outside")){
+                bandingPrice += 2 * Math.ceil((height + bandingHeightAllowance) / 12);
+            }
+            bandingPrice *= bandingCostPerYard;
+        }
+        setPrice(basePrice + " for yardage + " + addPrice + " for operating function + " + bandingPrice + " for banding = " + (bandingPrice + basePrice + addPrice));
+    }
+
+    // This is triggered when items that affect price but not yardage are changed -> recalculate price only
+    useEffect(() => {
+        let doCalc = true;
+        // If yardage hasn't been calculated yet, skip price calculation
+        if (yardage === 0 || !yardage){
+            doCalc = false;
+        }
+        if (doCalc) calcPrice();
+    }, [trim, banding, opFunction, stabilizer, lined]);
+
+    // Helper function to ensure only valid numbers are entered
+    const checkNum = (e) => {if (!e.target.validity.valid) e.target.value = '';}
+    // Helper function to display total
+    const getTotal = (num1, frac1) => { return Number(num1) + Number(frac1);}
+    // Helper function to shorten a number to two decimal places
+    const short = (value) => {return Number(value).toFixed(2);}
+    // Helper function to round a value up to the nearest quarter yard
+    const round = (value) => {return value - (value % 0.25) + 0.25}
+
+    // 
+    // Unused states and handlers
+    // 
+    
+    /* const[windowImg, setWindowImg] = useState(null);
     const handleImageUpload = (event) => {
         if (event.target.files.length > 5){
             setWindowImg(null);
@@ -44,105 +452,47 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
             }
             setWindowImg(event.target.files);
         }
-    }
-    const handleMount = (event) => {setMount(event.target.value);}
-    const [type, setType] = useState('flat');
-    const handleType = (event) => {setType(event.target.value);}
-    const handleStationary = (event) =>{setStationary(event.target.value);}
-    const handleOpFunction = (event) => {setOpFunction(event.target.value);
-        if (event.target.value === 'motorized'){setMotorType('battery')}
-    }
-    const handleMotorChange = (event) => {setMotorType(event.target.value);
-        if (event.target.value === 'hardwired'){setHomeAuto('no')}
-    }
-    const handleHomeAuto = (event) => {setHomeAuto(event.target.value);}
-    const handleLinedChange = (event) => {setLined(event.target.value);}
-    const handleCom = (event) => {setCom(event.target.value);}
-    const handleMainRailroad = (event) => {setMainRailroad(event.target.value);}
-    const handleContrastRailroad = (event) => {setContrastRailroad(event.target.value);}
+    }*/
+    
+    /* const[stationary,setStationary] = useState('');
+    const handleStationary = (event) =>{setStationary(event.target.value);} */
 
-    const handleUnits1 = (event) => {setUnits1(event.target.value);}
+    // const[hardwired, setHardwired] = useState('');
 
+    /* const [abvc, abvcc] = useState('');
+    const handleabvc = (e) => {abvcc(e.target.value);}; */
 
-    //Main fabric units
-    const handleUnits2 = (event) => {setUnits2(event.target.value);}
+    /* const[contrastrailroad, setContrastRailroad] = useState('');
+    const handleContrastRailroad = (event) => {setContrastRailroad(event.target.value);} */
 
-    const [mainWidth, mainWidthChange] = useState('');
-    const [mainVertical, mainVerticalChange] = useState('');
-    const [mainHorizontal, mainHorizontalChange] = useState('');
+    /*
+    // const[units1, setUnits1] = useState('in');
+    // const[units2, setUnits2] = useState('in');
+    // const[units3, setUnits3] = useState('in');
+    // const handleUnits1 = (event) => {setUnits1(event.target.value);}
+    // const handleUnits2 = (event) => {setUnits2(event.target.value);}
+    // const handleUnits3 = (event) => {setUnits3(event.target.value);}*/
 
-    const handleMainWidth = (e) => {mainWidthChange(e.target.value);};
-    const handleMainVertical = (e) => {mainVerticalChange(e.target.value);};
-    const handleMainHorizontal = (e) => {mainHorizontalChange(e.target.value);};
+    /*
+    // Contrast fabric units
+    // const [contr, setContr] = useState(null);
 
-    //Contrast fabric units
-    const [contr, setContr] = useState(null);
-    const handleUnits3 = (event) => {setUnits3(event.target.value);}
+    // const [contrastWidth, contrastWidthChange] = useState('');
+    // const [contrastVertical, contrastVerticalChange] = useState('');
+    // const [contrastHorizontal, contrastHorizontalChange] = useState('');
+    // const handleContrastWidth = (e) => {contrastWidthChange(e.target.value);};
+    // const handleContrastVertical = (e) => {contrastVerticalChange(e.target.value);};
+    // const handleContrastHorizontal = (e) => {contrastHorizontalChange(e.target.value);}; */
 
-    const [contrastWidth, contrastWidthChange] = useState('');
-    const [contrastVertical, contrastVerticalChange] = useState('');
-    const [contrastHorizontal, contrastHorizontalChange] = useState('');
+    // const [bandingType, setBandingType] = useState(null);
 
-    const handleContrastWidth = (e) => {contrastWidthChange(e.target.value);};
-    const handleContrastVertical = (e) => {contrastVerticalChange(e.target.value);};
-    const handleContrastHorizontal = (e) => {contrastHorizontalChange(e.target.value);};
-
-    const [banding, setBanding] = useState(false);
-    const [bandingType, setBandingType] = useState(null);
-
-    useEffect(() => {
+    /*useEffect(() => {
         if (!banding){
             setBandingType(null);
         }
-    },[banding])
+    },[banding])*/
 
-    const [bead, setBead] = useState("Steel");
-
-    useEffect(() => {
-        if (opFunction !== "lift"){
-            setBead(null);
-        }
-    },[opFunction])
-
-    const fractions = [
-        { label: '0', value: 0},
-        { label: '1/8', value: '.125' },
-        { label: '1/4', value: '.25' },
-        { label: '3/8', value: '.375' },
-        { label: '1/2', value: '.5' },
-        { label: '5/8', value: '.625' },
-        { label: '3/4', value: '.75' },
-        { label: '7/8', value: '.875' }
-    ];
-
-    const [linings, setLinings] = useState();
-        useEffect(() => {
-            fetch('https://script.google.com/macros/s/AKfycbxPB_2UsBjeXSeMmpmraXDAmu5Q1lJ6GX_vB6eoeqjrPflKnsLhN6VxF4wkJlBYUPRL1w/exec', {method: "GET"})
-            .then(response => response.json()).then(
-                data => {
-                    console.log(data);
-                    console.log(typeof data.msg, data.msg);
-                    console.log(typeof data.msg[0], data.msg[0]);
-                    setLinings({
-                        'Unlined': data.msg[0][1],
-                        'Self-Lined': data.msg[0][2],
-                        'Light Filtering': data.msg[0][3],
-                        'Sheer': data.msg[0][4],
-                        'Blackout': data.msg[0][5],
-                        'Lined & Standard Interlined': data.msg[0][6],
-                        'Other': data.msg[0][7], //Lined and bump, and all self-lined with other options
-                        'French Blackout': data.msg[0][8],
-                    })
-                });
-        }, []);
-    
-        const getLiningPrice = (lining) => {
-            if (lining in linings){ return linings[lining]; }
-            else if (lining.includes("Light") || lining ==='Napped Sateen'){ return linings['Light Filtering']; }
-            else {return linings['Other'];}
-        }
-
-    const submitForm = (e) => {
+    /*const submitForm = (e) => {
         e.preventDefault();
 
         let formData = new FormData();
@@ -159,7 +509,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
         formData.append('Units1', units1);
         formData.append('Location', mount);
 
-        if (mount === 'inside'){
+        if (mount === 'Inside'){
             formData.append('F2fw', document.getElementById('f2fw').value + f2fw);
             formData.append('F2fh', document.getElementById('f2fh').value + f2fh);
         }
@@ -172,8 +522,8 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
 
         formData.append('Stationary', stationary);
 
-        if(opFunction === 'lift'){formData.append('OpFunc', opFunction + document.getElementById('lift-color').value);}
-        else if (opFunction === 'motorized'){
+        if(opFunction === 'Lift'){formData.append('OpFunc', opFunction + document.getElementById('lift-color').value);}
+        else if (opFunction === 'Motorized'){
             if(motorType === 'hardwired'){
                 if(homeAuto === 'no') {formData.append('OpFunc', opFunction + ' ' + motorType + ' no existing home auto');}
                 else{formData.append('OpFunc', opFunction + ' ' + motorType + ' existing home auto: ' + document.getElementById('homeauto').value);}
@@ -245,9 +595,9 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
         .catch(err => console.log(err));
 
         
-    }
+    }*/
 
-    async function uploadAllFiles() {
+    /*async function uploadAllFiles() {
         console.log("Uploading:", {
             pname, name, address, windowImg
           });
@@ -284,505 +634,14 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
           console.error("One or more uploads failed", error);
           alert("There was an error uploading the files.");
         }
-      }
-
-    const Dropdown =({ value, change}) => { 
-        return( 
-            <>
-                <select value={value} onChange={(e) => change(e)} style={{width: '50px'}}>
-                    {fractions.map((fraction) => (
-                    <option key={fraction.value} value={fraction.value}
-                    >
-                        {fraction.label}
-                    </option>
-                    ))}
-                </select>
-            </> 
-        )}
-
-    // Helper function to calculate the hobbled fabric addition
-    const calculateHobbledAddition = (shadeHeight) => {
-        if (type !== "hobbled") {
-            return shadeHeight;
-        }
-        // Add 5 inches for every 8 inches of height (shade height only)
-        return Math.ceil(shadeHeight / 8) * 5;
-    };
-
-    const [yardage, setYardage] = useState(null);
-    const calcYardageOld = () => {
-        if (mainrailroad === "true"){
-            if (document.getElementById('f2fw').value == 0 
-            || document.getElementById('f2fh').value == 0
-            ){
-                alert("Please fill out all relevant fields");
-                return;
-            }
-            if (mount === "outside" && document.getElementById('abvf').value == 0){
-                alert("Please fill out all relevant fields");
-                return;
-            }
-            if (type === "london"){
-                let panelHeight = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
-                if (mount === "outside"){
-                    panelHeight =+ Number(document.getElementById('abvf').value) + Number(abvf);
-                }
-                let check;
-                if (mainWidth === '') {check = 54;}
-                else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
-                if (panelHeight > check){
-                    alert("Height is too much by " + (panelHeight - check));
-                    return;
-                }
-                let cutWidth = 6.0 + Number(document.getElementById('f2fw').value) + Number(f2fw);
-                if(cutWidth % 18 !== 0){
-                    cutWidth += 18 - (cutWidth % 18);
-                }
-                calculateHobbledAddition(cutWidth);
-                cutWidth = (cutWidth / 36);
-                setYardage(cutWidth);
-                return;
-            }
-            else{
-                let panelHeight = 24.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
-                if (mount === "outside"){
-                    panelHeight =+ Number(document.getElementById('abvf').value) + Number(abvf);
-                }
-                let check;
-                if (mainWidth === '') {check = 54;}
-                else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
-                if (panelHeight > check){
-                    alert("Height is too much by " + (panelHeight - check));
-                    return;
-                }
-
-                // do i still need the +6 for london hear?
-                let cutWidth = 6.0 + Number(document.getElementById('f2fw').value) + Number(f2fw);
-                let pleats = Number(document.getElementById('london-pleats').value);
-                if (!pleats || pleats <= 0){pleats = 1;}
-                cutWidth += 12 * pleats;
-                if(cutWidth % 18 !== 0){
-                    cutWidth += 18 - (cutWidth % 18);
-                }
-                cutWidth = (cutWidth / 36);
-                setYardage(cutWidth);
-                return;
-            }
-        }
-        //this is for solid fabric (no vertical repeat)
-        if (Number(document.getElementById('mainvert').value) === 0 && Number(mainVertical) === 0){
-            console.log("no vertical repeat");
-            //inside mounting
-            if (mount === 'inside'){
-                console.log('inside');
-                if (document.getElementById('f2fw').value == 0 
-                || document.getElementById('f2fh').value == 0
-                ){
-                    alert("Please fill out all relevant fields");
-                    return;
-                }
-                const cutWidth = (Number(document.getElementById('f2fw').value) + Number(f2fw)) * 0.75 + 3;
-                let check;
-                if (mainWidth === '') {check = 54;}
-                else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
-                const widths = Math.ceil(cutWidth /check);
-                if (type != "london"){
-                    const cutLength = 20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
-                    const yardDiff = cutLength % 9;
-                    let cutYards = cutLength;
-                    if (yardDiff !== 0){
-                        cutYards += (9 - yardDiff);
-                    }    
-                    calculateHobbledAddition(cutYards);
-                    cutYards = (cutYards / 36).toFixed(2); 
-                    setYardage(widths * cutYards);
-                    return;
-                } else{
-                    const cutLength = 24.0 + Number(document.getElementById('f2fh').value) + Number(f2fh);
-                    const yardDiff = cutLength % 9;
-                    let cutYards = cutLength;
-                    if (yardDiff !== 0){
-                        cutYards += (9 - yardDiff);
-                    }    
-                    cutYards = (cutYards / 36).toFixed(2); 
-                    setYardage(widths * cutYards);
-                    return;
-                }
-            }
-            //outside mounting
-            else{
-                console.log("outside");
-                if (document.getElementById('f2fw').value == 0 
-                || document.getElementById('abvf').value == 0 
-                || document.getElementById('f2fh').value == 0
-                ){
-                    alert("Please fill out all relevant fields");
-                    return;
-                }
-                let check;
-                if (mainWidth === '') {check = 54;}
-                else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
-                const widths = Math.ceil(4.0 + Number(document.getElementById('f2fw').value) + Number(f2fw)) / check;
-                const obHeight = Number(document.getElementById('abvf').value) + Number(abvf) + Number(document.getElementById('f2fh').value) + Number(f2fh);
-                let cutYards = 20.0 + obHeight;
-                const yardDiff = cutYards % 9;
-                if (yardDiff !== 0){
-                    cutYards += (9 - yardDiff);
-                }    
-                calculateHobbledAddition(cutYards);
-                cutYards = (cutYards / 36).toFixed(2); 
-                setYardage(widths * cutYards);
-                return;
-            }
-        }
-        //fabrics with repeat
-        else{
-            if (document.getElementById('f2fw').value == 0 
-                || document.getElementById('mainvert').value == 0 
-                || document.getElementById('f2fh').value == 0
-                ){
-                    alert("Please fill out all relevant fields");
-                    return;
-                }
-            if (mount === "outside" && document.getElementById('abvf').value == 0){
-                alert("Please fill out all relevant fields");
-                return;
-            }
-            let repeats;
-            if (mount === "outside"){repeats = Math.ceil((20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh) + Number(document.getElementById('abvf').value) + Number(abvf)) / (Number(document.getElementById('mainvert').value) + Number(mainVertical)));}
-            else{repeats = Math.ceil((20.0 + Number(document.getElementById('f2fh').value) + Number(f2fh)) / (Number(document.getElementById('mainvert').value) + Number(mainVertical)));}
-            const cutLength = repeats * (Number(document.getElementById('mainvert').value) + Number(mainVertical)); 
-            const yardDiff = cutLength % 9;
-            let cutYards = cutLength;
-            if (yardDiff !== 0){
-                cutYards += (9 - yardDiff);
-            }    
-            calculateHobbledAddition(cutYards);
-            cutYards = (cutYards / 36).toFixed(2); 
-            let check;
-            if (mainWidth === '') {check = 54;}
-            else {check = (Number(document.getElementById('mainwidth').value) + Number(mainWidth));}
-            const widths = Math.ceil((Number(document.getElementById('f2fw').value) + Number(f2fw)) / check);
-            setYardage(widths * cutYards);
-            return;
-        }
-    }
-    const calcYardage = () => {
-        if (document.getElementById('f2fh').value && document.getElementById('f2fw').value){
-            setF2fhTotal(Number(document.getElementById('f2fh').value) + Number(f2fh));
-            setF2fwTotal(Number(document.getElementById('f2fw').value) + Number(f2fw));
-            console.log('setTotals')
-        }
-        if (mount === 'outside' && document.getElementById('abvf').value){
-            setAbvfTotal(Number(document.getElementById('abvf').value) + Number(abvf));
-        }
-        if (mainrailroad === "true") {
-            if (
-                !document.getElementById("f2fw").value ||
-                !document.getElementById("f2fh").value
-            ) {
-                alert("Please fill out all relevant fields");
-                return;
-            }
-            if (mount === "outside" && !document.getElementById("abvf").value) {
-                alert("Please fill out all relevant fields");
-                return;
-            }
-
-            // --- Railroaded Fabrics ---
-            if (type === "london") {
-                let panelHeight =
-                    24.0 + Number(document.getElementById("f2fh").value) + Number(f2fh);
-                if (mount === "outside") {
-                    panelHeight += Number(document.getElementById("abvf").value) + Number(abvf);
-                }
-
-                let check;
-                if (mainWidth === "") {
-                    check = 54;
-                } else {
-                    check = Number(document.getElementById("mainwidth").value) + Number(mainWidth);
-                }
-                if (panelHeight > check) {
-                    alert("Height is too much by " + (panelHeight - check));
-                    return;
-                }
-
-                // Width + pleats for London
-                let cutWidth = 6.0 + Number(document.getElementById("f2fw").value) + Number(f2fw);
-                let pleats = Number(document.getElementById("london-pleats").value);
-                if (!pleats || pleats <= 0) pleats = 1;
-                cutWidth += 12 * pleats;
-
-                if (cutWidth % 18 !== 0) {
-                    cutWidth += 18 - (cutWidth % 18);
-                }
-
-                cutWidth = cutWidth / 36;
-                setYardage(cutWidth);
-                return;
-            } else {
-                // Non-London (standard) railroaded
-                let panelHeight =
-                    20.0 + Number(document.getElementById("f2fh").value) + Number(f2fh);
-                if (mount === "outside") {
-                    panelHeight += Number(document.getElementById("abvf").value) + Number(abvf);
-                }
-
-                let check;
-                if (mainWidth === "") {
-                    check = 54;
-                } else {
-                    check = Number(document.getElementById("mainwidth").value) + Number(mainWidth);
-                }
-                if (panelHeight > check) {
-                    alert("Height is too much by " + (panelHeight - check));
-                    return;
-                }
-
-                let cutWidth = 6.0 + Number(document.getElementById("f2fw").value) + Number(f2fw);
-                if (cutWidth % 18 !== 0) {
-                    cutWidth += 18 - (cutWidth % 18);
-                }
-                cutWidth = cutWidth / 36;
-                setYardage(cutWidth);
-                return;
-            }
-        }
-
-        // --- SOLID FABRIC (no vertical repeat) ---
-        if (
-            !document.getElementById("mainvert").value &&
-            Number(mainVertical) === 0
-        ) {
-            console.log("no vertical repeat");
-
-            // Inside mount
-            if (mount === "inside") {
-                console.log("inside");
-                if (
-                    !document.getElementById("f2fw").value||
-                    !document.getElementById("f2fh").value
-                ) {
-                    alert("Please fill out all relevant fields");
-                    return;
-                }
-
-                // --- Width + Pleats ---
-                let cutWidth = (Number(document.getElementById("f2fw").value) + Number(f2fw)) * 0.75 + 3;
-                if (type === "london"){
-                    let pleats = Number(document.getElementById("london-pleats").value);
-                    if (!pleats || pleats <= 0) pleats = 1;
-                    cutWidth += 12 * pleats;
-                }
-
-                let check;
-                if (mainWidth === "") {
-                    check = 54;
-                } else {
-                    check = Number(document.getElementById("mainwidth").value) + Number(mainWidth);
-                }
-                const widths = Math.ceil(cutWidth / check);
-
-                // --- Height ---
-                const baseAdd = type === "london" ? 24.0 : 20.0;
-                let cutLength = baseAdd + Number(document.getElementById("f2fh").value) + Number(f2fh);
-
-                const yardDiff = cutLength % 9;
-                if (yardDiff !== 0) cutLength += 9 - yardDiff;
-
-                calculateHobbledAddition(cutLength);
-                cutLength = (cutLength / 36).toFixed(2);
-                setYardage(widths * cutLength);
-                return;
-            }
-
-            // Outside mount
-            else {
-                console.log("outside");
-                if (
-                    !document.getElementById("f2fw").value ||
-                    !document.getElementById("abvf").value ||
-                    !document.getElementById("f2fh").value
-                ) {
-                    alert("Please fill out all relevant fields");
-                    return;
-                }
-
-                let check;
-                if (mainWidth === "") {
-                    check = 54;
-                } else {
-                    check = Number(document.getElementById("mainwidth").value) + Number(mainWidth);
-                }
-
-                // --- Width + Pleats ---
-                let cutWidth =
-                    4.0 + Number(document.getElementById("f2fw").value) + Number(f2fw);
-                if (type === "london"){
-                    let pleats = Number(document.getElementById("london-pleats").value);
-                    if (!pleats || pleats <= 0) pleats = 1;
-                    cutWidth += 12 * pleats;
-                }
-
-                const widths = Math.ceil(cutWidth / check);
-
-                // --- Height ---
-                const baseAdd = type === "london" ? 24.0 : 20.0;
-                const obHeight =
-                    Number(document.getElementById("abvf").value) +
-                    Number(abvf) +
-                    Number(document.getElementById("f2fh").value) +
-                    Number(f2fh);
-                let cutYards = baseAdd + obHeight;
-
-                const yardDiff = cutYards % 9;
-                if (yardDiff !== 0) cutYards += 9 - yardDiff;
-
-                calculateHobbledAddition(cutYards);
-                cutYards = (cutYards / 36).toFixed(2);
-                setYardage(widths * cutYards);
-                return;
-            }
-        }
-
-        // --- FABRICS WITH REPEAT ---
-        else {
-            if (
-                !document.getElementById("f2fw").value ||
-                !document.getElementById("mainvert").value ||
-                !document.getElementById("f2fh").value
-            ) {
-                alert("Please fill out all relevant fields");
-                return;
-            }
-            if (mount === "outside" && document.getElementById("abvf").value == 0) {
-                alert("Please fill out all relevant fields");
-                return;
-            }
-
-            // --- Repeats calculation ---
-            const baseAdd = type === "london" ? 24.0 : 20.0;
-            let repeats;
-            if (mount === "outside") {
-                repeats = Math.ceil(
-                    (baseAdd +
-                        Number(document.getElementById("f2fh").value) +
-                        Number(f2fh) +
-                        Number(document.getElementById("abvf").value) +
-                        Number(abvf)) /
-                        (Number(document.getElementById("mainvert").value) + Number(mainVertical))
-                );
-            } else {
-                repeats = Math.ceil(
-                    (baseAdd +
-                        Number(document.getElementById("f2fh").value) +
-                        Number(f2fh)) /
-                        (Number(document.getElementById("mainvert").value) + Number(mainVertical))
-                );
-            }
-
-            const cutLength =
-                repeats *
-                (Number(document.getElementById("mainvert").value) + Number(mainVertical));
-
-            const yardDiff = cutLength % 9;
-            let cutYards = cutLength;
-            if (yardDiff !== 0) cutYards += 9 - yardDiff;
-
-            calculateHobbledAddition(cutYards);
-            cutYards = (cutYards / 36).toFixed(2);
-
-            // --- Width + Pleats ---
-            let cutWidth = Number(document.getElementById("f2fw").value) + Number(f2fw);
-            if (type === "london"){
-                let pleats = Number(document.getElementById("london-pleats").value);
-                if (!pleats || pleats <= 0) pleats = 1;
-                cutWidth += 12 * pleats;
-            }
-
-            let check;
-            if (mainWidth === "") {
-                check = 54;
-            } else {
-                check = Number(document.getElementById("mainwidth").value) + Number(mainWidth);
-            }
-            const widths = Math.ceil(cutWidth / check);
-
-            setYardage(widths * cutYards);
-            return;
-        }
-    };
-
-
-    const [price, setPrice] = useState(null);
-    const [stabilizer, setStabilizer] = useState("yes");
-    const calcPrice = () => {
-        if (!f2fhTotal || !f2fwTotal
-        || !opFunction || !lined){
-            alert("Please fill out all relevant fields");
-            return;
-        }
-        const width = f2fwTotal;
-        let height = f2fhTotal
-        if (mount === "outside"){//outside
-            if (abvfTotal == null){
-                alert("Please fill out all relevant fields");
-                return;
-            }
-            height += abvfTotal;
-        }
-        let sqFootage = width * height;
-        
-        sqFootage = Math.ceil(sqFootage / 144);
-        const basePrice = sqFootage * getLiningPrice(lined);
-        let addPrice = 0;
-        if (opFunction === "cordlock" || opFunction === "lift"){
-            if (!stabilizer){
-                alert("Please fill out all relevant fields");
-                return;
-            }
-            if (stabilizer === "yes"){
-                addPrice = 4.0 * sqFootage;
-            }
-        }
-        else if (opFunction === "cordless"){
-            addPrice = 30.0 * (width) / 12;
-        }
-        else{//this is for motorized
-            addPrice = 650.0;
-            const extraFeet = Math.ceil(((width) - 72) / 12);
-            if (extraFeet > 2)
-                addPrice += (extraFeet - 2) * 45.0;
-        }
-        let bandingPrice = 0;
-        if (banding){
-            if (document.getElementById("banding bottom").checked){
-                bandingPrice += Math.ceil(width / 12);
-            }
-            if (document.getElementById("banding top").checked){
-                bandingPrice += Math.ceil(width / 12);
-            }
-            if (document.getElementById("banding inside").checked){
-                bandingPrice += 2 * Math.ceil((height + 10) / 12);
-            }
-            if (document.getElementById("banding outside").checked){
-                bandingPrice += 2 * Math.ceil((height + 10) / 12);
-            }
-            bandingPrice *= 13;
-        }
-        console.log(basePrice);
-        console.log(addPrice);
-        console.log(bandingPrice);
-        setPrice(basePrice + " for yardage + " + addPrice + " for operating function + " + bandingPrice + " for banding = " + (bandingPrice + basePrice + addPrice));
-    }
-
-    const checkNum = (e) => {if (!e.target.validity.valid) e.target.value = '';}
+      } */
 
     return(
-        <div className="container">
+        <div className="container container-row">
+            <div className='container left'>
             {formSection === 1 && <div className='form-group-indent'>
                 <h1>Roman Shade Dimensions</h1>
+                <>
                 {/* <label>
                     Please load a photo of the window:
                     <input type='file' onChange={handleImageUpload} style={{marginLeft:'15px'}} multiple></input>
@@ -794,7 +653,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                     <input value='in' type='radio' name='units1' onChange={handleUnits1}
                         style={{marginLeft:'25px'}} checked={units1 === 'in'}></input> Inches
                 </label><br></br> */}
-
+                </>
                     <div className="form-section">
                         <div className='row dimensions-section'>
                             <div className='column'>
@@ -802,33 +661,34 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                                 <div>
                                     <label>
                                         <input type='radio' name='type' style={{marginRight:'5px'}}
-                                        onChange={handleType} value={'flat'} defaultChecked={true}>
+                                        onChange={handleType} value={'Flat'} defaultChecked={true}>
                                         </input>
                                         Flat
                                     </label> <br />
                                     <label>
                                         <input type='radio' name='type' style={{marginRight:'5px'}}
-                                        onChange={handleType} value={'relaxed'} >
+                                        onChange={handleType} value={'Relaxed'} >
                                         </input>
                                         Relaxed
                                     </label> <br />
                                     <label>
                                         <input type='radio' name='type' style={{marginRight:'5px'}}
-                                        onChange={handleType} value={'hobbled'} >
+                                        onChange={handleType} value={'Hobbled'} >
                                         </input>
                                         Hobbled
                                     </label> <br />
                                     <label>
                                         <input type='radio' name='type' style={{marginRight:'5px'}}
-                                        onChange={handleType} value={'london'} >
+                                        onChange={handleType} value={'London'} >
                                         </input>
                                         London
                                     </label> <br />
-                                    {type === 'london' && <div>
+                                    {type === 'London' && <div>
                                         <label style={{marginLeft:'25px'}}>
                                             How many pleats do you want? <br />
-                                            <input type="text" name='london-pleats' ></input>
-                                        </label> <br />
+                                            <input type="number" className='fixed-width-input' 
+                                            name='London-pleats' onInput={checkNum}></input>
+                                        </label>
                                     </div>} <br />
                                 </div>
                             </div>
@@ -837,12 +697,12 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                                 <div>
                                     <label className="radio-label"> 
                                         <input type='radio' name='mount' defaultChecked={true}
-                                        value={'inside'} onChange={handleMount}></input>
+                                        value={'Inside'} onChange={handleMount}></input>
                                         Inside
                                     </label>
                                     <label className="radio-label">
                                         <input type='radio' name='mount'
-                                        value={'outside'} onChange={handleMount}></input>
+                                        value={'Outside'} onChange={handleMount}></input>
                                         Outside
                                     </label>
                                 </div>
@@ -852,26 +712,29 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                                     <label className='dimension-label'>
                                         Frame-to-frame width:
                                     </label><br />
-                                    <input className='fixed-width-input' min="0" onInput={checkNum}id='f2fw'></input>
-                                    {units1 === 'in' && <>
+                                    <input type='number' className='fixed-width-input' min="0" placeholder={f2fw || 0}
+                                    onInput={checkNum} id='f2fw' onChange={handlef2fw}></input>
+                                    {<>
                                         <Dropdown
-                                            value = {f2fw}
-                                            change = {handlef2fw}
+                                            value = {f2fwFrac}
+                                            change = {handlef2fwFrac}
                                         ></Dropdown>
                                     </>}<br></br>
                                     <label className='dimension-label'>
                                         Frame-to-frame height (to sill): 
                                     </label> <br />
-                                    <input id='f2fh' className='fixed-width-input' min="0" onInput={checkNum} ></input>
-                                    {units1 === 'in' && <>
+                                    <input id='f2fh' type='number' className='fixed-width-input' min="0" placeholder={f2fh || 0}
+                                    onInput={checkNum} onChange={handlef2fh} ></input>
+                                    {<>
                                         <Dropdown
-                                            value = {f2fh}
-                                            change = {handlef2fh}
+                                            value = {f2fhFrac}
+                                            change = {handlef2fhFrac}
                                         ></Dropdown>
                                     </>}
                                 </div>
 
-                                {mount === 'outside' && <div >
+                                {mount === 'Outside' && <div >
+                                    <>
                                     {/* <label >
                                         Above frame to ceiling:
                                         <input id='abvc' style={{marginLeft:'289px'}}></input>
@@ -882,14 +745,16 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                                             change = {handleabvc}
                                         ></Dropdown>
                                     </>}<br></br> */}
+                                    </>
                                     <label className='dimension-label'>
                                         How far above frame:
                                     </label><br />
-                                    <input id='abvf' className='fixed-width-input' min="0" onInput={checkNum}></input>
-                                    {units1 === 'in' && <>
+                                    <input id='abvf' type='number' className='fixed-width-input' min="0" placeholder={abvf || 0}
+                                    onInput={checkNum} onChange={handleabvf}></input>
+                                    {<>
                                         <Dropdown
-                                            value = {abvf}
-                                            change = {handleabvf}
+                                            value = {abvfFrac}
+                                            change = {handleabvfFrac}
                                         ></Dropdown>
                                     </>}
                                     <br></br><br></br>
@@ -918,19 +783,19 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                         <h4>Are you using COM material?</h4>
                         <div>
                             <label className="radio-label">
-                                <input type='radio' name='COM'
+                                <input type='radio' name='COM' defaultChecked={com === 'yes'}
                                 value={'yes'} onChange={handleCom}></input>
                                 Yes
                             </label>
                             <label className="radio-label">
-                                <input type='radio' name='COM'
+                                <input type='radio' name='COM' defaultChecked={com === 'no'}
                                 value={'no'} onChange={handleCom}></input>
                                 No (you will purchase your material from Plaza Park Interiors)
                             </label>
                         </div><br />
 
                         <h4>Main Fabric specifications: <small>Please note all yardage will be based on 54” wide, solid goods if specifications are not provided.</small></h4>
-                        
+                        <>
                         {/* <label>What units are the measurements in?</label>
                         <label className="radio-label">
                             <input value='cm' type='radio' name='units2' onChange={handleUnits2}></input> Centimeters
@@ -941,17 +806,19 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                         </label> 
                         <br />
                         */}
+                        </>
                         <div className='row dimensions-section'>
                         <div className='column'>
                             <label>
                                 Width:
                                 <br />
-                                <input type='number' id='mainwidth' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                                <input type='number' id='mainwidth' className='fixed-width-input' min="0" 
+                                onInput={checkNum} onChange={handleMainWidth} placeholder={mainWidth || 0}></input>
                             </label>
-                            {units2 === 'in' && <>
+                            {<>
                                 <Dropdown
-                                value={mainWidth}
-                                change={handleMainWidth}
+                                value={mainWidthFrac}
+                                change={handleMainWidthFrac}
                                 ></Dropdown>
                             </>}
                         </div><br />
@@ -959,12 +826,13 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                             <label>
                                 Vertical repeat:
                                 <br />
-                                <input type='number' id='mainvert' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                                <input type='number' id='mainvert' className='fixed-width-input' min="0" 
+                                onInput={checkNum} onChange={handleMainVertical} placeholder={mainVertical || 0}></input>
                             </label>
-                            {units2 === 'in' && <>
+                            {<>
                                 <Dropdown
-                                value={mainVertical}
-                                change={handleMainVertical}
+                                value={mainVerticalFrac}
+                                change={handleMainVerticalFrac}
                                 ></Dropdown>
                             </>}
                         </div><br />
@@ -972,12 +840,13 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                             <label>
                                 Horizontal repeat:
                                 <br />
-                                <input type='number' id='mainhorizontal' className='fixed-width-input' min="0" onInput={checkNum}></input>
+                                <input type='number' id='mainhorizontal' className='fixed-width-input' min="0" 
+                                onInput={checkNum} onChange={handleMainHorizontal} placeholder={mainHorizontal || 0}></input>
                             </label>
-                            {units2 === 'in' && <>
+                            {<>
                                 <Dropdown
-                                value={mainHorizontal}
-                                change={handleMainHorizontal}
+                                value={mainHorizontalFrac}
+                                change={handleMainHorizontalFrac}
                                 ></Dropdown>
                             </>}
                         </div>
@@ -1012,24 +881,28 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                                 <h4>Embellishments</h4>
                                 <div>
                                     <label className="checkbox-label">
-                                        <input type="checkbox" onChange={() => {setBanding(!banding)}}/>
+                                        <input type="checkbox" onChange={() => {setBanding(!banding);  setTrim([])}}/>
                                         Ready to use banding/trim
                                     </label>
                                     {banding && <div className="sub-option-indent">
                                         <label className="checkbox-label">
-                                            <input type="checkbox" name="banding-type" id='banding bottom'/>
+                                            <input type="checkbox" name="banding-type" id='Bottom' value='Bottom'
+                                            onChange={handleTrim} defaultChecked={trim.includes('Bottom')}/>
                                             Bottom
                                         </label>
                                         <label className="checkbox-label">
-                                            <input type="checkbox" name="banding-type" id='banding inside'/>
+                                            <input type="checkbox" name="banding-type" id='Inside' value='Inside'
+                                            onChange={handleTrim} defaultChecked={trim.includes('Inside')}/>
                                             Inside Edge
                                         </label>
                                         <label className="checkbox-label">
-                                            <input type="checkbox" name="banding-type" id='banding outside'/>
+                                            <input type="checkbox" name="banding-type" id='Outside' value='Outside'
+                                            onChange={handleTrim} defaultChecked={trim.includes('Outside')}/>
                                             Outside Edge
                                         </label>
                                         <label className="checkbox-label">
-                                            <input type="checkbox" name="banding-type" id='banding top'/>
+                                            <input type="checkbox" name="banding-type" id='Top' value='Top'
+                                            onChange={handleTrim} defaultChecked={trim.includes('Top')}/>
                                             Top
                                         </label>
                                     </div>}
@@ -1038,19 +911,15 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                             <div className='column'>
                                 <h4>How are we running the fabric?</h4>
                                 <label className="radio-label">
-                                    <input type='radio' name='mainrailroad'
+                                    <input type='radio' name='mainrailroad' defaultChecked={mainrailroad === 'false'}
                                     value={'false'} onChange={handleMainRailroad}></input>
                                     Up the bolt
                                 </label>
                                 <label className="radio-label">
-                                    <input type='radio' name='mainrailroad'
+                                    <input type='radio' name='mainrailroad' defaultChecked={mainrailroad === 'true'}
                                     value={'true'} onChange={handleMainRailroad}></input>
                                     Railroading
                                 </label><br />
-                            </div>
-                            <div className='column'>
-                                <button className='button-other' onClick={() => {calcYardage()}}>Calculate yardage</button>
-                                {yardage} <br />
                             </div>
                         </div>
                     </div>
@@ -1058,9 +927,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                     <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
                 </div>
             }
-            
-
-
+        
             {formSection === 2 && <div className="form-group-indent">
                 <h1>Roman Shade Materials</h1>
                 <div className='form-section'> 
@@ -1070,29 +937,29 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                             <div className="form-section">
                                 <label> 
                                     <input type='radio' name='opFunction' style={{marginRight:'5px'}} defaultChecked={true}
-                                    value={'cordless'} onChange={handleOpFunction}></input>
+                                    value={'Cordless'} onChange={handleOpFunction}></input>
                                     Cordless
                                 </label> <br></br>
                                 <label> 
                                     <input type='radio' name='opFunction' style={{marginRight:'5px'}} 
-                                    value={'cordlock'} onChange={handleOpFunction}></input>
+                                    value={'Cordlock'} onChange={handleOpFunction}></input>
                                     Cordlock
                                 </label> <br></br>
                                 <label> 
                                     <input type='radio' name='opFunction' style={{marginRight:'5px'}}
-                                    value={'lift'} onChange={handleOpFunction}></input>
+                                    value={'Lift'} onChange={handleOpFunction}></input>
                                     Clutch Lift
                                 </label> <br></br>
                                 <label> 
                                     <input type='radio' name='opFunction' style={{marginRight:'5px'}}
-                                    value={'motorized'} onChange={handleOpFunction}></input>
+                                    value={'Motorized'} onChange={handleOpFunction}></input>
                                     Motorized (pick 1):
                                 </label> <br></br>
                                 <br></br>
                             </div>
                         </div>
                         <div className='column'>
-                            {opFunction === 'lift' && <div>
+                            {opFunction === 'Lift' && <div>
                                 <h4>Lift Options</h4>
                                 <label>
                                     <input name='lift-color' defaultChecked={true} type='radio' style={{marginRight:'5px'}} onClick={() => {setBead("Steel")}}></input>
@@ -1116,7 +983,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                                 </label> <br />
 
                             </div>}
-                            {opFunction === "motorized" &&  <div>
+                            {opFunction === "Motorized" &&  <div>
                                 <h4>Motorized Options</h4>
                                 <label> 
                                     <input type='radio' defaultChecked = {true} name='motorType'
@@ -1129,19 +996,19 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                                     Plug in
                                 </label> <br></br><br></br>
                             </div>}
-                            {(opFunction === "cordlock") && <div>
+                            {(opFunction === "Cordlock") && <div>
                                 <h4>Stabilizer Bars</h4>
                                 <label><input type="radio" defaultChecked={true} name='stablizer' onChange={() => setStabilizer("yes")}/> Yes</label>
                                 <br /><label><input type="radio" name='stablizer' onChange={() => setStabilizer("no")}/> No</label>
                             </div>}
                         </div>
                         <div className='column'>
-                            {(opFunction === "lift") && <div>
+                            {(opFunction === "Lift") && <div>
                                 <h4>Stabilizer Bars</h4>
                                 <label><input type="radio" defaultChecked={true} name='stablizer' onChange={() => setStabilizer("yes")}/> Yes</label>
                                 <br /><label><input type="radio" name='stablizer' onChange={() => setStabilizer("no")}/> No</label>
                             </div>}
-                            {opFunction === "motorized" && <div>
+                            {opFunction === "Motorized" && <div>
                                 <h4>Existing Home Automation</h4>
                                 <label>
                                     <input type='radio' name='homeAuto' 
@@ -1233,60 +1100,42 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                             French Blackout = Face fabric + 3 layered linings
                             </label>
                         </div>
-                        <div className='column'>
-                            <button className='button-other' onClick={() => {calcPrice()}}>Calculate Price</button> 
-                            <br />{price}
-                        </div>
                     </div>
-                    
-                    
-                    <br></br>
-                </div>
-
-                <div className='form-section'></div>
+                </div> <br />
                 
-                <button className="next-button" onClick={() => handleFormSection(prev => prev + 1)}>Next</button>
                 <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
             </div>}
 
-            {formSection === 3 && <div className='form-group-indent'>
-                <h1>Review & Submit</h1><br />
-
+            </div>
+            <div className="container right">
+                <h1>Review</h1>
                 <div className="form-section">
                     <div className='row dimensions-section'>
                         <div className='column'>
-                            Frame to frame width: {f2fwTotal}  <br />
-                            Frame to frame height: {f2fhTotal}  <br />
-                            {mount === 'outside' && <>
-                                How far above frame: {abvfTotal} <br />
+                            Frame to frame width: {getTotal(f2fw, f2fwFrac)}  <br />
+                            Frame to frame height: {getTotal(f2fh, f2fhFrac)}  <br />
+                            {mount === 'Outside' && <>
+                                How far above frame: {getTotal(abvf, abvfFrac)} <br />
                             </>}
                             Mounting type: {mount}<br />
                             Type of Roman: {type}<br />
+                            Fabric running: {mainrailroad ==='true' ? 'Railroaded' : 'Up the bolt'}<br />
                         </div>
                         <div className='column'>
                             COM material: {com ==='yes' ? 'Yes' : 'No'}<br />
-                            Main fabric width: {mainWidth || 54}  <br />
-                            Main fabric vertical repeat: {mainVertical || 0}  <br />
-                            Main fabric horizontal repeat: {mainHorizontal || 0} <br />
-                            Lining type: {lined}<br />
-                            
+                            Main fabric width: {getTotal(mainWidth, mainWidthFrac)}  <br />
+                            Main fabric vertical repeat: {getTotal(mainVertical, mainVerticalFrac)}  <br />
+                            Main fabric horizontal repeat: {getTotal(mainHorizontal, mainHorizontalFrac)} <br />
+                            Lining type: {lined} <br />
+                            Embellishments: {banding ? trim.length > 0 ? trim.join(', ') : 'None' : 'None'}<br />
                         </div>
-                    </div>
-                </div>
-                <div className='form-section'>
-                    <div className='row dimensions-section'>
                         <div className='column'>
                             Yardage required: {yardage} yards<br />
-
-                        </div>
-                        <div className='column'>
                             Price estimate: {price}<br />
                         </div>
                     </div>
                 </div>
-                <button className="back-button" onClick={() => handleFormSection(prev => prev - 1)}>Back</button>
-            </div> }
-
+            </div>
         </div>
     )
 }

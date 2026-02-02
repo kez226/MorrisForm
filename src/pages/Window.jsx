@@ -1,31 +1,33 @@
 import '../App.css';
 import '../styles.css'
+import { useEffect, useState } from 'react';
 
 import Drapery from './Drapery';
 import Roman from './Roman';
 import Valance from './Valance';
-import HardTreatments from './HardTreatments';
 import Pillows from './Pillows';
 import Cushions from './Cushions';
-import React, { useEffect, useState } from 'react';
+
+// Other treatment option that we aren't currently using
+import HardTreatments from './HardTreatments';
 
 const Window = () => {
-  const [pname,setPName] = useState('');
+  const [pname,setPName] = useState('');      //project name
   const [address,setAddress] = useState('');
   const [name,setName] = useState('');
-  const [estName,setEstName] = useState('');
-  const [contact,setContact] = useState('');
-  const [room,setRoom] = useState('');
-  const [windows,setWindows] = useState('');
-  // const [existingTreatment, setExistingTreatment] = useState(false);
-  // const [drapery, setDrapery] = useState(false);
-  // const [roman, setRoman] = useState(false);
-  // const [valence, setValence] = useState(false);
-  // const [hard, setHard] = useState(false);
-  // const [pillows, setPillow] = useState(false);
-  // const [cushions, setCushion] = useState(false);
+  const [estName,setEstName] = useState('');  //estimator name
+  const [contact,setContact] = useState(''); 
+  const [room,setRoom] = useState(''); 
+  const [windows,setWindows] = useState(''); 
 
+  const [treatmentType, setTreatmentType] = useState('');
+  const handleTreatmentType = (event) => {setTreatmentType(event.target.value);};
+
+  // This is what we use to track which section of the form we are on
+  // 0 = Home page, 1 = First page of treatment form, 2 = Second page of treatment form
   const [formSection, setFormSection] = useState(0);
+
+  // Function called when we try to change form sections
   const handleFormSection = (str) => {
     if (treatmentType === '') {
       alert('Please select a treatment type before proceeding.');
@@ -34,11 +36,13 @@ const Window = () => {
     if(str === 'next'){setFormSection(formSection + 1);} 
     else {
       setFormSection(formSection - 1);
-      setTreatmentType('');
-    }};
-  const [treatmentType, setTreatmentType] = useState('');
-  const handleTreatmentType = (event) => {setTreatmentType(event.target.value);};
+      // If we are going back to the home page, reset treatment type
+      if (formSection === 0) setTreatmentType('');
+    }
+  };
 
+  // Not really being used currently
+  // Used to check the number of uploads has been done
   const [uploads, setUploads] = useState(0);
 
   const handleNameChange = (event) => {setName(event.target.value);};
@@ -48,64 +52,18 @@ const Window = () => {
   const handleContactChange = (event) => {setContact(event.target.value);};
   const handleRoom = (event) => {setRoom(event.target.value);};
   const handleWindows = (event) => {setWindows(event.target.value);};
-  // const handleExistingChange = (event) => {setExistingTreatment(event.target.value);};
-  // const handleDraperyChange = (event) => {
-  //     setDrapery(event.target.checked);
-  //   // if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
-  //   //   setDrapery(event.target.checked);
-  //   // }else{
-  //   //   alert('Please fill out all fields about your project');
-  //   // }
-  // };
-  // const handleRomanChange = (event) => {
-  //   // if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
-  //   //   setRoman(event.target.checked);
-  //   // }else{
-  //   //   alert('Please fill out all fields about your project');
-  //   // }
-  //     setRoman(event.target.checked);
 
-  // };
-  // const handleValenceChange = (event) => {
-  //   // if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
-  //   //   setValence(event.target.checked);
-  //   // }else{
-  //   //   alert('Please fill out all fields about your project');
-  //   // }
-  //     setValence(event.target.checked);
-
-  // };
-  // const handleHardChange = (event) => {
-  //   if(name !== '' && contact !== '' && pname !== '' && address !== '' && windows !== '' && room !== ''){
-  //     setHard(event.target.checked);
-  //   }else{
-  //     alert('Please fill out all fields about your project');
-  //   }
-  // };
-  // const handlePillow = (event) => {
-  //   // if(name !== '' && contact !== '' && pname !== '' && address !== ''){
-  //   //   setPillow(event.target.checked);
-  //   // }else{
-  //   //   alert('Please fill out all fields about your project');
-  //   // }
-  //     setPillow(event.target.checked);
-
-  // };
-  // const handleCushion = (event) => {
-  //   // if(name !== '' && contact !== '' && pname !== '' && address !== ''){
-  //   //   setCushion(event.target.checked);
-  //   // }else{
-  //   //   alert('Please fill out all fields about your project');
-  //   // }
-  //     setCushion(event.target.checked);
-
-  // };
-
+  // Also not being used
+  // If we upload the current estimate, we want to return to the home page
+  // and reset room and window fields so we can start another estimate
   useEffect(() => {
     setWindows('');
     setRoom('');
   },[uploads])
 
+
+  // Honestly not sure if this is needed anymore
+  // Test folder creation in google drive via google apps script
   async function testFolder() {
     const url = "https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec";
   
@@ -123,7 +81,7 @@ const Window = () => {
   }
 
   return(<><div>
-
+    {/* This is the main home page section */}
       {formSection == 0 && 
         <div className="main-content-wrapper">
           <div className="container">
@@ -211,73 +169,43 @@ const Window = () => {
         </div>
       }
 
-      {formSection > 0 && 
-          <div>
-            {treatmentType === 'drapery' && <Drapery 
-              name={name} pname={pname} address={address} email={contact} estName={estName}
-              room={room}
-              numWindow={windows}
-              uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
-            ></Drapery>}
-            {treatmentType === 'roman' && <Roman 
-              name={name} pname={pname} address={address} email={contact} estName={estName}
-              room={room}
-              numWindow={windows}
-              uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
-            ></Roman>}
-            {treatmentType === 'valence' && <Valance 
-              name={name} pname={pname} address={address} email={contact} estName={estName}
-              room={room}
-              numWindow={windows}
-              uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
-            ></Valance>}
-            {treatmentType === 'pillows' && <Pillows 
-              name={name} pname={pname} address={address} email={contact} estName={estName}
-              room={room}
-              numWindow={windows}
-              uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
-            ></Pillows>}
-            {treatmentType === 'cushions' && <Cushions 
-              name={name} pname={pname} address={address} email={contact} estName={estName}
-              room={room}
-              numWindow={windows}
-              uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
-            ></Cushions>}
-            {/* <button className="next-button" onClick={() => handleFormSection("next")}>Next</button>
-            <button className="back-button" onClick={() => handleFormSection("back")}>Back</button> */}
-          </div>
-        
-      }
-
+      {/* Here we check what treatment type was selected before the next button was pressed and render the appropriate component       
+          We also pass the information collected but we aren't currently using that info (name,room)
+          Would be used for when the estimation is sent to the excel sheet/other db options*/}
+      {formSection > 0 && <div>
+        {treatmentType === 'drapery' && <Drapery 
+          name={name} pname={pname} address={address} email={contact} estName={estName}
+          room={room}
+          numWindow={windows}
+          uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
+        ></Drapery>}
+        {treatmentType === 'roman' && <Roman 
+          name={name} pname={pname} address={address} email={contact} estName={estName}
+          room={room}
+          numWindow={windows}
+          uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
+        ></Roman>}
+        {treatmentType === 'valence' && <Valance 
+          name={name} pname={pname} address={address} email={contact} estName={estName}
+          room={room}
+          numWindow={windows}
+          uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
+        ></Valance>}
+        {treatmentType === 'pillows' && <Pillows 
+          name={name} pname={pname} address={address} email={contact} estName={estName}
+          room={room}
+          numWindow={windows}
+          uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
+        ></Pillows>}
+        {treatmentType === 'cushions' && <Cushions 
+          name={name} pname={pname} address={address} email={contact} estName={estName}
+          room={room}
+          numWindow={windows}
+          uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
+        ></Cushions>}
+      </div>}
     </div>
-
-    {/* <button onClick={testFolder}>button</button> */}
-
-      {/* {drapery && <div style={{padding:'5px'}}><Drapery 
-      name={name} pname={pname} address={address} email={contact} estName={estName}
-      room={document.getElementById('room').value}
-      numWindow={document.getElementById('windowNum').value}
-      uploads={setUploads}
-      ></Drapery></div>}
-      
-      {roman && <div style={{padding:'5px'}}><Roman
-      name={name} pname={pname} address={address} email={contact} estName={estName}
-      room={document.getElementById('room').value}
-      numWindow={document.getElementById('windowNum').value}
-      uploads={setUploads}></Roman></div>}
-
-      {valence && <div style={{padding:'5px'}}><Valance
-      name={name} pname={pname} address={address} email={contact} estName={estName}
-      room={document.getElementById('room').value}
-      numWindow={document.getElementById('windowNum').value}
-      uploads={setUploads}
-      ></Valance></div>}
-      {hard && <div style={{padding:'5px'}}><HardTreatments></HardTreatments></div>}
-      {pillows && <div style={{padding:'5px'}}><Pillows
-      name={name} pname={pname} address={address} email={contact} estName={estName}></Pillows></div>}
-      {cushions && <div style={{padding:'5px'}}><Cushions
-      name={name} pname={pname} address={address} email={contact} estName={estName}></Cushions></div>} */}
-  </>)
+    </>)
 }
 
 export default Window;
