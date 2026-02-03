@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, formSection, handleFormSection}) => {
+const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, formSection, handleFormSection, linings}) => {
     const[mount, setMount] = useState('Inside');
     const[opFunction, setOpFunction] = useState('Cordless');
     const[motorType, setMotorType] = useState('battery'); // Value isn't used but included for completeness
@@ -96,24 +96,6 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
                 </select>
             </> 
     )}
-
-    const [linings, setLinings] = useState();
-    useEffect(() => {
-        fetch('https://script.google.com/macros/s/AKfycbxPB_2UsBjeXSeMmpmraXDAmu5Q1lJ6GX_vB6eoeqjrPflKnsLhN6VxF4wkJlBYUPRL1w/exec', {method: "GET"})
-        .then(response => response.json()).then(
-            data => {
-                setLinings({
-                    'Unlined': data.msg[0][1],
-                    'Self-Lined': data.msg[0][2],
-                    'Light Filtering': data.msg[0][3],
-                    'Sheer': data.msg[0][4],
-                    'Blackout': data.msg[0][5],
-                    'Lined & Standard Interlined': data.msg[0][6],
-                    'Other': data.msg[0][7], //Lined and bump, and all self-lined with other options
-                    'French Blackout': data.msg[0][8],
-                })
-            });
-    }, []);
 
     const getLiningPrice = (lining) => {
         if (lining in linings){ return linings[lining]; }
@@ -588,7 +570,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
         //     console.log(key, value); // Logs each key-value pair
         //   });
 
-        fetch("https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec", {
+        fetch(process.env.REACT_APP_FORM_SUBMISSION_API, {
             method: 'POST',
             body: formData,
         }).then(res => res.json())
@@ -607,7 +589,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
         console.log("Uploading:", {
             pname, name, address, windowImg
           });
-        const url = "https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec";
+        const url = process.env.REACT_APP_FORM_SUBMISSION_API;
       
         const uploadPromises = Array.from(windowImg).map(file => {
           return new Promise((resolve, reject) => {

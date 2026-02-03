@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import '../styles.css'
 
-const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName, formSection, handleFormSection}) => {
+const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName, formSection, handleFormSection, linings}) => {
     const[stationary, setStationary] = useState('false');
     const[ripplePercent, setRipplePercent] = useState('60%');
     const handleRipple = (event) => {setRipplePercent(event.target.value);}
@@ -81,25 +81,6 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             </select>
         </>)
     }
-
-    // Linings represents the linings and their prices fetched from the Google Sheets script
-    const [linings, setLinings] = useState(null);
-    useEffect(() => {
-        fetch('https://script.google.com/macros/s/AKfycbxPB_2UsBjeXSeMmpmraXDAmu5Q1lJ6GX_vB6eoeqjrPflKnsLhN6VxF4wkJlBYUPRL1w/exec', {method: "GET"})
-        .then(response => response.json()).then(
-            data => {
-                setLinings({
-                    'Unlined': data.msg[0][1],
-                    'Self-Lined': data.msg[0][2],
-                    'Light Filtering': data.msg[0][3],
-                    'Sheer': data.msg[0][4],
-                    'Blackout': data.msg[0][5],
-                    'Lined & Standard Interlined': data.msg[0][6],
-                    'Other': data.msg[0][7], //Lined and bump, and all self-lined with other options
-                    'French Blackout': data.msg[0][8],
-                })
-            });
-    }, []);
 
     // This function gets the pricing for the selected lining
     const getLiningPrice = (lining) => {
@@ -562,7 +543,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         //     console.log(key, value); // Logs each key-value pair
         //   });
 
-        fetch("https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec", {
+        fetch("process.env.REACT_APP_FORM_SUBMISSION_API", {
             method: 'POST',
             body: formData,
         }).then(res => res.json())
@@ -582,9 +563,9 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             const fr = new FileReader();
             fr.readAsArrayBuffer(file);
             fr.onload = f => {
-                
-                const url = "https://script.google.com/macros/s/AKfycbwlwY47vpYlfYv8YA43q9TFm0VYSJiVuKlPV4m5OGt15_SBQsKkWBVJ-B5vAi1yiTdizg/exec";
-                
+
+                const url = process.env.REACT_APP_FILE_UPLOAD_API;
+
                 const qs = new URLSearchParams({filename: file.name, mimeType: file.type});
                 fetch(`${url}?${qs}`, {method: "POST", body: JSON.stringify([...new Int8Array(f.target.result)])})
                 .then(res => res.json())
@@ -600,7 +581,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
             console.log("no images to upload");
             return;
         }
-        const url = "https://script.google.com/macros/s/AKfycbzsVchSaJPQySfT4Qk2hcXMdikph2EVy3PsAzD5p1AM7hJ-oqJodhMwYguy5kQdFlIH6A/exec";
+        const url = "process.env.REACT_APP_FORM_SUBMISSION_API";
       
         const uploadPromises = Array.from(windowImg).map(file => {
           return new Promise((resolve, reject) => {

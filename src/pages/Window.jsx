@@ -33,7 +33,13 @@ const Window = () => {
       alert('Please select a treatment type before proceeding.');
       return;
     }
-    if(str === 'next'){setFormSection(formSection + 1);} 
+    if(str === 'next'){
+      if (formSection === 0 && !linings){
+        alert('Loading pricing info... Please wait a moment and try again.');
+        return;
+      }
+      setFormSection(formSection + 1);
+    } 
     else {
       setFormSection(formSection - 1);
       // If we are going back to the home page, reset treatment type
@@ -60,6 +66,25 @@ const Window = () => {
     setWindows('');
     setRoom('');
   },[uploads])
+
+  // Linings represents the linings and their prices fetched from the Google Sheets script
+    const [linings, setLinings] = useState(null);
+    useEffect(() => {
+        fetch(process.env.REACT_APP_PRICING_API, {method: "GET"})
+        .then(response => response.json()).then(
+            data => {
+                setLinings({
+                    'Unlined': data.msg[0][1],
+                    'Self-Lined': data.msg[0][2],
+                    'Light Filtering': data.msg[0][3],
+                    'Sheer': data.msg[0][4],
+                    'Blackout': data.msg[0][5],
+                    'Lined & Standard Interlined': data.msg[0][6],
+                    'Other': data.msg[0][7], //Lined and bump, and all self-lined with other options
+                    'French Blackout': data.msg[0][8],
+                })
+            });
+    }, []);
 
 
   // Honestly not sure if this is needed anymore
@@ -163,7 +188,7 @@ const Window = () => {
                 </div>
               </div>
             </div>
-            <button className="next-button" onClick={() => handleFormSection("next")}>Next</button>
+            <button className="next-button" onClick={() => {handleFormSection("next");}}>Next</button>
 
           </div>
         </div>
@@ -177,11 +202,13 @@ const Window = () => {
           name={name} pname={pname} address={address} email={contact} estName={estName}
           room={room}
           numWindow={windows}
+          linings={linings}
           uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
         ></Drapery>}
         {treatmentType === 'roman' && <Roman 
           name={name} pname={pname} address={address} email={contact} estName={estName}
           room={room}
+          linings={linings}
           numWindow={windows}
           uploads={setUploads} formSection={formSection} handleFormSection={setFormSection}
         ></Roman>}
