@@ -47,7 +47,7 @@ const Roman = ({pname, name, address, email, room, numWindow, uploads, estName, 
     const [mainHorizontalFrac, mainHorizontalFracChange] = useState(0);
 
     const handleMainWidth = (e) => {
-        if (e.target.value === 0) mainWidthChange(54);
+        if (e.target.value === '') mainWidthChange(54);
         else mainWidthChange(e.target.value);
     };
     const handleMainVertical = (e) => {mainVerticalChange(e.target.value);};
