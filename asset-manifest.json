@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/MorrisForm/static/css/main.a7946136.css",
-    "main.js": "/MorrisForm/static/js/main.5c0f2925.js",
+    "main.js": "/MorrisForm/static/js/main.f15e4c4c.js",
     "static/js/453.e89a4e76.chunk.js": "/MorrisForm/static/js/453.e89a4e76.chunk.js",
     "index.html": "/MorrisForm/index.html",
     "main.a7946136.css.map": "/MorrisForm/static/css/main.a7946136.css.map",
-    "main.5c0f2925.js.map": "/MorrisForm/static/js/main.5c0f2925.js.map",
+    "main.f15e4c4c.js.map": "/MorrisForm/static/js/main.f15e4c4c.js.map",
     "453.e89a4e76.chunk.js.map": "/MorrisForm/static/js/453.e89a4e76.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.a7946136.css",
-    "static/js/main.5c0f2925.js"
+    "static/js/main.f15e4c4c.js"
   ]
 }
