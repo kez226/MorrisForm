@@ -8,6 +8,10 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
     const handleStationaryChange = (event) => {setStationary(event.target.value);}
 
     // No handle function, the set functions are called directly
+    const[yardage, setYardage] = useState(0);
+    const[panels, setPanels] = useState(1);
+
+
     const[fullness, setFullness] = useState(2);
     const handleFullnessChange = (event) => {
         if (event.target.value < 1.0 || event.target.value > 4.0){
@@ -17,8 +21,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         }
         else setFullness(event.target.value);
     }
-    const[yardage, setYardage] = useState(0);
-    const[panels, setPanels] = useState(1);
+    
+    const [widths, setWidths] = useState(0);
 
     const[pleat, setPleat] = useState('2 Finger Top Tack');
     const handlePleatChange = (event) => {
@@ -246,7 +250,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     let fabWidth = Number(mainWidth) + Number(mainWidth2);
                     if (fabWidth === 0) {fabWidth = 54}
                     if (check > fabWidth){alert("Height is too much by " + (check-fabWidth)); 
-                        setYardage(0);
+                        setMainRailroad('false');
                         return;}
                     setYardage(yardage);
                     return;
@@ -306,6 +310,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         }else{
             setYardage(0);
             setPrice(0);
+            setWidths(0);
         }
     }, [
         pleat,mainrailroad, panels,stationary,fullness,
@@ -346,6 +351,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         const width = f2fwFrac + f2fw;
         let height = f2fhFrac + f2fh;
         let widths = Math.ceil((width) * fullness / (Number(mainWidth) + Number(mainWidth2)));
+        setWidths(short((width) * fullness / (Number(mainWidth) + Number(mainWidth2))));
         if (panels === 2 && widths % 2 !== 0) widths += 1;
         let costPerWidth = getLiningPrice(lined);
         if (pleat === "Ripplefold") {costPerWidth += addCostPerWidth;}
@@ -919,12 +925,12 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             <div className='column'>
                                 <h4>How are we running the fabric?</h4>
                                 <label className="radio-label">
-                                    <input type='radio' name='mainrailroad' defaultChecked={mainrailroad === 'false'}
+                                    <input type='radio' name='mainrailroad' checked={mainrailroad === 'false'}
                                     value={'false'} onChange={handleMainRailroad}></input>
                                     Up the bolt
                                 </label>
                                 <label className="radio-label">
-                                    <input type='radio' name='mainrailroad' defaultChecked={mainrailroad === 'true'}
+                                    <input type='radio' name='mainrailroad' checked={mainrailroad === 'true'}
                                     value={'true'} onChange={handleMainRailroad}></input>
                                     Railroading
                                 </label><br />
@@ -1044,6 +1050,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             Embellishments: {banding ? trim.length > 0 ? trim.join(', ') : 'None' : 'None'}<br />
                         </div>
                         <div className='column'>
+                            Number of widths: {widths || 0}<br />
                             Yardage required: {short(yardage) || 0} yards<br />
                             Price estimate: {price || "$0"}<br />
                         </div>
