@@ -253,6 +253,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         setMainRailroad('false');
                         return;}
                     setYardage(yardage);
+                    setWidths("Railroaded so not applicable");
                     return;
                 }
                 //stationary
@@ -273,6 +274,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                     else{check += cutLengthAddition}
                     if (check > fabWidth){alert("Height is too much by " + (check-fabWidth)); return;}
                     setYardage(ypp * panels);
+                    setWidths("Railroaded so not applicable");
                 }
             }
         }
@@ -351,7 +353,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         const width = f2fwFrac + f2fw;
         let height = f2fhFrac + f2fh;
         let widths = Math.ceil((width) * fullness / (Number(mainWidth) + Number(mainWidth2)));
-        setWidths(short((width) * fullness / (Number(mainWidth) + Number(mainWidth2))));
+        // No widths for railroaded so only set when we are not railroaded
+        if(mainrailroad !== 'true')setWidths(short((width) * fullness / (Number(mainWidth) + Number(mainWidth2))));
         if (panels === 2 && widths % 2 !== 0) widths += 1;
         let costPerWidth = getLiningPrice(lined);
         if (pleat === "Ripplefold") {costPerWidth += addCostPerWidth;}
