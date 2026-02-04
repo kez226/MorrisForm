@@ -9,6 +9,14 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
 
     // No handle function, the set functions are called directly
     const[fullness, setFullness] = useState(2);
+    const handleFullnessChange = (event) => {
+        if (event.target.value < 1.0 || event.target.value > 4.0){
+            alert("Fullness must be between 1 and 4");
+            setFullness(2);
+            event.target.value = ""
+        }
+        else setFullness(event.target.value);
+    }
     const[yardage, setYardage] = useState(0);
     const[panels, setPanels] = useState(1);
 
@@ -337,7 +345,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
         }
         const width = f2fwFrac + f2fw;
         let height = f2fhFrac + f2fh;
-        const widths = Math.ceil((width) * fullness / 54.0);
+        let widths = Math.ceil((width) * fullness / (Number(mainWidth) + Number(mainWidth2)));
+        if (panels === 2 && widths % 2 !== 0) widths += 1;
         let costPerWidth = getLiningPrice(lined);
         if (pleat === "Ripplefold") {costPerWidth += addCostPerWidth;}
         const basePrice = widths * costPerWidth;
@@ -756,7 +765,8 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                         </div>}
                         {(pleat !== 'Ripplefold') &&<div className='column'>
                             <h4>What is the fullness?</h4>
-                            <label className="radio-label">
+                            <input type="number" step="0.01" onInput={checkNum} placeholder={fullness} onBlur={handleFullnessChange}/>
+                            {/* <label className="radio-label">
                                 <input defaultChecked={fullness === 1.5} type='radio' name='fullness' onClick={() => setFullness(1.5)}></input> 1.5
                             </label>
                             <label className="radio-label">
@@ -773,7 +783,7 @@ const Drapery = ({pname, name, address, email, room, numWindow, uploads, estName
                             </label>
                             <label className="radio-label">
                                 <input defaultChecked={fullness === 3} type='radio' name='fullness' onClick={() => setFullness(3)}></input> 3
-                            </label>
+                            </label> */}
                         </div>}
                         </div>
                     </div>
